@@ -28,9 +28,6 @@
         <configuration>
           <rules>
             <myCustomRule implementation="org.codehaus.mojo.enforcer.rule.BanDuplicateClassesRule">
-              <ignoreClasses>
-                <ignoreClass>org.apache.commons.logging.*</ignoreClass>
-              </ignoreClasses>
             </myCustomRule>
           </rules>
         </configuration>

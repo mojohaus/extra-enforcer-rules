@@ -10,12 +10,15 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +38,7 @@ public class BanDuplicateClassesRule implements EnforcerRule {
 
     /**
      * Convert a wildcard into a regex.
+     *
      * @param wildcard the wildcard to convert.
      * @return the equivalent regex.
      */
@@ -98,39 +102,41 @@ public class BanDuplicateClassesRule implements EnforcerRule {
             Map<String, Artifact> classNames = new HashMap<String, Artifact>();
             for (Artifact o : dependencyArtifacts) {
                 File file = o.getFile();
-                try {
-                    JarFile jar = new JarFile(file);
+                log.info(file.toString());
+                if (!file.exists()) {
+                    log.warn("Could not find " + o + " at " + file);
+                } else if (file.isDirectory()) {
                     try {
-                        outer:
-                        for (JarEntry entry : Collections.<JarEntry>list(jar.entries())) {
-                            String name = entry.getName();
-                            if (!name.endsWith(".class")) {
-                                continue;
-                            }
-                            Artifact dup = classNames.get(name);
-                            if (dup != null) {
-                                for (Pattern p : ignores) {
-                                    if (p.matcher(name).matches()) {
-                                        log.debug("Ignoring duplicate class " + name);
-                                        continue outer;
-                                    }
-                                }
-                                throw new EnforcerRuleException(
-                                        "Duplicate class " + name + " found in both " + dup + " and " + o);
-                            }
-                            classNames.put(name, o);
-                        }
-                    } finally {
-                        try {
-                            jar.close();
-                        } catch (IOException e) {
-                            // ignore
-                        }
+                    for (String name: (List<String>)FileUtils.getFileNames(file, null, null, false)) {
+                        log.info("  " + name);
+                        checkAndAddName(o, name, classNames, ignores, log);
                     }
-                } catch (IOException e) {
-                    throw new EnforcerRuleException(
-                            "Unable to process dependency " + o.toString() + " due to " + e.getLocalizedMessage(),
-                            e);
+                    } catch (IOException e) {
+                        throw new EnforcerRuleException(
+                                "Unable to process dependency " + o.toString() + " due to " + e.getLocalizedMessage()
+                                ,
+                                e);
+                    }
+                } else if (file.isFile()) {
+                    try {
+                        JarFile jar = new JarFile(file);
+                        try {
+                            for (JarEntry entry : Collections.<JarEntry>list(jar.entries())) {
+                                checkAndAddName(o, entry.getName(), classNames, ignores, log);
+                            }
+                        } finally {
+                            try {
+                                jar.close();
+                            } catch (IOException e) {
+                                // ignore
+                            }
+                        }
+                    } catch (IOException e) {
+                        throw new EnforcerRuleException(
+                                "Unable to process dependency " + o.toString() + " due to " + e.getLocalizedMessage()
+                                ,
+                                e);
+                    }
                 }
             }
 
@@ -142,6 +148,26 @@ public class BanDuplicateClassesRule implements EnforcerRule {
         } catch (InvalidDependencyVersionException e) {
             throw new EnforcerRuleException("Unable to resolve dependencies" + e.getLocalizedMessage(), e);
         }
+    }
+
+    private void checkAndAddName(Artifact artifact, String name, Map<String, Artifact> classNames,
+                                 Collection<Pattern> ignores, Log log) throws EnforcerRuleException {
+        if (!name.endsWith(".class")) {
+            return;
+        }
+        Artifact dup = classNames.get(name);
+        if (dup != null) {
+            for (Pattern p : ignores) {
+                if (p.matcher(name).matches()) {
+                    log.debug("Ignoring duplicate class " + name);
+                    return;
+                }
+            }
+            throw new EnforcerRuleException("Duplicate class " + name + " found in both " + dup + " and " + artifact)
+                    ;
+        }
+        classNames.put(name, artifact);
+
     }
 
     public boolean isCacheable() {
