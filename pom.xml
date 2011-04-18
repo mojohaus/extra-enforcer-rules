@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>mojo-sandbox-parent</artifactId>
+    <version>5-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.codehaus.mojo</groupId>
+  <artifactId>extra-enforcer-rules</artifactId>
+  <version>1.0-alpha-1-SNAPSHOT</version>
+  <packaging>maven-plugin</packaging>
+
+  <name>Extra Enforcer Rules</name>
+
+  <description>
+    Extra Enforcer Rules. These are extra rules for Apache Maven's Enforcer Plugin.
+  </description>
+
+  <inceptionYear>2011</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.codehaus.org/browse/MOJO</url>
+  </issueManagement>
+
+  <scm>
+    <connection>scm:svn:https://svn.codehaus.org/mojo/trunk/sandbox/extra-enforcer-rules</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/sandbox/extra-enforcer-rules</developerConnection>
+    <url>http://fisheye.codehaus.org/browse/mojo/trunk/sandbox/extra-enforcer-rules</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <name>Stephen Connolly</name>
+      <email>stephen.alan.connolly@gmail.com</email>
+      <roles>
+        <role>Lead Developer</role>
+      </roles>
+      <timezone>0</timezone>
+    </developer>
+  </developers>
+
+  <prerequisites>
+    <maven>2.0.9</maven>
+  </prerequisites>
+
+  <properties>
+    <api.version>1.0</api.version>
+    <maven.version>2.0.9</maven.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.enforcer</groupId>
+      <artifactId>enforcer-api</artifactId>
+      <version>${api.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>${maven.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>${maven.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>${maven.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>${maven.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>1.0-alpha-9</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <version>1.5</version>
+        <configuration>
+          <projectsDirectory>src/it</projectsDirectory>
+          <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+          <showErrors>true</showErrors>
+          <streamLogs>true</streamLogs>
+          <settingsFile>src/it/settings.xml</settingsFile>
+          <pomIncludes>
+            <pomInclude>*/pom.xml</pomInclude>
+          </pomIncludes>
+          <postBuildHookScript>verify.bsh</postBuildHookScript>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <!-- run integration tests
+          to use this profile:
+          or run integration tests: mvn -Prun-its
+      -->
+      <id>run-its</id>
+      <build>
+        <defaultGoal>verify</defaultGoal>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>integration-test</id>
+                <goals>
+                  <goal>install</goal>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <streamLogs>true</streamLogs>
+                  <debug>false</debug>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>
