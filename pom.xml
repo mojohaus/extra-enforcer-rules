@@ -11,7 +11,6 @@
   <groupId>org.codehaus.mojo</groupId>
   <artifactId>extra-enforcer-rules</artifactId>
   <version>1.0-alpha-1-SNAPSHOT</version>
-  <packaging>maven-plugin</packaging>
 
   <name>Extra Enforcer Rules</name>
 
