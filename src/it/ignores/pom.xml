@@ -9,14 +9,14 @@
 
   <dependencies>
     <dependency>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-        <version>1.1.1</version>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
     </dependency>
     <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jcl-over-slf4j</artifactId>
-        <version>1.6.1</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>1.6.1</version>
     </dependency>
   </dependencies>
 
@@ -27,9 +27,9 @@
         <version>1.0</version>
         <dependencies>
           <dependency>
-          <groupId>@project.groupId@</groupId>
-          <artifactId>@project.artifactId@</artifactId>
-          <version>@project.version@</version>
+            <groupId>@project.groupId@</groupId>
+            <artifactId>@project.artifactId@</artifactId>
+            <version>@project.version@</version>
           </dependency>
         </dependencies>
         <configuration>
