@@ -34,8 +34,9 @@
         </dependencies>
         <configuration>
           <rules>
-            <myCustomRule implementation="org.codehaus.mojo.enforcer.rule.BanDuplicateClassesRule">
-            </myCustomRule>
+            <banDuplicateClasses>
+              <findAllDuplicates>true</findAllDuplicates>
+            </banDuplicateClasses>
           </rules>
         </configuration>
       </plugin>
