@@ -14,7 +14,14 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
@@ -79,7 +86,9 @@ public class BanDuplicateClasses
         return result.toString();
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     public void execute( EnforcerRuleHelper helper )
         throws EnforcerRuleException
     {
@@ -266,16 +275,25 @@ public class BanDuplicateClasses
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isCacheable()
     {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isResultValid( EnforcerRule enforcerRule )
     {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getCacheId()
     {
         return "Does not matter as not cacheable";
