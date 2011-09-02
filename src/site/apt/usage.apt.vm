@@ -47,7 +47,7 @@ Usage
           </dependencies>
         </plugin>
       </plugins>
-    <pluginManagement>
+    </pluginManagement>
   </build>
   [...]
 </project>

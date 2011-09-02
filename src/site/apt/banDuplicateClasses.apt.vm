@@ -65,7 +65,7 @@ Ban Duplicate Classes
                     <!-- example of ignoring with wildcards -->
                     <ignoreClass>org.apache.commons.logging.*</ignoreClass>
                   </ignoreClasses>
-                  <findAllDuplicates>true<findAllDuplicates>
+                  <findAllDuplicates>true</findAllDuplicates>
                 </banDuplicateClasses>
               </rules>
               <fail>true</fail>
