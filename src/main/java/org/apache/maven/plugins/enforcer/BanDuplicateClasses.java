@@ -134,10 +134,11 @@ public class BanDuplicateClasses
                             "Unable to process dependency " + o.toString() + " due to " + e.getLocalizedMessage(), e );
                     }
                 }
-                else if ( file.isFile() )
+                else if ( file.isFile() && !"pom".equals( o.getType() ) )
                 {
                     try
                     {
+                        //@todo use UnArchiver as defined per type
                         JarFile jar = new JarFile( file );
                         try
                         {
