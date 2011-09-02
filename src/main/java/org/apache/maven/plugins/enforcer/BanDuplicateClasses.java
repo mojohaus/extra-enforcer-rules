@@ -1,17 +1,5 @@
 package org.apache.maven.plugins.enforcer;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.enforcer.rule.api.EnforcerRule;
-import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
-import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.FileUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +13,15 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.enforcer.rule.api.EnforcerRule;
+import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Bans duplicate classes on the classpath.
@@ -109,14 +106,7 @@ public class BanDuplicateClasses
         {
             MavenProject project = (MavenProject) helper.evaluate( "${project}" );
 
-            ArtifactFactory factory = (ArtifactFactory) helper.getComponent( ArtifactFactory.class );
-
-            Set<Artifact> dependencyArtifacts = project.getDependencyArtifacts();
-
-            if ( dependencyArtifacts == null )
-            {
-                dependencyArtifacts = project.createArtifacts( factory, null, null );
-            }
+            Set<Artifact> dependencyArtifacts = project.getArtifacts();
 
             Map<String, Artifact> classNames = new HashMap<String, Artifact>();
             Map<String, Set<Artifact>> duplicates = new HashMap<String, Set<Artifact>>();
@@ -210,17 +200,9 @@ public class BanDuplicateClasses
             }
 
         }
-        catch ( ComponentLookupException e )
-        {
-            throw new EnforcerRuleException( "Unable to lookup a component " + e.getLocalizedMessage(), e );
-        }
         catch ( ExpressionEvaluationException e )
         {
             throw new EnforcerRuleException( "Unable to lookup an expression " + e.getLocalizedMessage(), e );
-        }
-        catch ( InvalidDependencyVersionException e )
-        {
-            throw new EnforcerRuleException( "Unable to resolve dependencies" + e.getLocalizedMessage(), e );
         }
     }
 
