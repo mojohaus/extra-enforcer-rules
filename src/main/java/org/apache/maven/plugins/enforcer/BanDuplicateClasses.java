@@ -90,17 +90,19 @@ public class BanDuplicateClasses
         throws EnforcerRuleException
     {
         Log log = helper.getLog();
-        List<Pattern> ignores = new ArrayList<Pattern>();
+        List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
         if ( ignoreClasses != null )
         {
+            IgnorableDependency context = new IgnorableDependency();
             for ( String ignore : ignoreClasses )
             {
                 log.info( "Adding ignore: " + ignore );
                 ignore = ignore.replace( '.', '/' );
                 String pattern = asRegex( ignore );
                 log.info( "Ignore: " + ignore + " maps to regex " + pattern );
-                ignores.add( Pattern.compile( pattern ) );
+                context.ignores.add( Pattern.compile( pattern ) );
             }
+            ignorableDependencies.add( context );
         }
         try
         {
@@ -125,7 +127,7 @@ public class BanDuplicateClasses
                         for ( String name : (List<String>) FileUtils.getFileNames( file, null, null, false ) )
                         {
                             log.info( "  " + name );
-                            checkAndAddName( o, name, classNames, duplicates, ignores, log );
+                            checkAndAddName( o, name, classNames, duplicates, ignorableDependencies, log );
                         }
                     }
                     catch ( IOException e )
@@ -144,7 +146,7 @@ public class BanDuplicateClasses
                         {
                             for ( JarEntry entry : Collections.<JarEntry>list( jar.entries() ) )
                             {
-                                checkAndAddName( o, entry.getName(), classNames, duplicates, ignores, log );
+                                checkAndAddName( o, entry.getName(), classNames, duplicates, ignorableDependencies, log );
                             }
                         }
                         finally
@@ -208,7 +210,7 @@ public class BanDuplicateClasses
     }
 
     private void checkAndAddName( Artifact artifact, String name, Map<String, Artifact> classNames,
-                                  Map<String, Set<Artifact>> duplicates, Collection<Pattern> ignores, Log log )
+                                  Map<String, Set<Artifact>> duplicates, Collection<IgnorableDependency> ignores, Log log )
         throws EnforcerRuleException
     {
         if ( !name.endsWith( ".class" ) )
@@ -218,12 +220,18 @@ public class BanDuplicateClasses
         Artifact dup = classNames.get( name );
         if ( dup != null )
         {
-            for ( Pattern p : ignores )
+            for ( IgnorableDependency c : ignores )
             {
-                if ( p.matcher( name ).matches() )
+                if ( matchesArtifact( dup, c ) )
                 {
-                    log.debug( "Ignoring duplicate class " + name );
-                    return;
+                    for ( Pattern p : c.ignores )
+                    {
+                        if ( p.matcher( name ).matches() )
+                        {
+                            log.debug( "Ignoring duplicate class " + name );
+                            return;
+                        }
+                    }
                 }
             }
             if ( findAllDuplicates )
@@ -258,6 +266,14 @@ public class BanDuplicateClasses
 
     }
 
+    private boolean matchesArtifact( Artifact dup, IgnorableDependency c )
+    {
+        return ( c.artifactId == null || c.artifactId.matcher( dup.getArtifactId() ).matches() )
+            && ( c.groupId == null || c.groupId.matcher( dup.getGroupId() ).matches() )
+            && ( c.classifier == null || c.classifier.matcher( dup.getClassifier() ).matches() )
+            && ( c.type == null || c.type.matcher( dup.getType() ).matches() );
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -280,5 +296,14 @@ public class BanDuplicateClasses
     public String getCacheId()
     {
         return "Does not matter as not cacheable";
+    }
+    
+    private class IgnorableDependency
+    {
+        private Pattern groupId;
+        private Pattern artifactId;
+        private Pattern classifier;
+        private Pattern type;
+        private List<Pattern> ignores = new ArrayList<Pattern>();
     }
 }
