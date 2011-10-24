@@ -19,8 +19,9 @@
   Ban Duplicate Classes
   ------
   Stephen Connolly
+  Robert Scholte
   ------
-  April 2011
+  October 2011
   ------
 
 Ban Duplicate Classes
@@ -31,11 +32,13 @@ Ban Duplicate Classes
 
    * ignoreClasses - a list of classes to ignore duplicates of. Wildcards can be specified using the * character.
 
-   * findAllDuplicates - a boolean to indicate whether the rule should find all duplicates or fail fast at the first duplicate. Defaults to false.
+   * findAllDuplicates - a boolean to indicate whether the rule should find all duplicates or fail fast at the first duplicate. Defaults to <<<false>>>.
 
    * message - an optional message to provide when duplicates are found.
+   
+   * dependencies - a list of dependencies for which you want to ignore specific classes.
 
-    []
+   []
 
 
   Sample Plugin Configuration:
@@ -48,7 +51,7 @@ Ban Duplicate Classes
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.0</version>
+        <version>${enforcerApiVersion}</version> <!-- find the latest version at http://maven.apache.org/plugins/maven-enforcer-plugin/ -->
         <executions>
           <execution>
             <id>enforce-ban-duplicate-classes</id>
@@ -85,6 +88,39 @@ Ban Duplicate Classes
   [...]
 </project>
 +---+
+
+  You can even ignore classes per dependency if you'd like. For every dependency you can specify either the <<<groupId>>>, <<<artifactId>>>, <<<type>>> or <<<classifier>>>.\
+  You can't specify the version, because once Maven has resolved the version of a specific dependency there's only one version available.\
+  Note that you can use wildcard-expressions for these values, i.e. a '?' for one character and a '*' for any number of characters. 
+
+  The configuration would look like this
+
++---+
+<configuration>
+  <rules>
+    <banDuplicateClasses>
+      <ignoreClasses>
+        <ignoreClass>org.slf4j.*</ignoreClass>
+      </ignoreClasses>
+      <dependencies>
+        <dependency>
+          <artifactId>jcl-over-slf4j</artifactId>
+          <ignoreClasses>
+            <ignoreClass>org.apache.commons.logging.impl.*</ignoreClass>
+          </ignoreClasses>
+        </dependency>
+        <dependency>
+          <groupId>org.*</groupId>
+          <artifactId>maven-*</artifactId>
+          <type>*ar</type>
+          <classifier>sources</classifier>
+        </dependency>
+      </dependencies>
+    </banDuplicateClasses>
+  </rules>
+</configuration>
++---+
+
 
 * Trademarks
 
