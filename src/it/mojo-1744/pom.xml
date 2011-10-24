@@ -1,0 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.codehaus.mojo.extra-enforcer-rules.it</groupId>
+  <artifactId>mojo-1744</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>1.5.11</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson.plugins.m2release</groupId>
+      <artifactId>nexus</artifactId>
+      <version>0.0.1</version>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>@project.groupId@</groupId>
+            <artifactId>@project.artifactId@</artifactId>
+            <version>@project.version@</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <rules>
+            <banDuplicateClasses>
+              <findAllDuplicates>true</findAllDuplicates>
+              <ignoreClasses>
+                <ignoreClass>org.slf4j.*</ignoreClass>
+                <ignoreClass>org.apache.commons.logging.LogConfigurationException</ignoreClass>
+                <ignoreClass>org.apache.commons.logging.LogFactory</ignoreClass>
+                <ignoreClass>org.apache.commons.logging.impl.SLF4JLog*</ignoreClass>
+              </ignoreClasses>
+              <dependencies>
+                <dependency>
+                  <artifactId>jcl-over-slf4j</artifactId>
+                  <ignoreClasses>
+                    <ignoreClass>org.apache.commons.logging.impl.Simple*</ignoreClass>
+                    <ignoreClass>org.apache.commons.logging.Log</ignoreClass>
+                  </ignoreClasses>
+                </dependency>
+              </dependencies>
+            </banDuplicateClasses>
+          </rules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

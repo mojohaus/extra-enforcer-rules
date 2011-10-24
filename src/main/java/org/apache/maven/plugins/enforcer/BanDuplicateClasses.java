@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +41,8 @@ public class BanDuplicateClasses
      * the end.
      */
     private boolean findAllDuplicates;
+    
+    private List<Dependency> dependencies;
 
     /**
      * Convert a wildcard into a regex.
@@ -79,6 +82,7 @@ public class BanDuplicateClasses
                     break;
             }
         }
+        result.append( "(\\.class)?" );
         result.append( '$' );
         return result.toString();
     }
@@ -93,26 +97,45 @@ public class BanDuplicateClasses
         List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
         if ( ignoreClasses != null )
         {
-            IgnorableDependency context = new IgnorableDependency();
-            for ( String ignore : ignoreClasses )
+            IgnorableDependency ignorableDependency = new IgnorableDependency();
+            applyIgnoreClasses( ignorableDependency, ignoreClasses, log, false );
+            ignorableDependencies.add( ignorableDependency );
+        }
+        if ( dependencies != null )
+        {
+            for ( Dependency dependency : dependencies )
             {
-                log.info( "Adding ignore: " + ignore );
-                ignore = ignore.replace( '.', '/' );
-                String pattern = asRegex( ignore );
-                log.info( "Ignore: " + ignore + " maps to regex " + pattern );
-                context.ignores.add( Pattern.compile( pattern ) );
+                log.info( "Adding ignorable dependency: " + dependency );
+                IgnorableDependency ignorableDependency = new IgnorableDependency();
+                if ( ignorableDependency.groupId != null )
+                {
+                    ignorableDependency.groupId = Pattern.compile( asRegex( dependency.getGroupId() ) );
+                }
+                if ( ignorableDependency.artifactId != null )
+                {
+                    ignorableDependency.artifactId = Pattern.compile( asRegex( dependency.getArtifactId() ) );
+                }
+                if ( dependency.getType() != null )
+                {
+                    ignorableDependency.type = Pattern.compile( asRegex( dependency.getType() ) );
+                }
+                if ( dependency.getClassifier() != null )
+                {
+                    ignorableDependency.classifier = Pattern.compile( asRegex( dependency.getClassifier() ) );
+                }
+                applyIgnoreClasses( ignorableDependency, dependency.getIgnoreClasses(), log, true );
+                ignorableDependencies.add( ignorableDependency );
             }
-            ignorableDependencies.add( context );
         }
         try
         {
             MavenProject project = (MavenProject) helper.evaluate( "${project}" );
 
-            Set<Artifact> dependencyArtifacts = project.getArtifacts();
+            Set<Artifact> artifacts = project.getArtifacts();
 
             Map<String, Artifact> classNames = new HashMap<String, Artifact>();
             Map<String, Set<Artifact>> duplicates = new HashMap<String, Set<Artifact>>();
-            for ( Artifact o : dependencyArtifacts )
+            for ( Artifact o : artifacts )
             {
                 File file = o.getFile();
                 log.debug( "Searching for duplicate classes in " + file );
@@ -209,6 +232,19 @@ public class BanDuplicateClasses
         }
     }
 
+    private void applyIgnoreClasses( IgnorableDependency ignorableDependency, String[] ignores, Log log, boolean indent )
+    {
+        String prefix = indent ? "  " : "";
+        for ( String ignore : ignores )
+        {
+            log.info( prefix + "Adding ignore: " + ignore );
+            ignore = ignore.replace( '.', '/' );
+            String pattern = asRegex( ignore );
+            log.info( prefix + "Ignore: " + ignore + " maps to regex " + pattern );
+            ignorableDependency.ignores.add( Pattern.compile( pattern ) );
+        }
+    }
+
     private void checkAndAddName( Artifact artifact, String name, Map<String, Artifact> classNames,
                                   Map<String, Set<Artifact>> duplicates, Collection<IgnorableDependency> ignores, Log log )
         throws EnforcerRuleException
@@ -239,10 +275,10 @@ public class BanDuplicateClasses
                 Set<Artifact> dups = duplicates.get( name );
                 if ( dups == null )
                 {
-                    dups = new HashSet<Artifact>();
+                    dups = new LinkedHashSet<Artifact>();
                 }
-                dups.add( artifact );
                 dups.add( dup );
+                dups.add( artifact );
                 duplicates.put( name, dups );
             }
             else
@@ -298,6 +334,9 @@ public class BanDuplicateClasses
         return "Does not matter as not cacheable";
     }
     
+    /**
+     * 
+     */
     private class IgnorableDependency
     {
         private Pattern groupId;
