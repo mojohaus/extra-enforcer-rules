@@ -50,24 +50,25 @@
   </developers>
 
   <prerequisites>
-    <maven>2.0.9</maven>
+    <maven>${maven.version}</maven>
   </prerequisites>
 
   <properties>
-    <api.version>1.0</api.version>
+    <enforcerApiVersion>1.0</enforcerApiVersion>
     <maven.version>2.0.9</maven.version>
+    <mojo.java.target>1.5</mojo.java.target>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.enforcer</groupId>
       <artifactId>enforcer-api</artifactId>
-      <version>${api.version}</version>
+      <version>${enforcerApiVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.enforcer</groupId>
       <artifactId>enforcer-rules</artifactId>
-      <version>${api.version}</version>
+      <version>${enforcerApiVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -104,13 +105,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-maven-plugin</artifactId>
