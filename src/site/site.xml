@@ -22,6 +22,7 @@ under the License.
     <menu name="Overview">
       <item name="Introduction" href="index.html"/>
       <item name="Usage" href="usage.html"/>
+      <item name="FAQ" href="faq.html"/>
     </menu>
     <menu name="Rules">
       <item name="Ban Duplicate Classes" href="banDuplicateClasses.html"/>
