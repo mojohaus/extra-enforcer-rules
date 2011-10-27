@@ -157,7 +157,7 @@ public class BanDuplicateClasses
             {
                 File file = o.getFile();
                 log.debug( "Searching for duplicate classes in " + file );
-                if ( !file.exists() )
+                if ( file == null || !file.exists() )
                 {
                     log.warn( "Could not find " + o + " at " + file );
                 }
