@@ -125,11 +125,11 @@ public class BanDuplicateClasses
             {
                 log.info( "Adding ignorable dependency: " + dependency );
                 IgnorableDependency ignorableDependency = new IgnorableDependency();
-                if ( ignorableDependency.groupId != null )
+                if ( dependency.getGroupId() != null )
                 {
                     ignorableDependency.groupId = Pattern.compile( asRegex( dependency.getGroupId() ) );
                 }
-                if ( ignorableDependency.artifactId != null )
+                if ( dependency.getArtifactId() != null )
                 {
                     ignorableDependency.artifactId = Pattern.compile( asRegex( dependency.getArtifactId() ) );
                 }
