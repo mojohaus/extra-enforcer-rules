@@ -16,18 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-File log = new File(basedir, 'build.log')
-assert log.exists()
-//find 
-def index 
-log.eachLine { line, number -> 
-  if ( line == 'Duplicate classes found:' ) { index = number }
-}
-assert log.readLines().get( index += 2 ).endsWith( "org.slf4j:jcl-over-slf4j:jar:1.5.11:compile" )
-assert log.readLines().get( index += 1 ).endsWith( "org.jvnet.hudson.plugins.m2release:nexus:jar:0.0.1:compile" )
-assert log.readLines().get( index += 2 ).endsWith( "org/apache/commons/logging/impl/SLF4JLocationAwareLog.class" )
+import org.codehaus.mojo.extraenforcerrules.it.BanDuplicateClassesLogParser;
 
-assert log.readLines().get( index += 3 ).endsWith( "commons-logging:commons-logging:jar:1.1.1:compile" )
-assert log.readLines().get( index += 1 ).endsWith( "org.slf4j:jcl-over-slf4j:jar:1.5.11:compile" )
-assert log.readLines().get( index += 1 ).endsWith( "org.jvnet.hudson.plugins.m2release:nexus:jar:0.0.1:compile" )
-assert log.readLines().get( index += 2 ).endsWith( "org/apache/commons/logging/impl/NoOpLog.class" )
+File log = new File( basedir, 'build.log' )
+assert log.exists()
+def duplicates =  new BanDuplicateClassesLogParser( log ).parse();
+
+assert duplicates == [
+  (["org.jvnet.hudson.plugins.m2release:nexus:jar:0.0.1:compile",
+    "org.slf4j:jcl-over-slf4j:jar:1.5.11:compile"] as Set)
+  : (["org/apache/commons/logging/impl/SLF4JLocationAwareLog.class"] as Set),
+  (["org.jvnet.hudson.plugins.m2release:nexus:jar:0.0.1:compile",
+    "org.slf4j:jcl-over-slf4j:jar:1.5.11:compile",
+    "commons-logging:commons-logging:jar:1.1.1:compile"] as Set)
+  : (["org/apache/commons/logging/impl/NoOpLog.class"] as Set),
+  (["commons-logging:commons-logging:jar:1.1.1:compile",
+    "org.slf4j:jcl-over-slf4j:jar:1.5.11:compile"] as Set)
+  : (["org/apache/commons/logging/impl/SimpleLog.class",
+      "org/apache/commons/logging/impl/SimpleLog\$1.class",
+      "org/apache/commons/logging/Log.class"] as Set)
+]

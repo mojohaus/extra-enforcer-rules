@@ -226,7 +226,7 @@ public class BanDuplicateClasses
                 buf.append( '\n' );
                 for ( Map.Entry<Set<Artifact>, List<String>> entry : inverted.entrySet() )
                 {
-                    buf.append( "\n  Found in: " );
+                    buf.append( "\n  Found in:" );
                     for ( Artifact a : entry.getKey() )
                     {
                         buf.append( "\n    " );
@@ -303,7 +303,7 @@ public class BanDuplicateClasses
             {
                 StringBuilder buf = new StringBuilder( message == null ? "Duplicate class found:" : message );
                 buf.append( '\n' );
-                buf.append( "\n  Found in: " );
+                buf.append( "\n  Found in:" );
                 buf.append( "\n    " );
                 buf.append( dup );
                 buf.append( "\n    " );

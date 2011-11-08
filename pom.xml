@@ -125,6 +125,7 @@
           <streamLogs>true</streamLogs>
           <settingsFile>src/it/settings.xml</settingsFile>
           <postBuildHookScript>verify</postBuildHookScript>
+          <addTestClassPath>true</addTestClassPath>
         </configuration>
         <executions>
           <execution>
