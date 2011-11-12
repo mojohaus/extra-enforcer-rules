@@ -271,12 +271,12 @@ public class BanDuplicateClasses
         {
             return;
         }
-        Artifact dup = classNames.get( name );
-        if ( dup != null )
+        
+        if ( classNames.containsKey( name ) )
         {
             for ( IgnorableDependency c : ignores )
             {
-                if ( matchesArtifact( dup, c ) )
+                if ( matchesArtifact( artifact, c ) )
                 {
                     for ( Pattern p : c.ignores )
                     {
@@ -288,14 +288,34 @@ public class BanDuplicateClasses
                     }
                 }
             }
+            
+            Artifact dup = classNames.put( name, artifact );
+            if ( !( findAllDuplicates && duplicates.containsKey( name ) ) )
+            {
+                for ( IgnorableDependency c : ignores )
+                {
+                    if ( matchesArtifact( artifact, c ) )
+                    {
+                        for ( Pattern p : c.ignores )
+                        {
+                            if ( p.matcher( name ).matches() )
+                            {
+                                log.debug( "Ignoring duplicate class " + name );
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            
             if ( findAllDuplicates )
             {
                 Set<Artifact> dups = duplicates.get( name );
                 if ( dups == null )
                 {
                     dups = new LinkedHashSet<Artifact>();
+                    dups.add( dup );
                 }
-                dups.add( dup );
                 dups.add( artifact );
                 duplicates.put( name, dups );
             }
@@ -316,8 +336,10 @@ public class BanDuplicateClasses
                 throw new EnforcerRuleException( buf.toString() );
             }
         }
-        classNames.put( name, artifact );
-
+        else 
+        {
+            classNames.put( name, artifact );
+        }
     }
 
     private boolean matchesArtifact( Artifact dup, IgnorableDependency c )
