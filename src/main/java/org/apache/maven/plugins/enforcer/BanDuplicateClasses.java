@@ -61,6 +61,11 @@ public class BanDuplicateClasses
     private boolean findAllDuplicates;
     
     private List<Dependency> dependencies;
+    
+    /**
+     * Only verify dependencies with one of these scopes
+     */
+    private List<String> scopes;
 
     /**
      * Convert a wildcard into a regex.
@@ -155,6 +160,14 @@ public class BanDuplicateClasses
             Map<String, Set<Artifact>> duplicates = new HashMap<String, Set<Artifact>>();
             for ( Artifact o : artifacts )
             {
+                if( scopes != null && !scopes.contains( o.getScope() ) )
+                {
+                    if( log.isDebugEnabled() )
+                    {
+                        log.debug( "Skipping " + o.toString() + " due to scope" );
+                    }
+                    continue;
+                }
                 File file = o.getFile();
                 log.debug( "Searching for duplicate classes in " + file );
                 if ( file == null || !file.exists() )
