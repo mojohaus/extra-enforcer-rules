@@ -36,6 +36,12 @@ Extra Enforcer Rules
 
   * {{{./banDuplicateClasses.html}banDuplicateClasses}} - verifies that there are no duplicate classes in the dependencies.
 
+  * {{{./requirePropertyDiverges.html}requirePropertyDiverges}} - verifies that a property in a child project diverges from one given in another project.
+
+  * {{{./requireDeveloperRoles.html}requireDeveloperRoles}} - verifies that certain roles for developers are defined in a project.
+
+  * {{{./requireContributorRoles.html}requireContributorRoles}} - verifies that certain roles for contributors are defined in a project.
+
   []
 
 * Usage

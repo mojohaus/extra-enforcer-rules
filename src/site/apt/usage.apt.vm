@@ -57,6 +57,10 @@ Usage
   the <<<pluginManagement>>> technique in the ultimate parent of your reactor build in order to ensure that
   the rule is available.
 
+  Note: If you want to extend rules in child poms read the article about
+  {{{http://www.sonatype.com/people/2011/01/maven-how-to-merging-plugin-configuration-in-complex-projects/} extending or replacing plugin
+  configurations on this page at Sonatype}}
+
 * Trademarks
 
   Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.
