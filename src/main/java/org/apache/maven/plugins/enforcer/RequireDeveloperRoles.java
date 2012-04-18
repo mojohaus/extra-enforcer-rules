@@ -30,6 +30,7 @@ import org.apache.maven.project.MavenProject;
  * This rule checks that certain roles are defined for developers.
  *
  * @author Mirko Friedenhagen
+ * @since 1.0-alpha-3
  */
 public class RequireDeveloperRoles extends AbstractRequireRoles
 {

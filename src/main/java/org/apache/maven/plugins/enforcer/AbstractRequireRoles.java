@@ -34,6 +34,7 @@ import org.codehaus.plexus.util.StringUtils;
  * This rule checks that certain roles are defined for developers and contributors.
  *
  * @author Mirko Friedenhagen
+ * @since 1.0-alpha-3
  */
 abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
 {

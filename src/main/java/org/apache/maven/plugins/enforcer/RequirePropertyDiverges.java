@@ -39,6 +39,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * This allows to enforce that a property is e.g. overridden in a child project.
  *
  * @author Mirko Friedenhagen
+ * @since 1.0-alpha-3
  */
 public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
 {
