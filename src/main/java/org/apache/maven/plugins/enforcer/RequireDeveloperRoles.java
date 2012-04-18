@@ -43,9 +43,9 @@ public class RequireDeveloperRoles extends AbstractRequireRoles
     
     @SuppressWarnings( "unchecked" )
     @Override
-    protected final Set<String> rolesFromMaven( MavenProject mavenProject )
+    protected final Set<String> getRolesFromProject( MavenProject mavenProject )
     {
-        final HashSet<String> result = new HashSet<String>();
+        final Set<String> result = new HashSet<String>();
         for ( final Developer developer : (List<Developer>) mavenProject.getDevelopers() )
         {
             List<String> roles = developer.getRoles();

@@ -43,9 +43,9 @@ public class RequireContributorRoles extends AbstractRequireRoles
 
     @SuppressWarnings( "unchecked" )
     @Override
-    protected final Set<String> rolesFromMaven( MavenProject mavenProject )
+    protected final Set<String> getRolesFromProject( MavenProject mavenProject )
     {
-        final HashSet<String> result = new HashSet<String>();
+        final Set<String> result = new HashSet<String>();
         for ( final Contributor contributor : (List<Contributor>) mavenProject.getContributors() )
         {
             List<String> roles = contributor.getRoles();

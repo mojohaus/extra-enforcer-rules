@@ -56,7 +56,7 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
         MavenProject mavenProject = getMavenProject( helper );
 
         final Set<String> rolesFromProperties = getRolesFromString( requiredRoles );
-        final Set<String> rolesFromMaven = rolesFromMaven( mavenProject );
+        final Set<String> rolesFromMaven = getRolesFromProject( mavenProject );
         rolesFromProperties.removeAll( rolesFromMaven );
 
         if ( rolesFromProperties.size() > 0 )
@@ -75,7 +75,7 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
      * @param mavenProject
      * @return roles from Maven.
      */
-    protected abstract Set<String> rolesFromMaven( final MavenProject mavenProject );
+    protected abstract Set<String> getRolesFromProject( final MavenProject mavenProject );
 
     /**
      * Returns the rolename.
