@@ -20,6 +20,10 @@ package org.apache.maven.plugins.enforcer;
  */
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.maven.model.Contributor;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -30,19 +34,25 @@ import org.apache.maven.project.MavenProject;
 public class RequireContributorRoles extends AbstractRequireRoles
 {
 
-    /**
-     * Returns name for which we want to check roles.
-     * @return name
-     */
     @Override
-    final String getRoleName()
+    protected final String getRoleName()
     {
         return "contributors";
     }
 
-    final HashSet<String> rolesFromMaven( MavenProject mavenProject )
+    @SuppressWarnings( "unchecked" )
+    @Override
+    protected final Set<String> rolesFromMaven( MavenProject mavenProject )
     {
-        return getRolesFromMaven( mavenProject.getContributors() );
+        final HashSet<String> result = new HashSet<String>();
+        for ( final Contributor contributor : (List<Contributor>) mavenProject.getContributors() )
+        {
+            List<String> roles = contributor.getRoles();
+            for ( String role : roles )
+            {
+                result.add( role );
+            }
+        }
+        return result;
     }
-
 }

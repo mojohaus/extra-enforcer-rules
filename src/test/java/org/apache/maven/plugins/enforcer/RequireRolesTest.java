@@ -21,6 +21,8 @@ package org.apache.maven.plugins.enforcer;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.model.Contributor;
@@ -105,7 +107,7 @@ public class RequireRolesTest
         expResult.add( "lead developer" );
         expResult.add( "business engineer" );
         final RequireContributorRoles instance = new RequireContributorRoles();
-        HashSet<String> result = instance.getRolesFromString( "lead developer, business engineer" );
+        Set<String> result = instance.getRolesFromString( "lead developer, business engineer" );
         assertEquals( expResult, result );
     }
 
@@ -123,7 +125,17 @@ public class RequireRolesTest
         singleHero.addRole( "business engineer" );
         List<Contributor> listFromMaven = Arrays.asList( singleHero );
         final RequireContributorRoles instance = new RequireContributorRoles();
-        HashSet<String> result = instance.getRolesFromMaven( listFromMaven );
+        final HashSet<String> result1 = new HashSet<String>();
+        for ( final Contributor contributor : listFromMaven )
+        {
+            @SuppressWarnings( "unchecked" )
+            List<String> roles = contributor.getRoles();
+            for ( String role : roles )
+            {
+                result1.add( role );
+            }
+        }
+        HashSet<String> result = result1;
         assertEquals( expResult, result );
     }
 }

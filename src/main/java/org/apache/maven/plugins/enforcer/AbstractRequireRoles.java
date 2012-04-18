@@ -22,9 +22,10 @@ package org.apache.maven.plugins.enforcer;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
-import org.apache.maven.model.Contributor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.util.StringUtils;
@@ -53,9 +54,8 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
 
         MavenProject mavenProject = getMavenProject( helper );
 
-        final HashSet<String> rolesFromProperties = getRolesFromString( requiredRoles );
-        @SuppressWarnings( "unchecked" )
-        final HashSet<String> rolesFromMaven = rolesFromMaven( mavenProject );
+        final Set<String> rolesFromProperties = getRolesFromString( requiredRoles );
+        final Set<String> rolesFromMaven = rolesFromMaven( mavenProject );
         rolesFromProperties.removeAll( rolesFromMaven );
 
         if ( rolesFromProperties.size() > 0 )
@@ -74,14 +74,14 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
      * @param mavenProject
      * @return roles from Maven.
      */
-    abstract HashSet<String> rolesFromMaven( final MavenProject mavenProject );
+    protected abstract Set<String> rolesFromMaven( final MavenProject mavenProject );
 
     /**
      * Returns the rolename.
      *
      * @return rolename.
      */
-    abstract String getRoleName();
+    protected abstract String getRoleName();
 
     /**
      * Returns the set of required roles from the property.
@@ -89,35 +89,13 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
      * @param toSet
      * @return
      */
-    HashSet<String> getRolesFromString( final String toSet )
+    Set<String> getRolesFromString( final String toSet )
     {
         final List<String> asList = Arrays.asList( StringUtils.split( toSet, "," ) );
-        final HashSet<String> result = new HashSet<String>();
+        final Set<String> result = new HashSet<String>();
         for ( String role : asList )
         {
             result.add( role.trim() );
-        }
-        return result;
-    }
-
-    /**
-     * Returns the roles from Maven.
-     *
-     * @param listFromMaven
-     *
-     * @return roles from Maven.
-     */
-    HashSet<String> getRolesFromMaven( List<Contributor> listFromMaven )
-    {
-        final HashSet<String> result = new HashSet<String>();
-        for ( final Contributor contributor : listFromMaven )
-        {
-            @SuppressWarnings( "unchecked" )
-            List<String> roles = contributor.getRoles();
-            for ( String role : roles )
-            {
-                result.add( role );
-            }
         }
         return result;
     }

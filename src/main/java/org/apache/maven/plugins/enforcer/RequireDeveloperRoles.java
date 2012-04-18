@@ -20,6 +20,10 @@ package org.apache.maven.plugins.enforcer;
  */
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.maven.model.Developer;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -31,13 +35,24 @@ public class RequireDeveloperRoles extends AbstractRequireRoles
 {
 
     @Override
-    String getRoleName()
+    protected String getRoleName()
     {
         return "developers";
     }
-    final HashSet<String> rolesFromMaven( MavenProject mavenProject )
+    
+    @SuppressWarnings( "unchecked" )
+    @Override
+    protected final Set<String> rolesFromMaven( MavenProject mavenProject )
     {
-        return getRolesFromMaven( mavenProject.getDevelopers() );
+        final HashSet<String> result = new HashSet<String>();
+        for ( final Developer developer : (List<Developer>) mavenProject.getDevelopers() )
+        {
+            List<String> roles = developer.getRoles();
+            for ( String role : roles )
+            {
+                result.add( role );
+            }
+        }
+        return result;
     }
-
 }
