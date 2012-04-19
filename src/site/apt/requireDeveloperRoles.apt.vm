@@ -16,23 +16,25 @@
 ~~ under the License.
 
   ------
-  Require Roles
+  Require Developer Roles
   ------
   Mirko Friedenhagen
   ------
   April 2012
   ------
 
-Require Roles
+Require Developer Roles
 
-  This rule checks that certain roles for developers are defined in a project.
+  This rule checks that certain roles in a project are represented by developers.
 
-  Say you want to enforce a policy that every project defines specific roles for
-  developers.
+  Say you want to enforce a policy that in every project there is at least one
+  developer representing a specific role, e.g. at least one developer has the role
+  "lead engineer".
 
   The following parameters are supported by this rule:
 
-   * <<<requiredRoles>>> - Comma separated list of developer roles which must be defined.
+   * <<<requiredRoles>>> - Comma separated list of roles which must be represented
+   by at least one developer.
 
    []
 
@@ -60,7 +62,7 @@ Require Roles
             <configuration>
               <rules>
                 <requireDeveloperRoles>
-                  <requiredRoles>project lead</requiredRoles>
+                  <requiredRoles>lead engineer</requiredRoles>
                 </requireDeveloperRoles>
               </rules>
               <fail>true</fail>
