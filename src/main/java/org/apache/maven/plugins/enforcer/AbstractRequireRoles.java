@@ -62,8 +62,8 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
         if ( rolesFromProperties.size() > 0 )
         {
             final String message = String.format(
-                    "Found undeclared role(s) '%s' for %s",
-                    rolesFromProperties, getRoleName() );
+                    "Found no %s representing role(s) '%s'",
+                    getRoleName(), rolesFromProperties );
             throw new EnforcerRuleException( message );
         }
 

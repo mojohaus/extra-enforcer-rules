@@ -27,7 +27,7 @@ import org.apache.maven.model.Contributor;
 import org.apache.maven.project.MavenProject;
 
 /**
- * This rule checks that certain roles are defined for contributors.
+ * This rule checks that contributors represent certain roles.
  *
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
@@ -38,7 +38,7 @@ public class RequireContributorRoles extends AbstractRequireRoles
     @Override
     protected final String getRoleName()
     {
-        return "contributors";
+        return "contributor";
     }
 
     @SuppressWarnings( "unchecked" )

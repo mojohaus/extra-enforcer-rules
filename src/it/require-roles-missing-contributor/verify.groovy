@@ -3,5 +3,5 @@ assert file.exists();
 
 String text = file.getText("utf-8");
 assert text.contains('org.apache.maven.plugins.enforcer.RequireContributorRoles failed with message');
-assert text.contains('undeclared role(s) \'[quality manager]\' for contributors');
+assert text.contains('Found no contributor representing role(s) \'[quality manager]\'');
 return true;

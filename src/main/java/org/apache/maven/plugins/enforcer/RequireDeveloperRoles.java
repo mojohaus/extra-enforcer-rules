@@ -27,7 +27,7 @@ import org.apache.maven.model.Developer;
 import org.apache.maven.project.MavenProject;
 
 /**
- * This rule checks that certain roles are defined for developers.
+ * This rule checks that developers represent certain roles.
  *
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
@@ -38,7 +38,7 @@ public class RequireDeveloperRoles extends AbstractRequireRoles
     @Override
     protected String getRoleName()
     {
-        return "developers";
+        return "developer";
     }
     
     @SuppressWarnings( "unchecked" )
