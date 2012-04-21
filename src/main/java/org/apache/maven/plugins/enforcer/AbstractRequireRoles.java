@@ -31,7 +31,7 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluatio
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * This rule checks that certain roles are defined for developers and contributors.
+ * This rule checks that certain roles are filled.
  *
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3

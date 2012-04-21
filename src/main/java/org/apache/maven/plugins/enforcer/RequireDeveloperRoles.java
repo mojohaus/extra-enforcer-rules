@@ -27,7 +27,7 @@ import org.apache.maven.model.Developer;
 import org.apache.maven.project.MavenProject;
 
 /**
- * This rule checks that developers represent certain roles.
+ * This rule checks that certain developer roles are filled.
  *
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3

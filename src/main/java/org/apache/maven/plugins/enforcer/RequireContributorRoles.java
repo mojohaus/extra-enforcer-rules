@@ -27,7 +27,7 @@ import org.apache.maven.model.Contributor;
 import org.apache.maven.project.MavenProject;
 
 /**
- * This rule checks that contributors represent certain roles.
+ * This rule verifies that certain contributor roles are filled.
  *
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
