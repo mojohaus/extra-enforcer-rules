@@ -124,7 +124,6 @@ public class RequireRolesTest
         singleHero.addRole( "lead developer" );
         singleHero.addRole( "business engineer" );
         List<Contributor> listFromMaven = Arrays.asList( singleHero );
-        final RequireContributorRoles instance = new RequireContributorRoles();
         final HashSet<String> result1 = new HashSet<String>();
         for ( final Contributor contributor : listFromMaven )
         {
@@ -137,5 +136,32 @@ public class RequireRolesTest
         }
         HashSet<String> result = result1;
         assertEquals( expResult, result );
+    }
+    
+    @Test( expected = EnforcerRuleException.class )
+    public void testExecuteInvalidContributor() throws ExpressionEvaluationException, EnforcerRuleException
+    {
+        setUpMavenProject();
+        final RequireContributorRoles instance = new RequireContributorRoles();
+        instance.setValidRoles( "hacker" );
+        instance.execute( helper );
+    }
+
+    @Test( expected = EnforcerRuleException.class )
+    public void testExecuteAllInvalidContributor() throws ExpressionEvaluationException, EnforcerRuleException
+    {
+        setUpMavenProject();
+        final RequireContributorRoles instance = new RequireContributorRoles();
+        instance.setValidRoles( "" ); //no roles allowed
+        instance.execute( helper );
+    }
+
+    @Test
+    public void testExecuteValidContributor() throws ExpressionEvaluationException, EnforcerRuleException
+    {
+        setUpMavenProject();
+        final RequireContributorRoles instance = new RequireContributorRoles();
+        instance.setValidRoles( "business engineer" ); //no roles allowed
+        instance.execute( helper );
     }
 }

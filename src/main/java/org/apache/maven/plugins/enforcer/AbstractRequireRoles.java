@@ -40,9 +40,15 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
 {
 
     /**
-     * Specify the required roles for developers as comma separated list.
+     * Specify the required roles as comma separated list.
      */
     private String requiredRoles = "";
+
+    /**
+     * Specify the allowed roles as comma separated list.
+     * These are combined with the requiredRoles.
+     */
+    private String validRoles = "*";
 
     /**
      * Execute the rule.
@@ -56,9 +62,9 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
         MavenProject mavenProject = getMavenProject( helper );
 
         final Set<String> rolesFromProperties = getRolesFromString( requiredRoles );
-        final Set<String> rolesFromMaven = getRolesFromProject( mavenProject );
-        rolesFromProperties.removeAll( rolesFromMaven );
-
+        final Set<String> rolesFromProject = getRolesFromProject( mavenProject );
+        rolesFromProperties.removeAll( rolesFromProject );
+        
         if ( rolesFromProperties.size() > 0 )
         {
             final String message = String.format(
@@ -67,6 +73,21 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
             throw new EnforcerRuleException( message );
         }
 
+        final Set<String> allowedRoles = getRolesFromString( validRoles );
+        if( !allowedRoles.contains( "*" ) )
+        {
+            allowedRoles.addAll( rolesFromProperties );
+            
+            // results in invalid roles
+            rolesFromProject.removeAll( allowedRoles );
+            if ( rolesFromProject.size() > 0 )
+            {
+                final String message = String.format(
+                        "Found invalid %s role(s) '%s'",
+                        getRoleName(), rolesFromProject );
+                throw new EnforcerRuleException( message );
+            }
+        }
     }
 
     /**
@@ -128,5 +149,10 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
     void setRequiredRoles( String requiredRoles )
     {
         this.requiredRoles = requiredRoles;
+    }
+    
+    void setValidRoles( String validRoles )
+    {
+        this.validRoles = validRoles;
     }
 }
