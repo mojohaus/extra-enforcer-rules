@@ -23,7 +23,7 @@
   March 2012
   ------
 
-Requite Property Diverges
+Require Property Diverges
 
   This rule checks that a property in a project diverges from one given in an ancestor project.
 
