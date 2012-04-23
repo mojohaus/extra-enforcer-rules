@@ -36,6 +36,9 @@ Require Contributor Roles
    * <<<requiredRoles>>> - Comma separated list of roles which must be represented
    by at least one contributor.
 
+   * <<<validRoles>>> - Comma separated list of roles which are allowed. <<<requiredRoles>>> are always valid.
+   By default it has the value <<<*>>>, which means every role is excepted. This rule does <<not>> support Ant-patterns. 
+   
    []
 
 
@@ -63,6 +66,7 @@ Require Contributor Roles
               <rules>
                 <requireContributorRoles>
                   <requiredRoles>business engineer, quality manager</requiredContributorRoles>
+                  <validRoles>java developer<validRoles>
                 </requireContributorRoles>
               </rules>
               <fail>true</fail>

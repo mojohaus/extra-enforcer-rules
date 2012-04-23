@@ -36,6 +36,9 @@ Require Developer Roles
    * <<<requiredRoles>>> - Comma separated list of roles which must be represented
    by at least one developer.
 
+   * <<<validRoles>>> - Comma separated list of roles which are allowed. <<<requiredRoles>>> are always valid.
+   By default it has the value <<<*>>>, which means every role is excepted. This rule does <<not>> support Ant-patterns.
+   
    []
 
 
@@ -63,6 +66,7 @@ Require Developer Roles
               <rules>
                 <requireDeveloperRoles>
                   <requiredRoles>lead engineer</requiredRoles>
+                  <validRoles>java developer<validRoles>
                 </requireDeveloperRoles>
               </rules>
               <fail>true</fail>
