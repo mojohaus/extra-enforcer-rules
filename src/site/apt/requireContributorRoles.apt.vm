@@ -66,7 +66,7 @@ Require Contributor Roles
               <rules>
                 <requireContributorRoles>
                   <requiredRoles>business engineer, quality manager</requiredContributorRoles>
-                  <validRoles>java developer<validRoles>
+                  <validRoles>java developer</validRoles>
                 </requireContributorRoles>
               </rules>
               <fail>true</fail>
