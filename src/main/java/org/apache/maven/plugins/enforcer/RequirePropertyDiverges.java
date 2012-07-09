@@ -18,6 +18,7 @@ package org.apache.maven.plugins.enforcer;
  * specific language governing permissions and limitations
  * under the License.
  */
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
@@ -226,12 +228,32 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
     {
         @SuppressWarnings( "unchecked" )
         final Map<String, Plugin> plugins = build.getPluginsAsMap();
+        final List<Xpp3Dom> ruleConfigurationsForPlugins = getRuleConfigurations( plugins );
+        final PluginManagement pluginManagement = build.getPluginManagement();
+        if (pluginManagement != null) {
+            @SuppressWarnings( "unchecked" )
+            final Map<String, Plugin> pluginsFromManagementAsMap = pluginManagement.getPluginsAsMap();
+            List<Xpp3Dom> ruleConfigurationsFromManagement = getRuleConfigurations( pluginsFromManagementAsMap );
+            ruleConfigurationsForPlugins.addAll( ruleConfigurationsFromManagement );
+        }
+        return ruleConfigurationsForPlugins;
+    }
+
+    List<Xpp3Dom> getRuleConfigurations( final Map<String, Plugin> plugins )
+    {
         if ( plugins.containsKey( MAVEN_ENFORCER_PLUGIN ) )
         {
             final Plugin enforcer = plugins.get( MAVEN_ENFORCER_PLUGIN );
             final Xpp3Dom configuration = ( Xpp3Dom ) enforcer.getConfiguration();
-            final Xpp3Dom rules = configuration.getChild( "rules" );
-            return Arrays.asList( rules.getChildren( getRuleName() ) );
+            if ( configuration != null )
+            {
+                final Xpp3Dom rules = configuration.getChild( "rules" );
+                return Arrays.asList( rules.getChildren( getRuleName() ) );
+            }
+            else
+            {
+                return new ArrayList<Xpp3Dom>();
+            }
         }
         else
         {

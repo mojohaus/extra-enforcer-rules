@@ -24,11 +24,13 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import static org.junit.Assert.assertEquals;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.when;
@@ -64,23 +66,44 @@ public class RequirePropertyDivergesTest
         RequirePropertyDiverges mockInstance = createMockRule();
         final MavenProject project = createMavenProject( "company", "company-parent-pom" );
         final Build build = new Build();
-        final HashMap<String, Plugin> hashMap = new HashMap<String, Plugin>();
+        build.setPluginManagement( new PluginManagement() );
         final Plugin plugin = new Plugin();
+        plugin.setGroupId( "org.apache.maven.plugins" );
         plugin.setArtifactId( "maven-enforcer-plugin" );
-        final Xpp3Dom configuration = new Xpp3Dom( "configuration" );
-        final Xpp3Dom rules = new Xpp3Dom( "rules" );
-        final Xpp3Dom rule = new Xpp3Dom( instance.getRuleName() );
-        rules.addChild( rule );
-        final Xpp3Dom property = new Xpp3Dom( "property" );
-        property.setValue( "checkedProperty" );
-        rule.addChild( property );
-        final Xpp3Dom regex = new Xpp3Dom( "regex" );
-        regex.setValue( "parentValue" );
-        rule.addChild( regex );
-        configuration.addChild( rules );
+        final Xpp3Dom configuration = createPluginConfiguration();
         plugin.setConfiguration( configuration );
         build.addPlugin( plugin );
         project.getOriginalModel().setBuild( build );
+        setUpHelper( project, "parentValue" );
+        mockInstance.execute( helper );
+    }
+
+    /**
+     * Test of execute method, of class RequirePropertyDiverges.
+     */
+    @Test
+    public void testExecuteInParentWithConfigurationInPluginManagement() throws EnforcerRuleException
+    {
+        RequirePropertyDiverges mockInstance = createMockRule();
+        final MavenProject project = createMavenProject( "company", "company-parent-pom" );
+        final Build build = new Build();
+        // create pluginManagement
+        final Plugin pluginInManagement = new Plugin();
+        pluginInManagement.setGroupId( "org.apache.maven.plugins" );
+        pluginInManagement.setArtifactId( "maven-enforcer-plugin" );
+        final Xpp3Dom configuration = createPluginConfiguration();
+        pluginInManagement.setConfiguration( configuration );
+        final PluginManagement pluginManagement = new PluginManagement();
+        pluginManagement.addPlugin( pluginInManagement );
+        build.setPluginManagement( pluginManagement );
+        // create plugins
+        final Plugin pluginInPlugins = new Plugin();
+        pluginInPlugins.setGroupId( "org.apache.maven.plugins" );
+        pluginInPlugins.setArtifactId( "maven-enforcer-plugin" );
+        build.addPlugin( pluginInPlugins );
+        // add build
+        project.getOriginalModel().setBuild( build );
+        //project.getOriginalModel().setBuild( build );
         setUpHelper( project, "parentValue" );
         mockInstance.execute( helper );
     }
@@ -89,6 +112,7 @@ public class RequirePropertyDivergesTest
     public void testProjectWithoutEnforcer()
     {
         final Build build = new Build();
+        //build.setPluginManagement( new PluginManagement() );
         instance.getRuleConfigurations( build );
     }
 
@@ -197,5 +221,21 @@ public class RequirePropertyDivergesTest
             throw new RuntimeException( ex );
         }
         Mockito.when( helper.getLog() ).thenReturn( Mockito.mock( Log.class ) );
+    }
+
+    Xpp3Dom createPluginConfiguration()
+    {
+        final Xpp3Dom configuration = new Xpp3Dom( "configuration" );
+        final Xpp3Dom rules = new Xpp3Dom( "rules" );
+        final Xpp3Dom rule = new Xpp3Dom( instance.getRuleName() );
+        rules.addChild( rule );
+        final Xpp3Dom property = new Xpp3Dom( "property" );
+        property.setValue( "checkedProperty" );
+        rule.addChild( property );
+        final Xpp3Dom regex = new Xpp3Dom( "regex" );
+        regex.setValue( "parentValue" );
+        rule.addChild( regex );
+        configuration.addChild( rules );
+        return configuration;
     }
 }
