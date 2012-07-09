@@ -220,7 +220,9 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
     }
 
     /**
-     *
+     * Returns the rule configurations from the <tt>pluginManagement</tt> as well
+     * as the <tt>plugins</tt> section.
+     * 
      * @param build the build to inspect.
      * @return configuration of the rules, may be an empty list.
      */
@@ -230,7 +232,8 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
         final Map<String, Plugin> plugins = build.getPluginsAsMap();
         final List<Xpp3Dom> ruleConfigurationsForPlugins = getRuleConfigurations( plugins );
         final PluginManagement pluginManagement = build.getPluginManagement();
-        if (pluginManagement != null) {
+        if ( pluginManagement != null )
+        {
             @SuppressWarnings( "unchecked" )
             final Map<String, Plugin> pluginsFromManagementAsMap = pluginManagement.getPluginsAsMap();
             List<Xpp3Dom> ruleConfigurationsFromManagement = getRuleConfigurations( pluginsFromManagementAsMap );
@@ -239,12 +242,20 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
         return ruleConfigurationsForPlugins;
     }
 
+    /**
+     * Returns the list of <tt>requirePropertyDiverges</tt> configurations from the map of plugins.
+     *
+     * @param plugins
+     * @return list of requirePropertyDiverges configurations.
+     */
     List<Xpp3Dom> getRuleConfigurations( final Map<String, Plugin> plugins )
     {
         if ( plugins.containsKey( MAVEN_ENFORCER_PLUGIN ) )
         {
             final Plugin enforcer = plugins.get( MAVEN_ENFORCER_PLUGIN );
             final Xpp3Dom configuration = ( Xpp3Dom ) enforcer.getConfiguration();
+            // may be null when rules are defined in pluginManagement during invocation
+            // for plugin section and vice versa.
             if ( configuration != null )
             {
                 final Xpp3Dom rules = configuration.getChild( "rules" );
@@ -252,6 +263,9 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
             }
             else
             {
+                // do not return Collections.emptyList() as this list
+                // might be extended during the search in the pluginManagement
+                // later on.
                 return new ArrayList<Xpp3Dom>();
             }
         }
