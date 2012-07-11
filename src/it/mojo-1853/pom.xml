@@ -8,12 +8,17 @@
     <packaging>pom</packaging>
     <name>Define company-parent-pom</name>
     <url>http://company/company-parent-pom/</url>
+    <properties>
+        <justAProperty>value of just a property</justAProperty>
+        <just.a.property.with.dots>value of just.a.property.with.dots</just.a.property.with.dots>
+    </properties>
     <build>
         <pluginManagement>
             <plugins>
                 <plugin>
                     <artifactId>maven-enforcer-plugin</artifactId>
                     <version>1.0</version>
+                    <inherited>true</inherited>
                     <dependencies>
                         <dependency>
                             <groupId>@project.groupId@</groupId>
@@ -26,6 +31,13 @@
                             <requirePropertyDiverges>
                                 <property>project.url</property>
                                 <regex>http://company/company-parent-pom/.*</regex>
+                            </requirePropertyDiverges>
+                            <requirePropertyDiverges>
+                                <property>project.properties(justAProperty)</property>
+                            </requirePropertyDiverges>
+                            <requirePropertyDiverges>
+                                <property>just.a.property.with.dots</property>
+                                <regex>value of just.a.property.with.dots</regex>
                             </requirePropertyDiverges>
                         </rules>
                     </configuration>

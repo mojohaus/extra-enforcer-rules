@@ -42,10 +42,25 @@ Require Property Diverges
 
    * <<<regex>>> - match the property value to a given regular expression. 
    When not given, this rule checks that the property in the child does not equal
-   the one from the defining ancestor. Note that certain properties (e.g.
-   <<<project.url>>> or <<<project.scm.connection>>> are automatically extended
-   with the child's <<<project.artifactId>>>, so using a regex will help in this
-   case, see sample below.
+   the one from the defining ancestor. 
+
+   []
+
+  Note that certain properties (e.g. <<<project.url>>> or <<<project.scm.connection>>>
+  are automatically extended with the child's <<<project.artifactId>>>, so using
+  a regex will help in this case, see sample below.
+ 
+  Another caveat: properties defined in the <<<properties>>> section will be 
+  overwritten with those from inheriting projects so you have to:
+
+   * define a <<<regex>>> for these as well, see the rule definition for the property
+   <<<just.a.property.with.dots>>> in the
+   {{{https://svn.codehaus.org/mojo/trunk/mojo/extra-enforcer-rules/src/it/mojo-1853/}<<mojo-1853>>}}
+   integration test when the property name contains a dot.
+
+   * use an {{{http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/introspection/ReflectionValueExtractor.html#evaluate(java.lang.String, java.lang.Object)}alternative syntax}} 
+   ala <<<project.properties(justAProperty)>>> when the property name does not
+   contain a dot.
 
    []
 
@@ -58,6 +73,11 @@ Require Property Diverges
   <artifactId>company-parent-pom</artifactId>
   <version>1.0</version>
   <url>http://company/wiki/company-parent-pom</url>
+  [...]
+  <properties>
+    <just.a.property.with.dots>just a value</just.a.property.with.dots>
+    <justAPropertyWithoutDots>just another value</justAPropertyWithoutDots>
+  </properties>
   [...]
   <build>
     <plugins>
@@ -79,6 +99,13 @@ Require Property Diverges
                 </requirePropertyDiverges>
                 <requirePropertyDiverges>
                   <property>project.groupId</property><!-- children must have a diverging groupId -->
+                </requirePropertyDiverges>
+                <requirePropertyDiverges>
+                  <property>just.a.property.with.dots</property>
+                  <regex>just a value</regex><!-- need to use a regex here as children's value will override the definition -->
+                </requirePropertyDiverges>
+                <requirePropertyDiverges>
+                  <property>project.properties(justAPropertyWithoutDots)</property>
                 </requirePropertyDiverges>
               </rules>
               <fail>true</fail>
