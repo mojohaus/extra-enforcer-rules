@@ -18,7 +18,6 @@ package org.apache.maven.plugins.enforcer;
  * specific language governing permissions and limitations
  * under the License.
  */
-import java.util.HashMap;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.model.Build;
@@ -30,7 +29,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import static org.junit.Assert.assertEquals;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.when;
@@ -67,9 +65,7 @@ public class RequirePropertyDivergesTest
         final MavenProject project = createMavenProject( "company", "company-parent-pom" );
         final Build build = new Build();
         build.setPluginManagement( new PluginManagement() );
-        final Plugin plugin = new Plugin();
-        plugin.setGroupId( "org.apache.maven.plugins" );
-        plugin.setArtifactId( "maven-enforcer-plugin" );
+        final Plugin plugin = newPlugin( "org.apache.maven.plugins", "maven-enforcer-plugin", "1.0");
         final Xpp3Dom configuration = createPluginConfiguration();
         plugin.setConfiguration( configuration );
         build.addPlugin( plugin );
@@ -88,18 +84,14 @@ public class RequirePropertyDivergesTest
         final MavenProject project = createMavenProject( "company", "company-parent-pom" );
         final Build build = new Build();
         // create pluginManagement
-        final Plugin pluginInManagement = new Plugin();
-        pluginInManagement.setGroupId( "org.apache.maven.plugins" );
-        pluginInManagement.setArtifactId( "maven-enforcer-plugin" );
+        final Plugin pluginInManagement = newPlugin( "org.apache.maven.plugins", "maven-enforcer-plugin", "1.0");
         final Xpp3Dom configuration = createPluginConfiguration();
         pluginInManagement.setConfiguration( configuration );
         final PluginManagement pluginManagement = new PluginManagement();
         pluginManagement.addPlugin( pluginInManagement );
         build.setPluginManagement( pluginManagement );
         // create plugins
-        final Plugin pluginInPlugins = new Plugin();
-        pluginInPlugins.setGroupId( "org.apache.maven.plugins" );
-        pluginInPlugins.setArtifactId( "maven-enforcer-plugin" );
+        final Plugin pluginInPlugins = newPlugin( "org.apache.maven.plugins", "maven-enforcer-plugin", "1.0");
         build.addPlugin( pluginInPlugins );
         // add build
         project.getOriginalModel().setBuild( build );
@@ -238,4 +230,14 @@ public class RequirePropertyDivergesTest
         configuration.addChild( rules );
         return configuration;
     }
+
+    static Plugin newPlugin( String groupId, String artifactId, String version )
+    {
+        Plugin plugin = new Plugin();
+        plugin.setArtifactId( artifactId );
+        plugin.setGroupId( groupId );
+        plugin.setVersion( version );
+        return plugin;
+    }
+
 }
