@@ -271,7 +271,7 @@ public class BanDuplicateClasses
             log.info( prefix + "Adding ignore: " + ignore );
             ignore = ignore.replace( '.', '/' );
             String pattern = asRegex( ignore );
-            log.info( prefix + "Ignore: " + ignore + " maps to regex " + pattern );
+            log.debug( prefix + "Ignore: " + ignore + " maps to regex " + pattern );
             ignorableDependency.ignores.add( Pattern.compile( pattern ) );
         }
     }
