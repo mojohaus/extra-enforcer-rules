@@ -29,6 +29,8 @@ under the License.
       <item name="Require Property Diverges" href="requirePropertyDiverges.html"/>
       <item name="Require Developer Roles" href="requireDeveloperRoles.html"/>
       <item name="Require Contributor Roles" href="requireContributorRoles.html"/>
+      <item name="Enforce Bytecode Version" href="enforceBytecodeVersion.html"/>
+      <item name="Ban Circular Dependencies" href="banCircularDependencies.html"/>
     </menu>
   </body>
 </project>

@@ -42,7 +42,7 @@ import org.apache.maven.plugins.enforcer.AbstractBanDependencies;
  * Hibernate, that embeds .class files with many different compilers, but are only loaded under right condition, is
  * gonna difficult to handle here. Maybe a solution would be to introduce some kind of exclusion.
  * 
- * @see http://en.wikipedia.org/wiki/Java_class_file#General_layout
+ * @see <a href="http://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
  * @since 1.0-alpha-4
  */
 public class EnforceBytecodeVersion
