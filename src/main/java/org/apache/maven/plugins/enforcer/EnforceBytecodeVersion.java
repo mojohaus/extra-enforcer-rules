@@ -43,6 +43,7 @@ import org.apache.maven.plugins.enforcer.AbstractBanDependencies;
  * gonna difficult to handle here. Maybe a solution would be to introduce some kind of exclusion.
  * 
  * @see http://en.wikipedia.org/wiki/Java_class_file#General_layout
+ * @since 1.0-alpha-4
  */
 public class EnforceBytecodeVersion
     extends AbstractBanDependencies
