@@ -35,7 +35,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugins.enforcer.AbstractBanDependencies;
 
 /**
  * Enforcer rule that will check the bytecode version of each class of each dependency. FIXME : Special jar like
@@ -48,17 +47,17 @@ import org.apache.maven.plugins.enforcer.AbstractBanDependencies;
 public class EnforceBytecodeVersion
     extends AbstractBanDependencies
 {
-    private static final Map<String, Integer> jdkToMajorVersionNumberMapping = new HashMap<String, Integer>();
+    private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new HashMap<String, Integer>();
     static
     {
-        jdkToMajorVersionNumberMapping.put( "1.1", 45 );
-        jdkToMajorVersionNumberMapping.put( "1.2", 46 );
-        jdkToMajorVersionNumberMapping.put( "1.3", 47 );
-        jdkToMajorVersionNumberMapping.put( "1.4", 48 );
-        jdkToMajorVersionNumberMapping.put( "1.5", 49 );
-        jdkToMajorVersionNumberMapping.put( "1.6", 50 );
-        jdkToMajorVersionNumberMapping.put( "1.7", 51 );
-        jdkToMajorVersionNumberMapping.put( "1.8", 52 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.1", 45 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.2", 46 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.3", 47 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.4", 48 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.5", 49 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.6", 50 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.7", 51 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.8", 52 );
     }
 
     /**
@@ -85,12 +84,12 @@ public class EnforceBytecodeVersion
     private EnforcerRuleHelper helper;
 
     @Override
-    public void execute( EnforcerRuleHelper helper )
+    public void execute( EnforcerRuleHelper pHelper )
         throws EnforcerRuleException
     {
         computeParameters();
 
-        this.helper = helper;
+        this.helper = pHelper;
         super.execute( helper );
     }
 
@@ -99,17 +98,17 @@ public class EnforceBytecodeVersion
     {
         if ( maxJdkVersion != null && maxJavaMajorVersionNumber != -1 )
         {
-            throw new IllegalArgumentException(
-                                                "Only maxJdkVersion or maxJavaMajorVersionNumber configuration parameters should be set. Not both." );
+            throw new IllegalArgumentException( "Only maxJdkVersion or maxJavaMajorVersionNumber "
+                                              + "configuration parameters should be set. Not both." );
         }
         if ( maxJdkVersion == null && maxJavaMajorVersionNumber == -1 )
         {
-            throw new IllegalArgumentException(
-                                                "Exactly one of maxJdkVersion or maxJavaMajorVersionNumber options should be set." );
+            throw new IllegalArgumentException( "Exactly one of maxJdkVersion or "
+                                              + "maxJavaMajorVersionNumber options should be set." );
         }
         if ( maxJdkVersion != null )
         {
-            Integer needle = jdkToMajorVersionNumberMapping.get( maxJdkVersion );
+            Integer needle = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( maxJdkVersion );
             if ( needle == null )
             {
                 throw new IllegalArgumentException( "Unknown JDK version given. Should be something like \"1.7\"" );
