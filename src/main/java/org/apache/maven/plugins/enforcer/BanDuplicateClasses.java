@@ -190,7 +190,7 @@ public class BanDuplicateClasses
                             "Unable to process dependency " + o.toString() + " due to " + e.getLocalizedMessage(), e );
                     }
                 }
-                else if ( file.isFile() && !"pom".equals( o.getType() ) )
+                else if ( file.isFile() && "jar".equals( o.getType() ) )
                 {
                     try
                     {
