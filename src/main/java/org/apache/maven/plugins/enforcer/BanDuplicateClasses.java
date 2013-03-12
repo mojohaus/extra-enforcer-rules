@@ -180,7 +180,7 @@ public class BanDuplicateClasses
                     {
                         for ( String name : (List<String>) FileUtils.getFileNames( file, null, null, false ) )
                         {
-                            log.info( "  " + name );
+                            log.debug( "  " + name );
                             checkAndAddName( o, name, classNames, duplicates, ignorableDependencies, log );
                         }
                     }
