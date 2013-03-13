@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>company.project</groupId>
+	<artifactId>all-roles-defined</artifactId>
+	<version>5.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<developers>
+		<developer>
+			<name>Project Lead</name>
+			<roles>
+				<role>lead engineer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Someone</name>
+			<roles>
+				<role>java developer</role>
+			</roles>
+		</developer>
+	</developers>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>1.0</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>extra-enforcer-rules</artifactId>
+						<version>1.0-alpha-4-SNAPSHOT</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<rules>
+						<requireDeveloperRoles>
+							<requiredRoles>lead engineer</requiredRoles>
+							<validRoles>java developer</validRoles>
+						</requireDeveloperRoles>
+					</rules>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
