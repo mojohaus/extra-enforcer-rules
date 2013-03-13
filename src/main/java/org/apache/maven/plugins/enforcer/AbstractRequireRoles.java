@@ -20,7 +20,9 @@ package org.apache.maven.plugins.enforcer;
  */
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -45,46 +47,56 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
     private String requiredRoles = "";
 
     /**
-     * Specify the allowed roles as comma separated list.
-     * These are combined with the requiredRoles.
+     * Specify the allowed roles as comma separated list. These are combined with the requiredRoles.
      */
     private String validRoles = "*";
 
     /**
      * Execute the rule.
-     *
+     * 
      * @param helper the helper
      * @throws EnforcerRuleException the enforcer rule exception
      */
-    public void execute( EnforcerRuleHelper helper ) throws EnforcerRuleException
+    public void execute( EnforcerRuleHelper helper )
+        throws EnforcerRuleException
     {
-
         MavenProject mavenProject = getMavenProject( helper );
 
-        final Set<String> rolesFromProperties = getRolesFromString( requiredRoles );
-        final Set<String> rolesFromProject = getRolesFromProject( mavenProject );
-        rolesFromProperties.removeAll( rolesFromProject );
-        
-        if ( rolesFromProperties.size() > 0 )
+        // Trying to prevent side-effects with unmodifiable sets (already got burned)
+        final Set<String> requiredRolesSet = Collections.unmodifiableSet( getRolesFromString( requiredRoles ) );
+        final Set<String> rolesFromProject = Collections.unmodifiableSet(getRolesFromProject( mavenProject ));
+
+        checkRequiredRoles( requiredRolesSet, rolesFromProject );
+        checkValidRoles( requiredRolesSet, rolesFromProject );
+    }
+
+    private void checkRequiredRoles( final Set<String> requiredRolesSet, final Set<String> rolesFromProject )
+        throws EnforcerRuleException
+    {
+        final Set<String> copyOfRequiredRolesSet = new LinkedHashSet<String>( requiredRolesSet );
+        copyOfRequiredRolesSet.removeAll( rolesFromProject );
+        if ( copyOfRequiredRolesSet.size() > 0 )
         {
-            final String message = String.format(
-                    "Found no %s representing role(s) '%s'",
-                    getRoleName(), rolesFromProperties );
+            final String message =
+                String.format( "Found no %s representing role(s) '%s'", getRoleName(), copyOfRequiredRolesSet );
             throw new EnforcerRuleException( message );
         }
+    }
 
+    private void checkValidRoles( final Set<String> requiredRolesSet, final Set<String> rolesFromProject )
+        throws EnforcerRuleException
+    {
+        final Set<String> copyOfRolesFromProject = new LinkedHashSet<String>(rolesFromProject); 
         final Set<String> allowedRoles = getRolesFromString( validRoles );
-        if( !allowedRoles.contains( "*" ) )
+        if ( !allowedRoles.contains( "*" ) )
         {
-            allowedRoles.addAll( rolesFromProperties );
-            
+            allowedRoles.addAll( requiredRolesSet );
+
             // results in invalid roles
-            rolesFromProject.removeAll( allowedRoles );
-            if ( rolesFromProject.size() > 0 )
+            copyOfRolesFromProject.removeAll( allowedRoles );
+            if ( copyOfRolesFromProject.size() > 0 )
             {
-                final String message = String.format(
-                        "Found invalid %s role(s) '%s'",
-                        getRoleName(), rolesFromProject );
+                final String message = String.format( "Found invalid %s role(s) '%s'", getRoleName(), copyOfRolesFromProject );
                 throw new EnforcerRuleException( message );
             }
         }
