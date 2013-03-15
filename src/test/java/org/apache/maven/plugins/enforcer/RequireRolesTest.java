@@ -42,59 +42,53 @@ public class RequireRolesTest
 
     final EnforcerRuleHelper helper = Mockito.mock( EnforcerRuleHelper.class );
 
-    /**
-     * Test of execute method, of class AbstractRequireRoles.
-     */
     @Test
-    public void testExecuteSuccess() throws ExpressionEvaluationException, EnforcerRuleException
+    public void shouldSucceedBecauseArchitectAsDeveloperAndBusinessEngineerAsContributorArePresent() throws Exception
     {
-        setUpMavenProject();
-        {
-            final RequireDeveloperRoles instance = new RequireDeveloperRoles();
-            instance.setRequiredRoles( "lead developer" );
-            instance.execute( helper );
-        }
-        {
-            final RequireContributorRoles instance = new RequireContributorRoles();
-            instance.setRequiredRoles( "business engineer" );
-            instance.execute( helper );
-        }
+        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
+        newRequireDeveloperRoles( "architect" /*required role*/, null /* valid roles not needed */).execute( helper );
+        newRequireContributorRoles( "business engineer" /*required role*/, "*" /* valid roles */).execute( helper );
     }
 
-    /**
-     * Test of execute method, of class RequireContributorRoles.
-     */
     @Test( expected = EnforcerRuleException.class )
-    public void testExecuteMissingContributorQa() throws ExpressionEvaluationException, EnforcerRuleException
+    public void shouldFailBecauseContributorWithRoleQualityManagerIsMissing() throws Exception
     {
-        setUpMavenProject();
-        final RequireContributorRoles instance = new RequireContributorRoles();
-        instance.setRequiredRoles( "business engineer, quality manager" );
-        instance.execute( helper );
+        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
+        newRequireContributorRoles( "business engineer, quality manager", null ).execute( helper );
     }
 
-    /**
-     * Test of execute method, of class RequireContributorRoles.
-     */
     @Test( expected = EnforcerRuleException.class )
-    public void testExecuteMissingDeveloperLead() throws ExpressionEvaluationException, EnforcerRuleException
+    public void shouldFailBecauseDeveloperWithRoleCodeMonkeyIsMissing() throws Exception
     {
-        setUpMavenProject();
-        final RequireDeveloperRoles instance = new RequireDeveloperRoles();
-        instance.setRequiredRoles( "developer" );
-        instance.execute( helper );
+        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
+        newRequireDeveloperRoles( "codemonkey" /* required but not in project */, 
+                                  null ).execute( helper );
     }
 
-    void setUpMavenProject() throws ExpressionEvaluationException
+    @Test( expected = EnforcerRuleException.class )
+    public void shouldFailBecauseContributorRoleBusinessEngineerIsInvalid() throws Exception
     {
-        final MavenProject mavenProject = new MavenProject();
-        final Developer developer = new Developer();
-        developer.addRole( "lead developer" );
-        mavenProject.addDeveloper( developer );
-        final Contributor contributor = new Contributor();
-        contributor.addRole( "business engineer" );
-        mavenProject.addContributor( contributor );
-        Mockito.when( helper.evaluate( "${project}" ) ).thenReturn( mavenProject );
+        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
+        newRequireContributorRoles( null /* no required roles needed */, 
+                                    "hacker" /* only valid role */).execute( helper );
+    }
+
+    @Test( expected = EnforcerRuleException.class )
+    public void shouldFailBecauseNoContributorRolesAtAllAreValid() throws Exception
+    {
+        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
+        newRequireContributorRoles( null /* no required roles needed */, 
+                                    "" /*but no role is valid at all */).execute( helper );
+    }
+
+    @Test
+    public void shouldSucceedAsNoRolesAreRequiredAndAllAreAccepted() throws Exception
+    {
+        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
+        newRequireContributorRoles( null /* no required roles */, 
+                                    "*" /* any role is valid */).execute( helper );
+        newRequireContributorRoles( null /* no required roles */, 
+                                    null /* any role is valid */).execute( helper );
     }
 
     /**
@@ -103,11 +97,9 @@ public class RequireRolesTest
     @Test
     public void testGetRolesFromString()
     {
-        HashSet<String> expResult = new HashSet<String>();
-        expResult.add( "lead developer" );
-        expResult.add( "business engineer" );
-        final RequireContributorRoles instance = new RequireContributorRoles();
-        Set<String> result = instance.getRolesFromString( "lead developer, business engineer" );
+        HashSet<String> expResult = new HashSet<String>( Arrays.asList( "architect", "codemonkey", "business engineer" ) );
+        final RequireContributorRoles sut = new RequireContributorRoles();
+        Set<String> result = sut.getRolesFromString( " architect,  business engineer   , codemonkey " );
         assertEquals( expResult, result );
     }
 
@@ -117,51 +109,69 @@ public class RequireRolesTest
     @Test
     public void testGetRolesFromMaven()
     {
-        HashSet<String> expResult = new HashSet<String>();
-        expResult.add( "lead developer" );
-        expResult.add( "business engineer" );
+        HashSet<String> expResult = new HashSet<String>( Arrays.asList( 
+                "quality manager", "product owner", "business engineer" ) );
         final Contributor singleHero = new Contributor();
-        singleHero.addRole( "lead developer" );
+        singleHero.addRole( "quality manager" );
         singleHero.addRole( "business engineer" );
+        singleHero.addRole( "product owner" );
         List<Contributor> listFromMaven = Arrays.asList( singleHero );
-        final HashSet<String> result1 = new HashSet<String>();
+        final HashSet<String> result = new HashSet<String>();
         for ( final Contributor contributor : listFromMaven )
         {
             @SuppressWarnings( "unchecked" )
             List<String> roles = contributor.getRoles();
             for ( String role : roles )
             {
-                result1.add( role );
+                result.add( role );
             }
         }
-        HashSet<String> result = result1;
         assertEquals( expResult, result );
     }
+
+    private void addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper() throws Exception
+    {
+        final MavenProject mavenProject = new MavenProject();
+        final Developer developer = new Developer();
+        developer.addRole( "architect" );
+        mavenProject.addDeveloper( developer );
+        final Contributor contributor = new Contributor();
+        contributor.addRole( "business engineer" );
+        mavenProject.addContributor( contributor );
+        Mockito.when( helper.evaluate( "${project}" ) ).thenReturn( mavenProject );
+    }
+
     
-    @Test( expected = EnforcerRuleException.class )
-    public void testExecuteInvalidContributor() throws ExpressionEvaluationException, EnforcerRuleException
+    private RequireDeveloperRoles newRequireDeveloperRoles(
+            final String commaSeparatedRequiredRoles,
+            final String commaSeparatedValidRoles )
     {
-        setUpMavenProject();
-        final RequireContributorRoles instance = new RequireContributorRoles();
-        instance.setValidRoles( "hacker" );
-        instance.execute( helper );
-    }
+        final RequireDeveloperRoles sut = new RequireDeveloperRoles();
+        if ( commaSeparatedRequiredRoles != null )
+        {
+            sut.setRequiredRoles( commaSeparatedRequiredRoles );
+        }
 
-    @Test( expected = EnforcerRuleException.class )
-    public void testExecuteAllInvalidContributor() throws ExpressionEvaluationException, EnforcerRuleException
-    {
-        setUpMavenProject();
-        final RequireContributorRoles instance = new RequireContributorRoles();
-        instance.setValidRoles( "" ); //no roles allowed
-        instance.execute( helper );
+        if ( commaSeparatedValidRoles != null )
+        {
+            sut.setValidRoles( commaSeparatedValidRoles );
+        }
+        return sut;
     }
+    
+    private RequireContributorRoles newRequireContributorRoles(
+            final String commaSeparatedRequiredRoles,
+            final String commaSeparatedValidRoles )
+    {
+        final RequireContributorRoles sut = new RequireContributorRoles();
+        if ( commaSeparatedRequiredRoles != null )
+        {
+            sut.setRequiredRoles( commaSeparatedRequiredRoles );
+        }
 
-    @Test
-    public void testExecuteValidContributor() throws ExpressionEvaluationException, EnforcerRuleException
-    {
-        setUpMavenProject();
-        final RequireContributorRoles instance = new RequireContributorRoles();
-        instance.setValidRoles( "business engineer" ); //no roles allowed
-        instance.execute( helper );
-    }
-}
+        if ( commaSeparatedValidRoles != null )
+        {
+            sut.setValidRoles( commaSeparatedValidRoles );
+        }
+        return sut;
+    }}
