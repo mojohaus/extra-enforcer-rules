@@ -151,31 +151,37 @@ public class EnforceBytecodeVersion
         try
         {
             JarFile jarFile = new JarFile( f );
-            getLog().debug( f.getName() + " => " + f.getPath() );
-            byte[] magicAndClassFileVersion = new byte[8];
-            for ( Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); )
-            {
-                JarEntry entry = e.nextElement();
-                if ( !entry.isDirectory() && entry.getName().endsWith( ".class" ) )
+            try {
+                getLog().debug( f.getName() + " => " + f.getPath() );
+                byte[] magicAndClassFileVersion = new byte[8];
+                for ( Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); )
                 {
-                    StringBuilder builder = new StringBuilder();
-                    builder.append( "\t" ).append( entry.getName() ).append( " => " );
-                    InputStream is = jarFile.getInputStream( entry );
-                    int read = is.read( magicAndClassFileVersion );
-                    is.close();
-                    assert read != 8;
-
-                    int minor = ( magicAndClassFileVersion[4] << 8 ) + magicAndClassFileVersion[5];
-                    int major = ( magicAndClassFileVersion[6] << 8 ) + magicAndClassFileVersion[7];
-                    builder.append( "major=" ).append( major ).append( ",minor=" ).append( minor );
-                    getLog().debug( builder.toString() );
-
-                    if ( ( major > maxJavaMajorVersionNumber )
-                        || ( major == maxJavaMajorVersionNumber && minor > maxJavaMinorVersionNumber ) )
+                    JarEntry entry = e.nextElement();
+                    if ( !entry.isDirectory() && entry.getName().endsWith( ".class" ) )
                     {
-                        return true;
+                        StringBuilder builder = new StringBuilder();
+                        builder.append( "\t" ).append( entry.getName() ).append( " => " );
+                        InputStream is = jarFile.getInputStream( entry );
+                        int read = is.read( magicAndClassFileVersion );
+                        is.close();
+                        assert read != 8;
+
+                        int minor = ( magicAndClassFileVersion[4] << 8 ) + magicAndClassFileVersion[5];
+                        int major = ( magicAndClassFileVersion[6] << 8 ) + magicAndClassFileVersion[7];
+                        builder.append( "major=" ).append( major ).append( ",minor=" ).append( minor );
+                        getLog().debug( builder.toString() );
+
+                        if ( ( major > maxJavaMajorVersionNumber )
+                            || ( major == maxJavaMajorVersionNumber && minor > maxJavaMinorVersionNumber ) )
+                        {
+                            return true;
+                        }
                     }
                 }
+            }
+            finally
+            {
+                jarFile.close();
             }
         }
         catch ( IOException e )
