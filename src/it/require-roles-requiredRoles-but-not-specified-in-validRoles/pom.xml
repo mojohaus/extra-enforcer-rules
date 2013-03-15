@@ -27,9 +27,9 @@
 				<version>1.0</version>
 				<dependencies>
 					<dependency>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>extra-enforcer-rules</artifactId>
-						<version>1.0-alpha-4-SNAPSHOT</version>
+						<groupId>@project.groupId@</groupId>
+						<artifactId>@project.artifactId@</artifactId>
+						<version>@project.version@</version>
 					</dependency>
 				</dependencies>
 				<configuration>
