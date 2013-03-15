@@ -36,8 +36,8 @@ Require Contributor Roles
    * <<<requiredRoles>>> - Comma separated list of roles which must be represented
    by at least one contributor.
 
-   * <<<validRoles>>> - Comma separated list of roles which are allowed. <<<requiredRoles>>> are always valid.
-   By default it has the value <<<*>>>, which means every role is excepted. This rule does <<not>> support Ant-patterns. 
+   * <<<validRoles>>> - Comma separated list of roles which are additionally allowed. <<<requiredRoles>>> are always valid, so the union of <<<requiredRoles>>> and <<<validRoles>>>forms the set of all accepted roles.
+   By default it has the value <<<*>>>, which means every role is accepted. This rule does <<not>> support Ant-patterns.
    
    []
 
