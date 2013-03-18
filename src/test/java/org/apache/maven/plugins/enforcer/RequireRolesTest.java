@@ -28,7 +28,6 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Developer;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.mockito.Mockito;

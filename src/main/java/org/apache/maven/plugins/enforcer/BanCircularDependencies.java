@@ -22,12 +22,15 @@ package org.apache.maven.plugins.enforcer;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * Bans circular dependencies on the classpath.
@@ -43,6 +46,8 @@ public class BanCircularDependencies
     public void execute( EnforcerRuleHelper helper )
         throws EnforcerRuleException
     {
+        warnIfMaven2( helper );
+
         Log log = helper.getLog();
         try
         {
@@ -53,16 +58,14 @@ public class BanCircularDependencies
             {
                 for ( Artifact artifact : artifacts )
                 {
-                    log.debug( "groupId " + artifact.getGroupId() + project.getGroupId() );
+                    log.debug( "groupId: " + artifact.getGroupId() + project.getGroupId() );
                     if ( artifact.getGroupId().equals( project.getGroupId() ) )
                     {
-                        log.debug( "artifactId" + artifact.getArtifactId() + " " + project.getArtifactId() );
+                        log.debug( "artifactId: " + artifact.getArtifactId() + " " + project.getArtifactId() );
                         if ( artifact.getArtifactId().equals( project.getArtifactId() ) )
                         {
                             StringBuilder buf = new StringBuilder( getErrorMessage() );
-                            buf.append( "\n  " ).
-                                append( artifact.getGroupId() ).append( ":" ).append( artifact.getArtifactId() ).
-                                append( "\n " );
+                            buf.append( "\n  " ).append( artifact.getGroupId() ).append( ":" ).append( artifact.getArtifactId() ).append( "\n " );
                             throw new EnforcerRuleException( buf.toString() );
                         }
                     }
@@ -71,16 +74,38 @@ public class BanCircularDependencies
         }
         catch ( ExpressionEvaluationException e )
         {
-            log.error( "Error checking for circular dependencies" );
+            log.error( "Error checking for circular dependencies", e );
             e.printStackTrace();
+        }
+    }
+
+    private void warnIfMaven2( EnforcerRuleHelper helper )
+    {
+        final Log log = helper.getLog();
+        RuntimeInformation rti;
+        try
+        {
+            rti = (RuntimeInformation) helper.getComponent( RuntimeInformation.class );
+            ArtifactVersion detectedMavenVersion = rti.getApplicationVersion();
+            log.debug( "Detected Maven Version: " + detectedMavenVersion );
+            if ( detectedMavenVersion.getMajorVersion() == 2 )
+            {
+                log.warn( "Circular dependencies cannot exist with Maven 2. "
+                    + "So that rule is of no use for that Maven version. " + "See rule documentation at "
+                    + "http://mojo.codehaus.org/extra-enforcer-rules/banCircularDependencies.html" );
+            }
+        }
+        catch ( ComponentLookupException e )
+        {
+            log.warn( "Unable to detect Maven version. Please report this issue to the mojo@codehaus project" );
         }
     }
 
     private String getErrorMessage()
     {
         if ( message == null )
-            return "Circular Dependency found. Your project's groupId:artifactId combination " +
-            		"must not exist in the list of direct or transitive dependencies.";
+            return "Circular Dependency found. Your project's groupId:artifactId combination "
+                + "must not exist in the list of direct or transitive dependencies.";
         return message;
     }
 
