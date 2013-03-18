@@ -99,12 +99,12 @@ public class EnforceBytecodeVersion
         if ( maxJdkVersion != null && maxJavaMajorVersionNumber != -1 )
         {
             throw new IllegalArgumentException( "Only maxJdkVersion or maxJavaMajorVersionNumber "
-                                              + "configuration parameters should be set. Not both." );
+                + "configuration parameters should be set. Not both." );
         }
         if ( maxJdkVersion == null && maxJavaMajorVersionNumber == -1 )
         {
             throw new IllegalArgumentException( "Exactly one of maxJdkVersion or "
-                                              + "maxJavaMajorVersionNumber options should be set." );
+                + "maxJavaMajorVersionNumber options should be set." );
         }
         if ( maxJdkVersion != null )
         {
@@ -151,7 +151,8 @@ public class EnforceBytecodeVersion
         try
         {
             JarFile jarFile = new JarFile( f );
-            try {
+            try
+            {
                 getLog().debug( f.getName() + " => " + f.getPath() );
                 byte[] magicAndClassFileVersion = new byte[8];
                 for ( Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); )
