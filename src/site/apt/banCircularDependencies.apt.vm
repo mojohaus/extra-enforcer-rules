@@ -24,6 +24,8 @@
 Ban Circular Dependencies
 
   This rule checks the dependencies and fails if the groupId:artifactId combination exists in the list of direct or transitive dependencies.
+  Note that this rule is of no use for Maven 2. It is only useful if you use or plan to use Maven 3. 
+  (For more information about this, see {{{http://mojo.10943.n7.nabble.com/VOTE-Release-extra-enforcer-rules-version-1-0-alpha-4-td39196.html#a39216}this thread)
 
     []
 
