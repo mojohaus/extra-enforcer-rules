@@ -23,11 +23,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -74,6 +76,12 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
         log.debug( getRuleName() + ": checking property '" + property + "' for project " + project );
 
         final MavenProject parent = findDefiningParent( project );
+        
+        // fail fast if the defining parent could not be found due to a bug in the rule
+        if ( parent == null )
+        {
+            throw new NullPointerException( "failed to find parent POM which defines the current rule" );
+        }
 
         if ( project.equals( parent ) )
         {
@@ -252,26 +260,47 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
     {
         if ( plugins.containsKey( MAVEN_ENFORCER_PLUGIN ) )
         {
+            final List<Xpp3Dom> ruleConfigurations = new ArrayList<Xpp3Dom>();
+
             final Plugin enforcer = plugins.get( MAVEN_ENFORCER_PLUGIN );
             final Xpp3Dom configuration = ( Xpp3Dom ) enforcer.getConfiguration();
-            // may be null when rules are defined in pluginManagement during invocation
-            // for plugin section and vice versa.
-            if ( configuration != null )
+
+            // add rules from plugin configuration
+            addRules( configuration, ruleConfigurations );
+
+            // add rules from all plugin execution configurations
+            for ( Object execution : enforcer.getExecutions() )
             {
-                final Xpp3Dom rules = configuration.getChild( "rules" );
-                return Arrays.asList( rules.getChildren( getRuleName() ) );
+                addRules( ( Xpp3Dom ) ( ( PluginExecution ) execution ).getConfiguration(), ruleConfigurations );
             }
-            else
-            {
-                // do not return Collections.emptyList() as this list
-                // might be extended during the search in the pluginManagement
-                // later on.
-                return new ArrayList<Xpp3Dom>();
-            }
+
+            return ruleConfigurations;
         }
         else
         {
             return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Add the rules found in the given configuration to the list of rule configurations.
+     * 
+     * @param configuration
+     *            configuration from which the rules are copied. May be <code>null</code>.
+     * @param ruleConfigurations
+     *            List to which the rules will be added.
+     */
+    private void addRules(final Xpp3Dom configuration, final List<Xpp3Dom> ruleConfigurations)
+    {
+        // may be null when rules are defined in pluginManagement during invocation
+        // for plugin section and vice versa.
+        if ( configuration != null )
+        {
+            final Xpp3Dom rules = configuration.getChild( "rules" );
+            if ( rules != null )
+            {
+                ruleConfigurations.addAll( Arrays.asList( rules.getChildren( getRuleName() ) ) );
+            }
         }
     }
 

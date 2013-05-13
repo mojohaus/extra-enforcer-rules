@@ -18,20 +18,22 @@ package org.apache.maven.plugins.enforcer;
  * specific language governing permissions and limitations
  * under the License.
  */
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import org.mockito.Mockito;
-import static org.mockito.Mockito.when;
 
 /**
  *
@@ -40,7 +42,7 @@ import static org.mockito.Mockito.when;
 public class RequirePropertyDivergesTest
 {
 
-    final EnforcerRuleHelper helper = Mockito.mock( EnforcerRuleHelper.class );
+    final EnforcerRuleHelper helper = mock( EnforcerRuleHelper.class );
     final RequirePropertyDiverges instance = new RequirePropertyDiverges();
 
     /**
@@ -51,6 +53,8 @@ public class RequirePropertyDivergesTest
     {
         RequirePropertyDiverges mockInstance = createMockRule();
         final MavenProject project = createMavenProject( "company", "child" );
+        final MavenProject parent = createParentProject();
+        project.setParent( parent );
         setUpHelper( project, "childValue" );
         mockInstance.execute( helper );
     }
@@ -62,6 +66,12 @@ public class RequirePropertyDivergesTest
     public void testExecuteInParent() throws EnforcerRuleException
     {
         RequirePropertyDiverges mockInstance = createMockRule();
+        final MavenProject project = createParentProject();
+        setUpHelper(project, "parentValue");
+        mockInstance.execute(helper);
+    }
+
+    private MavenProject createParentProject() {
         final MavenProject project = createMavenProject( "company", "company-parent-pom" );
         final Build build = new Build();
         build.setPluginManagement( new PluginManagement() );
@@ -70,8 +80,7 @@ public class RequirePropertyDivergesTest
         plugin.setConfiguration( configuration );
         build.addPlugin( plugin );
         project.getOriginalModel().setBuild( build );
-        setUpHelper( project, "parentValue" );
-        mockInstance.execute( helper );
+        return project;
     }
 
     /**
@@ -100,6 +109,27 @@ public class RequirePropertyDivergesTest
         mockInstance.execute( helper );
     }
 
+    /**
+     * Test of execute method, of class RequirePropertyDiverges.
+     */
+    @Test
+    public void testExecuteInParentWithConfigurationInExecution() throws EnforcerRuleException
+    {
+        RequirePropertyDiverges mockInstance = createMockRule();
+        final MavenProject project = createMavenProject( "company", "company-parent-pom" );
+        final Build build = new Build();
+        build.setPluginManagement( new PluginManagement() );
+        final Plugin plugin = newPlugin( "org.apache.maven.plugins", "maven-enforcer-plugin", "1.0" );
+        final Xpp3Dom configuration = createPluginConfiguration();
+        PluginExecution pluginExecution = new PluginExecution();
+        pluginExecution.setConfiguration( configuration );
+        plugin.addExecution( pluginExecution );
+        build.addPlugin( plugin );
+        project.getOriginalModel().setBuild( build );
+        setUpHelper(project, "parentValue");
+        mockInstance.execute( helper );
+    }
+
     @Test
     public void testProjectWithoutEnforcer()
     {
@@ -116,6 +146,8 @@ public class RequirePropertyDivergesTest
     {
         RequirePropertyDiverges mockInstance = createMockRule();
         final MavenProject project = createMavenProject( "company", "child" );
+        final MavenProject parent = createParentProject();
+        project.setParent( parent );
         setUpHelper( project, "parentValue" );
         mockInstance.execute( helper );
     }
@@ -205,14 +237,14 @@ public class RequirePropertyDivergesTest
     {
         try
         {
-            Mockito.when( helper.evaluate( "${project}" ) ).thenReturn( project );
-            Mockito.when( helper.evaluate( "${checkedProperty}" ) ).thenReturn( propertyValue );
+            when( helper.evaluate( "${project}" ) ).thenReturn( project );
+            when( helper.evaluate( "${checkedProperty}" ) ).thenReturn( propertyValue );
         }
         catch ( ExpressionEvaluationException ex )
         {
             throw new RuntimeException( ex );
         }
-        Mockito.when( helper.getLog() ).thenReturn( Mockito.mock( Log.class ) );
+        when( helper.getLog() ).thenReturn( mock( Log.class ) );
     }
 
     Xpp3Dom createPluginConfiguration()
