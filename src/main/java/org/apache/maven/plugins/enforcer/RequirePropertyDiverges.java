@@ -76,11 +76,11 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
         log.debug( getRuleName() + ": checking property '" + property + "' for project " + project );
 
         final MavenProject parent = findDefiningParent( project );
-        
+
         // fail fast if the defining parent could not be found due to a bug in the rule
         if ( parent == null )
         {
-            throw new NullPointerException( "failed to find parent POM which defines the current rule" );
+            throw new IllegalStateException( "Failed to find parent POM which defines the current rule" );
         }
 
         if ( project.equals( parent ) )
