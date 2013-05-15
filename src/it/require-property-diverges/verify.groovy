@@ -9,4 +9,6 @@ assert buf.contains('Property \'project.url\' evaluates to \'http://company/comp
 
 assert buf.contains('Property \'project.groupId\' evaluates to \'company.project1\'. This does match \'company.project1\' from parent MavenProject: company.project1:fail-property-without-regex-not-overridden:1.0-SNAPSHOT');
 
+assert buf.contains('Property \'project.url\' must be overridden:\nAll in-house projects need to link to a single Wiki-page.');
+
 return true;
