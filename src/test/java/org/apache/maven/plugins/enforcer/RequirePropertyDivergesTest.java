@@ -173,6 +173,34 @@ public class RequirePropertyDivergesTest
     }
 
     @Test
+    public void testCreateResultingErrorMessageReturningCustomMessage()
+    {
+        instance.setProperty( "checkedProperty" );
+        instance.message = "This is needed for foo.";
+        final String actual = instance.createResultingErrorMessage( "default message" );
+        final String expected = "Property 'checkedProperty' must be overridden:\nThis is needed for foo.";
+        assertEquals( expected, actual);
+    }
+
+    @Test
+    public void testCreateResultingErrorMessageReturningDefaultMessage()
+    {
+        instance.setProperty( "checkedProperty" );
+        instance.message = null;
+        {
+            final String actual = instance.createResultingErrorMessage( "default message" );
+            final String expected = "default message";
+            assertEquals( expected, actual );
+        }
+        instance.message = "";
+        {
+            final String actual = instance.createResultingErrorMessage( "default message" );
+            final String expected = "default message";
+            assertEquals( expected, actual );
+        }
+    }
+
+    @Test
     public void testGetRuleName()
     {
         assertEquals( "requirePropertyDiverges", instance.getRuleName() );

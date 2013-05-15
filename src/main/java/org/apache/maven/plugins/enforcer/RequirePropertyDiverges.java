@@ -124,11 +124,10 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
         Object parentValue = getPropertyValue( helper, propertyNameInParent );
         if ( propValue.equals( parentValue ) )
         {
-            final String errorMessage = String.format(
+            final String errorMessage = createResultingErrorMessage( String.format(
                     "Property '%s' evaluates to '%s'. This does match '%s' from parent %s",
-                    property, propValue, parentValue, parent );
+                    property, propValue, parentValue, parent ) );
             throw new EnforcerRuleException( errorMessage );
-
         }
     }
 
@@ -144,9 +143,10 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
         // Check that the property does not match the regex.
         if ( propValue.toString().matches( regex ) )
         {
-            final String errorMessage = String.format(
+            final String errorMessage = createResultingErrorMessage(
+                    String.format(
                     "Property '%s' evaluates to '%s'. This does match the regular expression '%s'",
-                    property, propValue, regex );
+                    property, propValue, regex ) );
             throw new EnforcerRuleException( errorMessage );
         }
     }
@@ -230,7 +230,7 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
     /**
      * Returns the rule configurations from the <tt>pluginManagement</tt> as well
      * as the <tt>plugins</tt> section.
-     * 
+     *
      * @param build the build to inspect.
      * @return configuration of the rules, may be an empty list.
      */
@@ -284,7 +284,7 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
 
     /**
      * Add the rules found in the given configuration to the list of rule configurations.
-     * 
+     *
      * @param configuration
      *            configuration from which the rules are copied. May be <code>null</code>.
      * @param ruleConfigurations
@@ -370,6 +370,25 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
         {
             throw new EnforcerRuleException( String.format(
                     "Property '%s' is required for this build and not defined in hierarchy at all.", property ) );
+        }
+    }
+
+    /**
+     * Either return the submitted errorMessage or replace it with the custom message set in the rule extended
+     * by the property name.
+     *
+     * @param errorMessage
+     * @return
+     */
+    String createResultingErrorMessage( String errorMessage )
+    {
+        if ( StringUtils.isNotEmpty( message ) )
+        {
+            return "Property '" + property + "' must be overridden:\n" + message;
+        }
+        else
+        {
+            return errorMessage;
         }
     }
 
