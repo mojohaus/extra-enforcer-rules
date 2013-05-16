@@ -195,6 +195,12 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
             regexDom.setValue( regex );
             ruleDom.addChild( regexDom );
         }
+        if ( message != null ) 
+        {
+            final Xpp3Dom messageDom = new Xpp3Dom( "message" );
+            messageDom.setValue( message );
+            ruleDom.addChild( messageDom );
+        }
         return ruleDom;
     }
 
