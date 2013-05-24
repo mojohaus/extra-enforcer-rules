@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
@@ -185,23 +187,7 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
      */
     Xpp3Dom createInvokingRuleDom()
     {
-        Xpp3Dom ruleDom = new Xpp3Dom( getRuleName() );
-        final Xpp3Dom propertyDom = new Xpp3Dom( "property" );
-        propertyDom.setValue( property );
-        ruleDom.addChild( propertyDom );
-        if ( regex != null )
-        {
-            final Xpp3Dom regexDom = new Xpp3Dom( "regex" );
-            regexDom.setValue( regex );
-            ruleDom.addChild( regexDom );
-        }
-        if ( message != null ) 
-        {
-            final Xpp3Dom messageDom = new Xpp3Dom( "message" );
-            messageDom.setValue( message );
-            ruleDom.addChild( messageDom );
-        }
-        return ruleDom;
+        return new CreateInvokingRuleDom( this ).getRuleDom();
     }
 
     /**
@@ -296,7 +282,7 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
      * @param ruleConfigurations
      *            List to which the rules will be added.
      */
-    private void addRules(final Xpp3Dom configuration, final List<Xpp3Dom> ruleConfigurations)
+    private void addRules( final Xpp3Dom configuration, final List<Xpp3Dom> ruleConfigurations )
     {
         // may be null when rules are defined in pluginManagement during invocation
         // for plugin section and vice versa.
@@ -305,9 +291,38 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
             final Xpp3Dom rules = configuration.getChild( "rules" );
             if ( rules != null )
             {
-                ruleConfigurations.addAll( Arrays.asList( rules.getChildren( getRuleName() ) ) );
+                final List<Xpp3Dom> originalListFromPom = Arrays.asList( rules.getChildren( getRuleName() ) );
+                ruleConfigurations.addAll( createRuleListWithNameSortedChildren( originalListFromPom ) );
             }
         }
+    }
+
+    /**
+     * As Xpp3Dom is very picky about the order of children while comparing, create a new list where the children
+     * are added in alphabetical order. See <a href="https://jira.codehaus.org/browse/MOJO-1931">MOJO-1931</a>.
+     *
+     * @param originalListFromPom order not specified
+     * @return a list where children's member are alphabetically sorted.
+     */
+    private List<Xpp3Dom> createRuleListWithNameSortedChildren( final List<Xpp3Dom> originalListFromPom )
+    {
+        final List<Xpp3Dom> listWithSortedEntries = new ArrayList<Xpp3Dom>( originalListFromPom.size() );
+        for ( Xpp3Dom unsortedXpp3Dom : originalListFromPom )
+        {
+            final Xpp3Dom sortedXpp3Dom = new Xpp3Dom( getRuleName() );
+            final SortedMap<String, Xpp3Dom> childrenMap = new TreeMap<String, Xpp3Dom>();
+            final Xpp3Dom[] children = unsortedXpp3Dom.getChildren();
+            for ( Xpp3Dom child : children )
+            {
+                childrenMap.put( child.getName(), child );
+            }
+            for ( Xpp3Dom entry : childrenMap.values() )
+            {
+                sortedXpp3Dom.addChild( entry );
+            }
+            listWithSortedEntries.add( sortedXpp3Dom );
+        }
+        return listWithSortedEntries;
     }
 
     /**
@@ -413,5 +428,52 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
     void setRegex( String regex )
     {
         this.regex = regex;
+    }
+
+    /**
+     * Creates the DOM of the invoking rule, but returns the children alphabetically sorted.
+     */
+    private static class CreateInvokingRuleDom
+    {
+
+        private final Xpp3Dom ruleDom;
+        private final SortedMap<String, Xpp3Dom> map = new TreeMap<String, Xpp3Dom>();
+
+        /** Real work is done in the constructor */
+        public CreateInvokingRuleDom( RequirePropertyDiverges rule )
+        {
+            ruleDom = new Xpp3Dom( rule.getRuleName() );
+            addToMapWhenNotNull( rule.property, "property" );
+            addToMapWhenNotNull( rule.message, "message" );
+            addToMapWhenNotNull( rule.regex, "regex" );
+            addChildrenToRuleDom();
+        }
+
+        /**
+         * Readily prepared in constructor.
+         *
+         * @return the ruleDom
+         */
+        public Xpp3Dom getRuleDom() {
+            return ruleDom;
+        }
+
+        private void addToMapWhenNotNull( String member, final String memberName )
+        {
+            if ( member != null )
+            {
+                final Xpp3Dom memberDom = new Xpp3Dom( memberName );
+                memberDom.setValue( member );
+                map.put( memberName, memberDom );
+            }
+        }
+        
+        private void addChildrenToRuleDom()
+        {
+            for ( Xpp3Dom entry : map.values() )
+            {
+                ruleDom.addChild( entry );
+            }
+        }
     }
 }

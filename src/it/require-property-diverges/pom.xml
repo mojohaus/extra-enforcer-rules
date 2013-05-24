@@ -37,9 +37,9 @@
               <regex>http://company/company-parent-pom/.*</regex>
             </requirePropertyDiverges>
             <requirePropertyDiverges>
-              <property>myFineProperty</property>
-              <regex>foo</regex>
-              <message>All in-house projects need to override this.</message>
+                <regex>foo</regex>
+                <property>myFineProperty</property>              
+                <message>All in-house projects need to override this.</message>
             </requirePropertyDiverges>
           </rules>
         </configuration>
