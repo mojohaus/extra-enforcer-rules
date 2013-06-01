@@ -19,9 +19,7 @@ package org.apache.maven.plugins.enforcer;
  * under the License.
  */
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.model.Developer;
 import org.apache.maven.project.MavenProject;
@@ -32,7 +30,7 @@ import org.apache.maven.project.MavenProject;
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
  */
-public class RequireDeveloperRoles extends AbstractRequireRoles
+public class RequireDeveloperRoles extends AbstractRequireRoles<Developer>
 {
 
     @Override
@@ -40,20 +38,10 @@ public class RequireDeveloperRoles extends AbstractRequireRoles
     {
         return "developer";
     }
-    
-    @SuppressWarnings( "unchecked" )
+
     @Override
-    protected final Set<String> getRolesFromProject( MavenProject mavenProject )
+    protected List<Developer> getRoles( MavenProject mavenProject )
     {
-        final Set<String> result = new HashSet<String>();
-        for ( final Developer developer : (List<Developer>) mavenProject.getDevelopers() )
-        {
-            List<String> roles = developer.getRoles();
-            for ( String role : roles )
-            {
-                result.add( role );
-            }
-        }
-        return result;
+        return mavenProject.getDevelopers();
     }
 }

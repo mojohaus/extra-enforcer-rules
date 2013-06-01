@@ -28,6 +28,8 @@ import java.util.Set;
 
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+import org.apache.maven.model.Contributor;
+import org.apache.maven.model.Developer;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.util.StringUtils;
@@ -38,7 +40,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
  */
-abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
+abstract class AbstractRequireRoles<T extends Contributor> extends AbstractNonCacheableEnforcerRule
 {
 
     /**
@@ -103,12 +105,26 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
     }
 
     /**
-     * Returns the roles from Maven.
+     * Returns the roles from the POM.
      *
      * @param mavenProject
-     * @return roles from Maven.
+     * @return roles from POM.
      */
-    protected abstract Set<String> getRolesFromProject( final MavenProject mavenProject );
+    @SuppressWarnings( "unchecked" )
+    final Set<String> getRolesFromProject( MavenProject mavenProject )
+    {
+        final Set<String> result = new HashSet<String>();
+        for ( final T roleFromPom : getRoles( mavenProject ) )
+        {
+            List<String> roles = roleFromPom.getRoles();
+            for ( String role : roles )
+            {
+                result.add( role );
+            }
+        }
+        return result;
+    }
+
 
     /**
      * Returns the rolename.
@@ -116,6 +132,14 @@ abstract class AbstractRequireRoles extends AbstractNonCacheableEnforcerRule
      * @return rolename.
      */
     protected abstract String getRoleName();
+
+    /**
+     * Returns the roles from the POM.
+     *
+     * @param mavenProject
+     * @return the list of {@link Contributor}s or {@link Developer}s.
+     */
+    protected abstract List<T> getRoles( final MavenProject mavenProject );
 
     /**
      * Returns the set of required roles from the property.
