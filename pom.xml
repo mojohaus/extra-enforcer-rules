@@ -9,7 +9,7 @@
 
   <groupId>org.codehaus.mojo</groupId>
   <artifactId>extra-enforcer-rules</artifactId>
-  <version>1.0-alpha-5</version>
+  <version>1.0-alpha-6-SNAPSHOT</version>
 
   <name>Extra Enforcer Rules</name>
 
@@ -33,9 +33,9 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:svn:https://svn.codehaus.org/mojo/tags/extra-enforcer-rules-1.0-alpha-5</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/extra-enforcer-rules-1.0-alpha-5</developerConnection>
-    <url>http://fisheye.codehaus.org/browse/mojo/tags/extra-enforcer-rules-1.0-alpha-5</url>
+    <connection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/extra-enforcer-rules</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/extra-enforcer-rules</developerConnection>
+    <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/extra-enforcer-rules</url>
   </scm>
 
   <developers>
