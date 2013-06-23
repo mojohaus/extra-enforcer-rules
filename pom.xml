@@ -140,7 +140,7 @@
           <postBuildHookScript>verify</postBuildHookScript>
           <addTestClassPath>true</addTestClassPath>
           <filterProperties>
-            <enforcerPluginVersion>1.3</enforcerPluginVersion>
+            <enforcerPluginVersion>1.0</enforcerPluginVersion>
           </filterProperties>
         </configuration>
         <executions>
