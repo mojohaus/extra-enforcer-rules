@@ -270,7 +270,7 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
         }
         else
         {
-            return Collections.emptyList();
+            return new ArrayList();
         }
     }
 
