@@ -19,6 +19,7 @@ package org.apache.maven.plugins.enforcer;
  * under the License.
  */
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -29,6 +30,9 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -40,6 +44,9 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 public class BanCircularDependencies
     extends AbstractStandardEnforcerRule
 {
+    
+    private transient DependencyGraphBuilder graphBuilder;
+    
     /**
      * {@inheritDoc}
      */
@@ -49,10 +56,29 @@ public class BanCircularDependencies
         warnIfMaven2( helper );
 
         Log log = helper.getLog();
+
+        try
+        {
+            graphBuilder = (DependencyGraphBuilder) helper.getComponent( DependencyGraphBuilder.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            // real cause is probably that one of the Maven3 graph builder could not be initiated and fails with a ClassNotFoundException
+            try
+            {
+                graphBuilder = (DependencyGraphBuilder) helper.getComponent( DependencyGraphBuilder.class.getName(), "maven2" );
+            }
+            catch ( ComponentLookupException e1 )
+            {
+                throw new EnforcerRuleException( "Unable to lookup DependencyGraphBuilder: ", e );
+            }
+        }
+
         try
         {
             MavenProject project = (MavenProject) helper.evaluate( "${project}" );
-            Set<Artifact> artifacts = project.getArtifacts();
+            
+            Set<Artifact> artifacts = getDependenciesToCheck( project );
 
             if ( artifacts != null )
             {
@@ -100,6 +126,42 @@ public class BanCircularDependencies
             log.warn( "Unable to detect Maven version. Please report this issue to the mojo@codehaus project" );
         }
     }
+    
+    protected Set<Artifact> getDependenciesToCheck( MavenProject project )
+    {
+        Set<Artifact> dependencies = null;
+        try
+        {
+            DependencyNode node = graphBuilder.buildDependencyGraph( project, null );
+            dependencies  = getAllDescendants( node );
+        }
+        catch ( DependencyGraphBuilderException e )
+        {
+            // otherwise we need to change the signature of this protected method
+            throw new RuntimeException( e );
+        }
+        return dependencies;
+    }
+    
+    private Set<Artifact> getAllDescendants( DependencyNode node )
+    {
+        Set<Artifact> children = null; 
+        if( node.getChildren() != null )
+        {
+            children = new HashSet<Artifact>();
+            for( DependencyNode depNode : node.getChildren() )
+            {
+                children.add( depNode.getArtifact() );
+                Set<Artifact> subNodes = getAllDescendants( depNode );
+                if( subNodes != null )
+                {
+                    children.addAll( subNodes );
+                }
+            }
+        }
+        return children;
+    }
+    
 
     private String getErrorMessage()
     {
