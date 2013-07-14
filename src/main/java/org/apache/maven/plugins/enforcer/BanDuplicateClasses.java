@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,11 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
@@ -49,6 +54,8 @@ public class BanDuplicateClasses
     extends AbstractStandardEnforcerRule
 {
 
+    private transient DependencyGraphBuilder graphBuilder;
+    
     /**
      * List of classes to ignore. Wildcard at the end accepted
      */
@@ -150,11 +157,29 @@ public class BanDuplicateClasses
                 ignorableDependencies.add( ignorableDependency );
             }
         }
+        
+        try
+        {
+            graphBuilder = (DependencyGraphBuilder) helper.getComponent( DependencyGraphBuilder.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            // real cause is probably that one of the Maven3 graph builder could not be initiated and fails with a ClassNotFoundException
+            try
+            {
+                graphBuilder = (DependencyGraphBuilder) helper.getComponent( DependencyGraphBuilder.class.getName(), "maven2" );
+            }
+            catch ( ComponentLookupException e1 )
+            {
+                throw new EnforcerRuleException( "Unable to lookup DependencyGraphBuilder: ", e );
+            }
+        }
+        
         try
         {
             MavenProject project = (MavenProject) helper.evaluate( "${project}" );
 
-            Set<Artifact> artifacts = project.getArtifacts();
+            Set<Artifact> artifacts = getDependenciesToCheck( project );
 
             Map<String, Artifact> classNames = new HashMap<String, Artifact>();
             Map<String, Set<Artifact>> duplicates = new HashMap<String, Set<Artifact>>();
@@ -361,6 +386,41 @@ public class BanDuplicateClasses
             && ( c.groupId == null || c.groupId.matcher( dup.getGroupId() ).matches() )
             && ( c.classifier == null || c.classifier.matcher( dup.getClassifier() ).matches() )
             && ( c.type == null || c.type.matcher( dup.getType() ).matches() );
+    }
+    
+    protected Set<Artifact> getDependenciesToCheck( MavenProject project )
+    {
+        Set<Artifact> dependencies = null;
+        try
+        {
+            DependencyNode node = graphBuilder.buildDependencyGraph( project, null );
+            dependencies  = getAllDescendants( node );
+        }
+        catch ( DependencyGraphBuilderException e )
+        {
+            // otherwise we need to change the signature of this protected method
+            throw new RuntimeException( e );
+        }
+        return dependencies;
+    }
+    
+    private Set<Artifact> getAllDescendants( DependencyNode node )
+    {
+        Set<Artifact> children = null; 
+        if( node.getChildren() != null )
+        {
+            children = new HashSet<Artifact>();
+            for( DependencyNode depNode : node.getChildren() )
+            {
+                children.add( depNode.getArtifact() );
+                Set<Artifact> subNodes = getAllDescendants( depNode );
+                if( subNodes != null )
+                {
+                    children.addAll( subNodes );
+                }
+            }
+        }
+        return children;
     }
 
     /**
