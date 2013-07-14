@@ -35,14 +35,15 @@ import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
-import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
-import org.apache.maven.shared.dependency.graph.DependencyNode;
+import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
+import org.apache.maven.shared.dependency.tree.DependencyNode;
+import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
@@ -54,7 +55,7 @@ public class BanDuplicateClasses
     extends AbstractStandardEnforcerRule
 {
 
-    private transient DependencyGraphBuilder graphBuilder;
+    private transient DependencyTreeBuilder treeBuilder;
     
     /**
      * List of classes to ignore. Wildcard at the end accepted
@@ -160,14 +161,14 @@ public class BanDuplicateClasses
         
         try
         {
-            graphBuilder = (DependencyGraphBuilder) helper.getComponent( DependencyGraphBuilder.class );
+            treeBuilder = (DependencyTreeBuilder) helper.getComponent( DependencyTreeBuilder.class );
         }
         catch ( ComponentLookupException e )
         {
             // real cause is probably that one of the Maven3 graph builder could not be initiated and fails with a ClassNotFoundException
             try
             {
-                graphBuilder = (DependencyGraphBuilder) helper.getComponent( DependencyGraphBuilder.class.getName(), "maven2" );
+                treeBuilder = (DependencyTreeBuilder) helper.getComponent( DependencyTreeBuilder.class.getName(), "maven2" );
             }
             catch ( ComponentLookupException e1 )
             {
@@ -178,8 +179,10 @@ public class BanDuplicateClasses
         try
         {
             MavenProject project = (MavenProject) helper.evaluate( "${project}" );
+            
+            ArtifactRepository localRepository = (ArtifactRepository) helper.evaluate( "${localRepository}" );
 
-            Set<Artifact> artifacts = getDependenciesToCheck( project );
+            Set<Artifact> artifacts = getDependenciesToCheck( project, localRepository );
 
             Map<String, Artifact> classNames = new HashMap<String, Artifact>();
             Map<String, Set<Artifact>> duplicates = new HashMap<String, Set<Artifact>>();
@@ -388,15 +391,15 @@ public class BanDuplicateClasses
             && ( c.type == null || c.type.matcher( dup.getType() ).matches() );
     }
     
-    protected Set<Artifact> getDependenciesToCheck( MavenProject project )
+    protected Set<Artifact> getDependenciesToCheck( MavenProject project, ArtifactRepository localRepository )
     {
         Set<Artifact> dependencies = null;
         try
         {
-            DependencyNode node = graphBuilder.buildDependencyGraph( project, null );
+            DependencyNode node = treeBuilder.buildDependencyTree( project, localRepository, null );
             dependencies  = getAllDescendants( node );
         }
-        catch ( DependencyGraphBuilderException e )
+        catch ( DependencyTreeBuilderException e )
         {
             // otherwise we need to change the signature of this protected method
             throw new RuntimeException( e );
