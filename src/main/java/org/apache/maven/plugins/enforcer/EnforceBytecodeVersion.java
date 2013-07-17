@@ -24,17 +24,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.dependency.tree.DependencyNode;
+import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
+import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * Enforcer rule that will check the bytecode version of each class of each dependency. FIXME : Special jar like
@@ -44,8 +57,7 @@ import org.apache.maven.plugin.logging.Log;
  * @see <a href="http://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
  * @since 1.0-alpha-4
  */
-public class EnforceBytecodeVersion
-    extends AbstractBanDependencies
+public class EnforceBytecodeVersion implements EnforcerRule
 {
     private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new HashMap<String, Integer>();
     static
@@ -59,6 +71,8 @@ public class EnforceBytecodeVersion
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.7", 51 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.8", 52 );
     }
+    
+    private String message;
 
     /**
      * JDK version as used for example in the maven-compiler-plugin : 1.5, 1.6 and so on. If in need of more precise
@@ -81,16 +95,157 @@ public class EnforceBytecodeVersion
      */
     int maxJavaMinorVersionNumber = 0;
 
+    /** Specify if transitive dependencies should be searched (default) or only look at direct dependencies. */
+    private boolean searchTransitive = true;
+    
+    private transient DependencyTreeBuilder treeBuilder;
+    
+    private transient ArtifactResolver resolver;
+    
+    private ArtifactRepository localRepository;
+    
+    private List<ArtifactRepository> remoteRepositories;
+    
     private EnforcerRuleHelper helper;
 
-    @Override
-    public void execute( EnforcerRuleHelper pHelper )
+    /**
+     * Execute the rule.
+     *
+     * @param helper the helper
+     * @throws EnforcerRuleException the enforcer rule exception
+     */
+    public void execute( EnforcerRuleHelper helper )
         throws EnforcerRuleException
     {
+        this.helper = helper;
+
         computeParameters();
 
-        this.helper = pHelper;
-        super.execute( helper );
+        MavenProject project;
+        
+        
+        try
+        {
+            project = (MavenProject) helper.evaluate( "${project}" );
+            
+            localRepository = (ArtifactRepository) helper.evaluate( "${localRepository}" );
+        }
+        catch ( ExpressionEvaluationException eee )
+        {
+            throw new EnforcerRuleException( "Unable to retrieve the MavenProject: ", eee );
+        }
+
+        try
+        {
+            resolver = (ArtifactResolver) helper.getComponent( ArtifactResolver.class );
+
+            treeBuilder = (DependencyTreeBuilder) helper.getComponent( DependencyTreeBuilder.class );
+
+        }
+        catch ( ComponentLookupException e )
+        {
+            // real cause is probably that one of the Maven3 graph builder could not be initiated and fails with a ClassNotFoundException
+            try
+            {
+                treeBuilder = (DependencyTreeBuilder) helper.getComponent( DependencyTreeBuilder.class.getName(), "maven2" );
+            }
+            catch ( ComponentLookupException e1 )
+            {
+                throw new EnforcerRuleException( "Unable to lookup DependencyGraphBuilder: ", e );
+            }
+        }
+        
+        // get the correct list of dependencies
+        Set<Artifact> dependencies = getDependenciesToCheck( project, localRepository );
+
+        // look for banned dependencies
+        Set<Artifact> foundExcludes = checkDependencies( dependencies, helper.getLog() );
+
+        // if any are found, fail the check but list all of them
+        if ( foundExcludes != null && !foundExcludes.isEmpty() )
+        {
+            StringBuilder buf = new StringBuilder();
+            if ( message != null )
+            {
+                buf.append( message + "\n" );
+            }
+            for ( Artifact artifact : foundExcludes )
+            {
+                buf.append( getErrorMessage( artifact ) );
+            }
+            message = buf.toString() + "Use 'mvn dependency:tree' to locate the source of the banned dependencies.";
+
+            throw new EnforcerRuleException( message );
+        }
+
+    }
+
+    protected CharSequence getErrorMessage( Artifact artifact )
+    {
+        return "Found Banned Dependency: " + artifact.getId() + "\n";
+    }
+
+    protected Set<Artifact> getDependenciesToCheck( MavenProject project, ArtifactRepository localRepository )
+    {
+        Set<Artifact> dependencies = null;
+        try
+        {
+            DependencyNode node = treeBuilder.buildDependencyTree( project, localRepository, null );
+            if( searchTransitive )
+            {
+                dependencies  = getAllDescendants( node );
+            }
+            else if ( node.getChildren() != null )
+            {
+                dependencies = new HashSet<Artifact>();
+                for( DependencyNode depNode : node.getChildren() )
+                {
+                    dependencies.add( depNode.getArtifact() );
+                }
+            }
+        }
+        catch ( DependencyTreeBuilderException e )
+        {
+            // otherwise we need to change the signature of this protected method
+            throw new RuntimeException( e );
+        }
+        return dependencies;
+    }
+
+    private Set<Artifact> getAllDescendants( DependencyNode node )
+    {
+        Set<Artifact> children = null; 
+        if( node.getChildren() != null )
+        {
+            children = new HashSet<Artifact>();
+            for( DependencyNode depNode : node.getChildren() )
+            {
+                try
+                {
+                    Artifact artifact = depNode.getArtifact();
+
+                    resolver.resolve( artifact, remoteRepositories, localRepository );
+                    
+                    children.add( artifact );
+
+                    Set<Artifact> subNodes = getAllDescendants( depNode );
+                    
+                    if( subNodes != null )
+                    {
+                        children.addAll( subNodes );
+                    }
+                }
+                catch ( ArtifactResolutionException e )
+                {
+                    getLog().warn( e.getMessage() );
+                }
+                catch ( ArtifactNotFoundException e )
+                {
+                    getLog().warn( e.getMessage() );
+                }
+            }
+        }
+        return children;
     }
 
     private void computeParameters()
@@ -121,9 +276,7 @@ public class EnforceBytecodeVersion
         }
     }
 
-    @SuppressWarnings( "unchecked" )
-    @Override
-    protected Set<Artifact> checkDependencies( Set/* <Artifact> */dependencies, Log log )
+    protected Set<Artifact> checkDependencies( Set<Artifact> dependencies, Log log )
         throws EnforcerRuleException
     {
         Set<Artifact> problematic = new LinkedHashSet<Artifact>();
@@ -196,6 +349,31 @@ public class EnforceBytecodeVersion
     {
         return helper.getLog();
     }
+    
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getCacheId()
+    {
+        return "0";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isCacheable()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isResultValid( EnforcerRule cachedRule )
+    {
+        return false;
+    }
 
     public void setMaxJavaMajorVersionNumber( int maxJavaMajorVersionNumber )
     {
@@ -206,4 +384,15 @@ public class EnforceBytecodeVersion
     {
         this.maxJavaMinorVersionNumber = maxJavaMinorVersionNumber;
     }
+    
+    /**
+     * Sets the search transitive.
+     *
+     * @param theSearchTransitive the searchTransitive to set
+     */
+    public void setSearchTransitive( boolean theSearchTransitive )
+    {
+        this.searchTransitive = theSearchTransitive;
+    }
+
 }
