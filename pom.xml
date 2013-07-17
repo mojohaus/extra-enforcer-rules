@@ -55,6 +55,7 @@
 
   <properties>
     <enforcerApiVersion>1.0</enforcerApiVersion>
+    <enforcerPluginVersion>1.0</enforcerPluginVersion>
     <maven.version>2.0.9</maven.version>
     <mojo.java.target>1.5</mojo.java.target>
   </properties>
@@ -145,7 +146,7 @@
           <postBuildHookScript>verify</postBuildHookScript>
           <addTestClassPath>true</addTestClassPath>
           <filterProperties>
-            <enforcerPluginVersion>1.0</enforcerPluginVersion>
+            <enforcerPluginVersion>${enforcerPluginVersion}</enforcerPluginVersion>
           </filterProperties>
         </configuration>
         <executions>
