@@ -18,9 +18,7 @@
  */
 File log = new File(basedir, 'build.log')
 assert log.exists()
-def ruleLines = log.readLines().findAll { line ->
-  line.startsWith( "[DEBUG] Searching for duplicate classes in" )
-}
-assert ruleLines[0].endsWith( "spring-beans-2.5.6.pom" )
-assert ruleLines[1].endsWith( "commons-logging-1.1.1.jar" )
-assert ruleLines[2].endsWith( "spring-core-2.5.6.jar" )
+def ruleLines = ( log.readLines().findResults { line ->
+  line.startsWith( "[DEBUG] Searching for duplicate classes in" ) ? line.find( ~/[a-z0-9.\-]+$/ ) : null
+} as Set )
+assert ruleLines == ( [ "spring-beans-2.5.6.pom", "commons-logging-1.1.1.jar" , "spring-core-2.5.6.jar" ] as Set )
