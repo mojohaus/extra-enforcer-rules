@@ -36,6 +36,9 @@ import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
@@ -52,10 +55,18 @@ import org.codehaus.plexus.util.FileUtils;
  * Bans duplicate classes on the classpath.
  */
 public class BanDuplicateClasses
-    extends AbstractStandardEnforcerRule
+    implements EnforcerRule
 {
 
     private transient DependencyTreeBuilder treeBuilder;
+    
+    private transient ArtifactResolver resolver;
+    
+    private ArtifactRepository localRepository;
+    
+    private List<ArtifactRepository> remoteRepositories;
+    
+    private String message;
     
     /**
      * List of classes to ignore. Wildcard at the end accepted
@@ -75,6 +86,8 @@ public class BanDuplicateClasses
      */
     private List<String> scopes;
 
+    private EnforcerRuleHelper helper;
+    
     /**
      * Convert a wildcard into a regex.
      *
@@ -124,19 +137,20 @@ public class BanDuplicateClasses
     public void execute( EnforcerRuleHelper helper )
         throws EnforcerRuleException
     {
-        Log log = helper.getLog();
+        this.helper = helper;
+        
         List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
         if ( ignoreClasses != null )
         {
             IgnorableDependency ignorableDependency = new IgnorableDependency();
-            applyIgnoreClasses( ignorableDependency, ignoreClasses, log, false );
+            applyIgnoreClasses( ignorableDependency, ignoreClasses, false );
             ignorableDependencies.add( ignorableDependency );
         }
         if ( dependencies != null )
         {
             for ( Dependency dependency : dependencies )
             {
-                log.info( "Adding ignorable dependency: " + dependency );
+                getLog().info( "Adding ignorable dependency: " + dependency );
                 IgnorableDependency ignorableDependency = new IgnorableDependency();
                 if ( dependency.getGroupId() != null )
                 {
@@ -154,13 +168,15 @@ public class BanDuplicateClasses
                 {
                     ignorableDependency.classifier = Pattern.compile( asRegex( dependency.getClassifier() ) );
                 }
-                applyIgnoreClasses( ignorableDependency, dependency.getIgnoreClasses(), log, true );
+                applyIgnoreClasses( ignorableDependency, dependency.getIgnoreClasses(), true );
                 ignorableDependencies.add( ignorableDependency );
             }
         }
         
         try
         {
+            resolver = (ArtifactResolver) helper.getComponent( ArtifactResolver.class );
+            
             treeBuilder = (DependencyTreeBuilder) helper.getComponent( DependencyTreeBuilder.class );
         }
         catch ( ComponentLookupException e )
@@ -180,7 +196,9 @@ public class BanDuplicateClasses
         {
             MavenProject project = (MavenProject) helper.evaluate( "${project}" );
             
-            ArtifactRepository localRepository = (ArtifactRepository) helper.evaluate( "${localRepository}" );
+            localRepository = (ArtifactRepository) helper.evaluate( "${localRepository}" );
+            
+            remoteRepositories = (List<ArtifactRepository>) helper.evaluate( "${project.remoteArtifactRepositories}" );
 
             Set<Artifact> artifacts = getDependenciesToCheck( project, localRepository );
 
@@ -190,17 +208,17 @@ public class BanDuplicateClasses
             {
                 if( scopes != null && !scopes.contains( o.getScope() ) )
                 {
-                    if( log.isDebugEnabled() )
+                    if( getLog().isDebugEnabled() )
                     {
-                        log.debug( "Skipping " + o.toString() + " due to scope" );
+                        getLog().debug( "Skipping " + o.toString() + " due to scope" );
                     }
                     continue;
                 }
                 File file = o.getFile();
-                log.debug( "Searching for duplicate classes in " + file );
+                getLog().debug( "Searching for duplicate classes in " + file );
                 if ( file == null || !file.exists() )
                 {
-                    log.warn( "Could not find " + o + " at " + file );
+                    getLog().warn( "Could not find " + o + " at " + file );
                 }
                 else if ( file.isDirectory() )
                 {
@@ -208,8 +226,8 @@ public class BanDuplicateClasses
                     {
                         for ( String name : (List<String>) FileUtils.getFileNames( file, null, null, false ) )
                         {
-                            log.debug( "  " + name );
-                            checkAndAddName( o, name, classNames, duplicates, ignorableDependencies, log );
+                            getLog().debug( "  " + name );
+                            checkAndAddName( o, name, classNames, duplicates, ignorableDependencies );
                         }
                     }
                     catch ( IOException e )
@@ -228,7 +246,7 @@ public class BanDuplicateClasses
                         {
                             for ( JarEntry entry : Collections.<JarEntry>list( jar.entries() ) )
                             {
-                                checkAndAddName( o, entry.getName(), classNames, duplicates, ignorableDependencies, log );
+                                checkAndAddName( o, entry.getName(), classNames, duplicates, ignorableDependencies );
                             }
                         }
                         finally
@@ -291,21 +309,21 @@ public class BanDuplicateClasses
         }
     }
 
-    private void applyIgnoreClasses( IgnorableDependency ignorableDependency, String[] ignores, Log log, boolean indent )
+    private void applyIgnoreClasses( IgnorableDependency ignorableDependency, String[] ignores, boolean indent )
     {
         String prefix = indent ? "  " : "";
         for ( String ignore : ignores )
         {
-            log.info( prefix + "Adding ignore: " + ignore );
+            getLog().info( prefix + "Adding ignore: " + ignore );
             ignore = ignore.replace( '.', '/' );
             String pattern = asRegex( ignore );
-            log.debug( prefix + "Ignore: " + ignore + " maps to regex " + pattern );
+            getLog().debug( prefix + "Ignore: " + ignore + " maps to regex " + pattern );
             ignorableDependency.ignores.add( Pattern.compile( pattern ) );
         }
     }
 
     private void checkAndAddName( Artifact artifact, String name, Map<String, Artifact> classNames,
-                                  Map<String, Set<Artifact>> duplicates, Collection<IgnorableDependency> ignores, Log log )
+                                  Map<String, Set<Artifact>> duplicates, Collection<IgnorableDependency> ignores )
         throws EnforcerRuleException
     {
         if ( !name.endsWith( ".class" ) )
@@ -313,23 +331,26 @@ public class BanDuplicateClasses
             return;
         }
         
-        if ( classNames.containsKey( name ) )
+        for ( IgnorableDependency c : ignores )
         {
-            for ( IgnorableDependency c : ignores )
+            if ( matchesArtifact( artifact, c ) )
             {
-                if ( matchesArtifact( artifact, c ) )
+                for ( Pattern p : c.ignores )
                 {
-                    for ( Pattern p : c.ignores )
+                    if ( p.matcher( name ).matches() )
                     {
-                        if ( p.matcher( name ).matches() )
+                        if( classNames.containsKey( name ) )
                         {
-                            log.debug( "Ignoring duplicate class " + name );
-                            return;
+                            getLog().debug( "Ignoring excluded class " + name );
                         }
+                        return;
                     }
                 }
             }
-            
+        }
+
+        if ( classNames.containsKey( name ) )
+        {
             Artifact dup = classNames.put( name, artifact );
             if ( !( findAllDuplicates && duplicates.containsKey( name ) ) )
             {
@@ -341,7 +362,7 @@ public class BanDuplicateClasses
                         {
                             if ( p.matcher( name ).matches() )
                             {
-                                log.debug( "Ignoring duplicate class " + name );
+                                getLog().debug( "Ignoring duplicate class " + name );
                                 return;
                             }
                         }
@@ -415,17 +436,39 @@ public class BanDuplicateClasses
             children = new HashSet<Artifact>();
             for( DependencyNode depNode : node.getChildren() )
             {
-                children.add( depNode.getArtifact() );
-                Set<Artifact> subNodes = getAllDescendants( depNode );
-                if( subNodes != null )
+                try
                 {
-                    children.addAll( subNodes );
+                    Artifact artifact = depNode.getArtifact();
+
+                    resolver.resolve( artifact, remoteRepositories, localRepository );
+                    
+                    children.add( artifact );
+
+                    Set<Artifact> subNodes = getAllDescendants( depNode );
+                    
+                    if( subNodes != null )
+                    {
+                        children.addAll( subNodes );
+                    }
+                }
+                catch ( ArtifactResolutionException e )
+                {
+                    getLog().warn( e.getMessage() );
+                }
+                catch ( ArtifactNotFoundException e )
+                {
+                    getLog().warn( e.getMessage() );
                 }
             }
         }
         return children;
     }
-
+    
+    private Log getLog()
+    {
+        return helper.getLog();
+    }
+    
     /**
      * {@inheritDoc}
      */
