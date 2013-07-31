@@ -24,30 +24,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
-import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.dependency.tree.DependencyNode;
-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * Enforcer rule that will check the bytecode version of each class of each dependency. FIXME : Special jar like
@@ -57,7 +43,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * @see <a href="http://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
  * @since 1.0-alpha-4
  */
-public class EnforceBytecodeVersion implements EnforcerRule
+public class EnforceBytecodeVersion extends AbstractResolveDependencies
 {
     private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new HashMap<String, Integer>();
     static
@@ -98,68 +84,14 @@ public class EnforceBytecodeVersion implements EnforcerRule
     /** Specify if transitive dependencies should be searched (default) or only look at direct dependencies. */
     private boolean searchTransitive = true;
     
-    private transient DependencyTreeBuilder treeBuilder;
-    
-    private transient ArtifactResolver resolver;
-    
-    private ArtifactRepository localRepository;
-    
-    private List<ArtifactRepository> remoteRepositories;
-    
-    private EnforcerRuleHelper helper;
-
-    /**
-     * Execute the rule.
-     *
-     * @param helper the helper
-     * @throws EnforcerRuleException the enforcer rule exception
-     */
-    public void execute( EnforcerRuleHelper helper )
+    @Override
+    protected void handleArtifacts( Set<Artifact> artifacts )
         throws EnforcerRuleException
     {
-        this.helper = helper;
-
         computeParameters();
 
-        MavenProject project;
-        
-        
-        try
-        {
-            project = (MavenProject) helper.evaluate( "${project}" );
-            
-            localRepository = (ArtifactRepository) helper.evaluate( "${localRepository}" );
-        }
-        catch ( ExpressionEvaluationException eee )
-        {
-            throw new EnforcerRuleException( "Unable to retrieve the MavenProject: ", eee );
-        }
-
-        try
-        {
-            resolver = (ArtifactResolver) helper.getComponent( ArtifactResolver.class );
-
-            treeBuilder = (DependencyTreeBuilder) helper.getComponent( DependencyTreeBuilder.class );
-
-        }
-        catch ( ComponentLookupException e )
-        {
-            // real cause is probably that one of the Maven3 graph builder could not be initiated and fails with a ClassNotFoundException
-            try
-            {
-                treeBuilder = (DependencyTreeBuilder) helper.getComponent( DependencyTreeBuilder.class.getName(), "maven2" );
-            }
-            catch ( ComponentLookupException e1 )
-            {
-                throw new EnforcerRuleException( "Unable to lookup DependencyGraphBuilder: ", e );
-            }
-        }
-        
-        // get the correct list of dependencies
-        Set<Artifact> dependencies = getDependenciesToCheck( project, localRepository );
-
         // look for banned dependencies
-        Set<Artifact> foundExcludes = checkDependencies( dependencies, helper.getLog() );
+        Set<Artifact> foundExcludes = checkDependencies( artifacts, getLog() );
 
         // if any are found, fail the check but list all of them
         if ( foundExcludes != null && !foundExcludes.isEmpty() )
@@ -177,75 +109,17 @@ public class EnforceBytecodeVersion implements EnforcerRule
 
             throw new EnforcerRuleException( message );
         }
-
+    }
+    
+    @Override
+    protected boolean isSearchTransitive()
+    {
+        return searchTransitive;
     }
 
     protected CharSequence getErrorMessage( Artifact artifact )
     {
         return "Found Banned Dependency: " + artifact.getId() + "\n";
-    }
-
-    protected Set<Artifact> getDependenciesToCheck( MavenProject project, ArtifactRepository localRepository )
-    {
-        Set<Artifact> dependencies = null;
-        try
-        {
-            DependencyNode node = treeBuilder.buildDependencyTree( project, localRepository, null );
-            if( searchTransitive )
-            {
-                dependencies  = getAllDescendants( node );
-            }
-            else if ( node.getChildren() != null )
-            {
-                dependencies = new HashSet<Artifact>();
-                for( DependencyNode depNode : node.getChildren() )
-                {
-                    dependencies.add( depNode.getArtifact() );
-                }
-            }
-        }
-        catch ( DependencyTreeBuilderException e )
-        {
-            // otherwise we need to change the signature of this protected method
-            throw new RuntimeException( e );
-        }
-        return dependencies;
-    }
-
-    private Set<Artifact> getAllDescendants( DependencyNode node )
-    {
-        Set<Artifact> children = null; 
-        if( node.getChildren() != null )
-        {
-            children = new HashSet<Artifact>();
-            for( DependencyNode depNode : node.getChildren() )
-            {
-                try
-                {
-                    Artifact artifact = depNode.getArtifact();
-
-                    resolver.resolve( artifact, remoteRepositories, localRepository );
-                    
-                    children.add( artifact );
-
-                    Set<Artifact> subNodes = getAllDescendants( depNode );
-                    
-                    if( subNodes != null )
-                    {
-                        children.addAll( subNodes );
-                    }
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    getLog().warn( e.getMessage() );
-                }
-                catch ( ArtifactNotFoundException e )
-                {
-                    getLog().warn( e.getMessage() );
-                }
-            }
-        }
-        return children;
     }
 
     private void computeParameters()
@@ -342,36 +216,6 @@ public class EnforceBytecodeVersion implements EnforcerRule
         {
             throw new EnforcerRuleException( "Error while reading jar file", e );
         }
-        return false;
-    }
-
-    private Log getLog()
-    {
-        return helper.getLog();
-    }
-    
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getCacheId()
-    {
-        return "0";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isCacheable()
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isResultValid( EnforcerRule cachedRule )
-    {
         return false;
     }
 
