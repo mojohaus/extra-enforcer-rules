@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.model.Contributor;
@@ -40,8 +41,9 @@ import org.codehaus.plexus.util.StringUtils;
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
  */
-abstract class AbstractRequireRoles<T extends Contributor> extends AbstractNonCacheableEnforcerRule
+abstract class AbstractRequireRoles<T extends Contributor> implements EnforcerRule
 {
+    private String message;
 
     /**
      * Specify the required roles as comma separated list.
@@ -190,5 +192,32 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractNonCa
     void setValidRoles( String validRoles )
     {
         this.validRoles = validRoles;
+    }
+    
+
+    //*********************
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getCacheId()
+    {
+        return "0";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isCacheable()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isResultValid( EnforcerRule cachedRule )
+    {
+        return false;
     }
 }

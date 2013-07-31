@@ -46,9 +46,9 @@ public class RuleXpp3DomTest
     public void checkRuleWithoutRegexButMessage()
     {
         sut1.setProperty( "foo" );
-        sut1.message = "Oops";
+        sut1.setMessage( "Oops" );
         sut2.setProperty( "foo" );
-        sut2.message = "Oops";
+        sut2.setMessage( "Oops" );
         checkEquals();
     }
 

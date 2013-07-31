@@ -9,7 +9,7 @@
 
   <groupId>org.codehaus.mojo</groupId>
   <artifactId>extra-enforcer-rules</artifactId>
-  <version>1.0-alpha-6-SNAPSHOT</version>
+  <version>1.0-beta-1-SNAPSHOT</version>
 
   <name>Extra Enforcer Rules</name>
 
@@ -64,11 +64,6 @@
     <dependency>
       <groupId>org.apache.maven.enforcer</groupId>
       <artifactId>enforcer-api</artifactId>
-      <version>${enforcerApiVersion}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.enforcer</groupId>
-      <artifactId>enforcer-rules</artifactId>
       <version>${enforcerApiVersion}</version>
     </dependency>
     <dependency>
@@ -162,6 +157,11 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.3</version>
       </plugin>
     </plugins>
   </build>

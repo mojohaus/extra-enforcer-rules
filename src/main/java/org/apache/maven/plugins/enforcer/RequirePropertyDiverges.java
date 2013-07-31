@@ -20,12 +20,12 @@ package org.apache.maven.plugins.enforcer;
  */
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.model.Build;
@@ -47,9 +47,10 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
  */
-public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
+public class RequirePropertyDiverges implements EnforcerRule
 {
-
+    private String message;
+    
     static final String MAVEN_ENFORCER_PLUGIN = "org.apache.maven.plugins:maven-enforcer-plugin";
     /**
      * Specify the required property. Must be given.
@@ -429,6 +430,14 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
     {
         this.regex = regex;
     }
+    
+    /**
+     * @param message the message to set
+     */
+    void setMessage( String message )
+    {
+        this.message = message;
+    }
 
     /**
      * Creates the DOM of the invoking rule, but returns the children alphabetically sorted.
@@ -475,5 +484,31 @@ public class RequirePropertyDiverges extends AbstractNonCacheableEnforcerRule
                 ruleDom.addChild( entry );
             }
         }
+    }
+    
+    //*********************
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getCacheId()
+    {
+        return "0";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isCacheable()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isResultValid( EnforcerRule cachedRule )
+    {
+        return false;
     }
 }
