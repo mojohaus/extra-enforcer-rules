@@ -62,10 +62,17 @@ public class BanDuplicateClasses
     
     private transient ArtifactResolver resolver;
     
-    private ArtifactRepository localRepository;
+    private transient ArtifactRepository localRepository;
     
-    private List<ArtifactRepository> remoteRepositories;
+    private transient List<ArtifactRepository> remoteRepositories;
     
+    private transient EnforcerRuleHelper helper;
+
+    // Configuration properties
+    
+    /**
+     * The failure message
+     */
     private String message;
     
     /**
@@ -86,7 +93,6 @@ public class BanDuplicateClasses
      */
     private List<String> scopes;
 
-    private EnforcerRuleHelper helper;
     
     /**
      * Convert a wildcard into a regex.
@@ -181,15 +187,7 @@ public class BanDuplicateClasses
         }
         catch ( ComponentLookupException e )
         {
-            // real cause is probably that one of the Maven3 graph builder could not be initiated and fails with a ClassNotFoundException
-            try
-            {
-                treeBuilder = (DependencyTreeBuilder) helper.getComponent( DependencyTreeBuilder.class.getName(), "maven2" );
-            }
-            catch ( ComponentLookupException e1 )
-            {
-                throw new EnforcerRuleException( "Unable to lookup DependencyGraphBuilder: ", e );
-            }
+                throw new EnforcerRuleException( "Unable to lookup DependencyTreeBuilder: ", e );
         }
         
         try
