@@ -20,6 +20,12 @@ import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
+/**
+ * Abstract rule for when the content of the artifacts matters.
+ * 
+ * @author Robert Scholte
+ *
+ */
 public abstract class AbstractResolveDependencies implements EnforcerRule
 {
 
