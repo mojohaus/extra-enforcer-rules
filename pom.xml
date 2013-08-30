@@ -136,6 +136,7 @@
                   <excludes>
                     <exclude>org.apache.maven.enforcer:enforcer-rules</exclude>
                   </excludes>
+                  <message>Don't depend on the standard Enforcer Rules, only on the API. See MOJO-1949</message>
                 </bannedDependencies>
               </rules>
             </configuration>
