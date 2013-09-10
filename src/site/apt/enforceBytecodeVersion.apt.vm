@@ -34,6 +34,8 @@ Enforce Bytecode Version
    * maxJavaMajorVersionNumber - an integer indicating the maximum bytecode major version number (cannot be specified if maxJdkVersion is present)
 
    * maxJavaMinorVersionNumber - an integer indicating the maximum bytecode minor version number (cannot be specified if maxJdkVersion is present)
+
+   * includes, excludes - optional lists of artifact patterns to include or exclude ([groupId]:[artifactId]:[type]:[version] with wildcards and optional segments)
    
    []
 
@@ -59,6 +61,9 @@ Note
               <rules>
                 <enforceBytecodeVersion>
                   <maxJdkVersion>1.5</maxJdkVersion>
+                  <excludes>
+                    <exclude>org.mindrot:jbcrypt</exclude>
+                  </excludes>
                 </enforceBytecodeVersion>
               </rules>
               <fail>true</fail>

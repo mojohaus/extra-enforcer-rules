@@ -24,21 +24,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.shared.artifact.filter.AbstractStrictPatternArtifactFilter;
+import org.apache.maven.shared.artifact.filter.StrictPatternExcludesArtifactFilter;
+import org.apache.maven.shared.artifact.filter.StrictPatternIncludesArtifactFilter;
 
 /**
- * Enforcer rule that will check the bytecode version of each class of each dependency. FIXME : Special jar like
- * Hibernate, that embeds .class files with many different compilers, but are only loaded under right condition, is
- * gonna difficult to handle here. Maybe a solution would be to introduce some kind of exclusion.
+ * Enforcer rule that will check the bytecode version of each class of each dependency.
  * 
  * @see <a href="http://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
  * @since 1.0-alpha-4
@@ -83,6 +87,9 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
 
     /** Specify if transitive dependencies should be searched (default) or only look at direct dependencies. */
     private boolean searchTransitive = true;
+
+    /** @see AbstractStrictPatternArtifactFilter */
+    private List<String> includes, excludes;
     
     @Override
     protected void handleArtifacts( Set<Artifact> artifacts )
@@ -91,7 +98,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
         computeParameters();
 
         // look for banned dependencies
-        Set<Artifact> foundExcludes = checkDependencies( artifacts, getLog() );
+        Set<Artifact> foundExcludes = checkDependencies( filterArtifacts( artifacts ), getLog() );
 
         // if any are found, fail the check but list all of them
         if ( foundExcludes != null && !foundExcludes.isEmpty() )
@@ -237,6 +244,42 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
     public void setSearchTransitive( boolean theSearchTransitive )
     {
         this.searchTransitive = theSearchTransitive;
+    }
+
+    // copied from RequireReleaseDeps
+    /*
+     * Filter the dependency artifacts according to the includes and excludes
+     * If includes and excludes are both null, the original set is returned.
+     *
+     * @param dependencies the list of dependencies to filter
+     * @return the resulting set of dependencies
+     */
+    private Set<Artifact> filterArtifacts( Set<Artifact> dependencies )
+    {
+        if ( includes == null && excludes == null )
+        {
+            return dependencies;
+        }
+
+        AndArtifactFilter filter = new AndArtifactFilter( );
+        if ( includes != null )
+        {
+            filter.add( new StrictPatternIncludesArtifactFilter( includes ) );
+        }
+        if ( excludes != null )
+        {
+            filter.add( new StrictPatternExcludesArtifactFilter( excludes ) );
+        }
+
+        Set<Artifact> result = new HashSet<Artifact>();
+        for ( Artifact artifact : dependencies )
+        {
+            if ( filter.include( artifact ) )
+            {
+                result.add( artifact );
+            }
+        }
+        return result;
     }
 
 }
