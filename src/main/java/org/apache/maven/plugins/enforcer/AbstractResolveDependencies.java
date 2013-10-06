@@ -1,8 +1,10 @@
 package org.apache.maven.plugins.enforcer;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -38,8 +40,6 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
     private transient List<ArtifactRepository> remoteRepositories;
     
     private transient EnforcerRuleHelper helper;
-    
-    
     public void execute( EnforcerRuleHelper helper )
         throws EnforcerRuleException
     {
@@ -132,7 +132,7 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
                     
                     if( subNodes != null )
                     {
-                        children.addAll( subNodes );
+                        children.addAll(subNodes);
                     }
                 }
                 catch ( ArtifactResolutionException e )
@@ -177,4 +177,93 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
         return "Does not matter as not cacheable";
     }
 
+
+    /**
+     * Convert a wildcard into a regex.
+     *
+     * @param wildcard the wildcard to convert.
+     * @return the equivalent regex.
+     */
+    protected static String asRegex(String wildcard)
+    {
+        StringBuilder result = new StringBuilder( wildcard.length() );
+        result.append( '^' );
+        for ( int index = 0; index < wildcard.length(); index++ )
+        {
+            char character = wildcard.charAt( index );
+            switch ( character )
+            {
+                case '*':
+                    result.append( ".*" );
+                    break;
+                case '?':
+                    result.append( "." );
+                    break;
+                case '$':
+                case '(':
+                case ')':
+                case '.':
+                case '[':
+                case '\\':
+                case ']':
+                case '^':
+                case '{':
+                case '|':
+                case '}':
+                    result.append( "\\" );
+                default:
+                    result.append( character );
+                    break;
+            }
+        }
+        result.append( "(\\.class)?" );
+        result.append( '$' );
+        return result.toString();
+    }
+
+    /**
+     *
+     */
+    protected class IgnorableDependency
+    {
+        public Pattern groupId;
+        public Pattern artifactId;
+        public Pattern classifier;
+        public Pattern type;
+        public List<Pattern> ignores = new ArrayList<Pattern>();
+
+        public IgnorableDependency applyIgnoreClasses( String[] ignores, boolean indent )
+        {
+            String prefix = indent ? "  " : "";
+            for ( String ignore : ignores )
+            {
+                getLog().info( prefix + "Adding ignore: " + ignore );
+                ignore = ignore.replace( '.', '/' );
+                String pattern = asRegex( ignore );
+                getLog().debug( prefix + "Ignore: " + ignore + " maps to regex " + pattern );
+                this.ignores.add( Pattern.compile( pattern ) );
+            }
+            return this;
+        }
+
+        public boolean matchesArtifact( Artifact dup )
+        {
+            return ( artifactId == null || artifactId.matcher( dup.getArtifactId() ).matches() )
+                && ( groupId == null || groupId.matcher( dup.getGroupId() ).matches() )
+                && ( classifier == null || classifier.matcher( dup.getClassifier() ).matches() )
+                && ( type == null || type.matcher( dup.getType() ).matches() );
+        }
+
+        public boolean matches(String className)
+        {
+            for ( Pattern p : ignores )
+            {
+                if ( p.matcher( className ).matches() )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
 }

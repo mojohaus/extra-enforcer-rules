@@ -36,7 +36,9 @@ Enforce Bytecode Version
    * maxJavaMinorVersionNumber - an integer indicating the maximum bytecode minor version number (cannot be specified if maxJdkVersion is present)
 
    * includes, excludes - optional lists of artifact patterns to include or exclude ([groupId]:[artifactId]:[type]:[version] with wildcards and optional segments)
-   
+
+   * ignoreClasses - a list of classes to ignore bytecode version problems. Wildcards can be specified using the * character.
+
    []
 
 Note 

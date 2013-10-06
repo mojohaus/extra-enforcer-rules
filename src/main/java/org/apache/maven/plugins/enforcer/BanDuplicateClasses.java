@@ -59,7 +59,7 @@ public class BanDuplicateClasses
      * the end.
      */
     private boolean findAllDuplicates;
-    
+
     private List<Dependency> dependencies;
     
     /**
@@ -67,51 +67,6 @@ public class BanDuplicateClasses
      */
     private List<String> scopes;
 
-    
-    /**
-     * Convert a wildcard into a regex.
-     *
-     * @param wildcard the wildcard to convert.
-     * @return the equivalent regex.
-     */
-    private static String asRegex( String wildcard )
-    {
-        StringBuilder result = new StringBuilder( wildcard.length() );
-        result.append( '^' );
-        for ( int index = 0; index < wildcard.length(); index++ )
-        {
-            char character = wildcard.charAt( index );
-            switch ( character )
-            {
-                case '*':
-                    result.append( ".*" );
-                    break;
-                case '?':
-                    result.append( "." );
-                    break;
-                case '$':
-                case '(':
-                case ')':
-                case '.':
-                case '[':
-                case '\\':
-                case ']':
-                case '^':
-                case '{':
-                case '|':
-                case '}':
-                    result.append( "\\" );
-                default:
-                    result.append( character );
-                    break;
-            }
-        }
-        result.append( "(\\.class)?" );
-        result.append( '$' );
-        return result.toString();
-    }
-
-    
     @Override
     protected void handleArtifacts( Set<Artifact> artifacts ) throws EnforcerRuleException
     {
@@ -119,7 +74,7 @@ public class BanDuplicateClasses
         if ( ignoreClasses != null )
         {
             IgnorableDependency ignorableDependency = new IgnorableDependency();
-            applyIgnoreClasses( ignorableDependency, ignoreClasses, false );
+            ignorableDependency.applyIgnoreClasses( ignoreClasses, false );
             ignorableDependencies.add( ignorableDependency );
         }
         if ( dependencies != null )
@@ -144,7 +99,7 @@ public class BanDuplicateClasses
                 {
                     ignorableDependency.classifier = Pattern.compile( asRegex( dependency.getClassifier() ) );
                 }
-                applyIgnoreClasses( ignorableDependency, dependency.getIgnoreClasses(), true );
+                ignorableDependency.applyIgnoreClasses( dependency.getIgnoreClasses(), true );
                 ignorableDependencies.add( ignorableDependency );
             }
         }
@@ -251,19 +206,6 @@ public class BanDuplicateClasses
 
     }
 
-    private void applyIgnoreClasses( IgnorableDependency ignorableDependency, String[] ignores, boolean indent )
-    {
-        String prefix = indent ? "  " : "";
-        for ( String ignore : ignores )
-        {
-            getLog().info( prefix + "Adding ignore: " + ignore );
-            ignore = ignore.replace( '.', '/' );
-            String pattern = asRegex( ignore );
-            getLog().debug( prefix + "Ignore: " + ignore + " maps to regex " + pattern );
-            ignorableDependency.ignores.add( Pattern.compile( pattern ) );
-        }
-    }
-
     private void checkAndAddName( Artifact artifact, String name, Map<String, Artifact> classNames,
                                   Map<String, Set<Artifact>> duplicates, Collection<IgnorableDependency> ignores )
         throws EnforcerRuleException
@@ -275,19 +217,13 @@ public class BanDuplicateClasses
         
         for ( IgnorableDependency c : ignores )
         {
-            if ( matchesArtifact( artifact, c ) )
+            if ( c.matchesArtifact( artifact ) && c.matches( name ) )
             {
-                for ( Pattern p : c.ignores )
+                if( classNames.containsKey( name ) )
                 {
-                    if ( p.matcher( name ).matches() )
-                    {
-                        if( classNames.containsKey( name ) )
-                        {
-                            getLog().debug( "Ignoring excluded class " + name );
-                        }
-                        return;
-                    }
+                    getLog().debug( "Ignoring excluded class " + name );
                 }
+                return;
             }
         }
 
@@ -298,16 +234,10 @@ public class BanDuplicateClasses
             {
                 for ( IgnorableDependency c : ignores )
                 {
-                    if ( matchesArtifact( artifact, c ) )
+                    if ( c.matchesArtifact( artifact ) && c.matches(name) )
                     {
-                        for ( Pattern p : c.ignores )
-                        {
-                            if ( p.matcher( name ).matches() )
-                            {
-                                getLog().debug( "Ignoring duplicate class " + name );
-                                return;
-                            }
-                        }
+                        getLog().debug( "Ignoring duplicate class " + name );
+                        return;
                     }
                 }
             }
@@ -344,25 +274,5 @@ public class BanDuplicateClasses
         {
             classNames.put( name, artifact );
         }
-    }
-
-    private boolean matchesArtifact( Artifact dup, IgnorableDependency c )
-    {
-        return ( c.artifactId == null || c.artifactId.matcher( dup.getArtifactId() ).matches() )
-            && ( c.groupId == null || c.groupId.matcher( dup.getGroupId() ).matches() )
-            && ( c.classifier == null || c.classifier.matcher( dup.getClassifier() ).matches() )
-            && ( c.type == null || c.type.matcher( dup.getType() ).matches() );
-    }
-    
-    /**
-     * 
-     */
-    private class IgnorableDependency
-    {
-        private Pattern groupId;
-        private Pattern artifactId;
-        private Pattern classifier;
-        private Pattern type;
-        private List<Pattern> ignores = new ArrayList<Pattern>();
     }
 }

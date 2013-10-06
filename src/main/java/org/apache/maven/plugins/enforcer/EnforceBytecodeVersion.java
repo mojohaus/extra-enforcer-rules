@@ -22,6 +22,7 @@ package org.apache.maven.plugins.enforcer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -90,7 +91,14 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
 
     /** @see AbstractStrictPatternArtifactFilter */
     private List<String> includes, excludes;
+
+    /**
+     * List of classes to ignore. Wildcard at the end accepted
+     */
+    private String[] ignoreClasses;
     
+    private List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
+
     @Override
     protected void handleArtifacts( Set<Artifact> artifacts )
         throws EnforcerRuleException
@@ -155,6 +163,12 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
         {
             throw new EnforcerRuleException( "maxJavaMajorVersionNumber must be set in the plugin configuration" );
         }
+        if ( ignoreClasses != null )
+        {
+            IgnorableDependency ignorableDependency = new IgnorableDependency();
+            ignorableDependency.applyIgnoreClasses( ignoreClasses, false );
+            ignorableDependencies.add( ignorableDependency );
+        }
     }
 
     protected Set<Artifact> checkDependencies( Set<Artifact> dependencies, Log log )
@@ -189,11 +203,19 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
             {
                 getLog().debug( f.getName() + " => " + f.getPath() );
                 byte[] magicAndClassFileVersion = new byte[8];
+                JAR:
                 for ( Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); )
                 {
                     JarEntry entry = e.nextElement();
                     if ( !entry.isDirectory() && entry.getName().endsWith( ".class" ) )
                     {
+                        for ( IgnorableDependency i : ignorableDependencies ) {
+                            if ( i.matches(entry.getName()))
+                            {
+                                continue JAR;
+                            }
+                        }
+
                         StringBuilder builder = new StringBuilder();
                         builder.append( "\t" ).append( entry.getName() ).append( " => " );
                         InputStream is = jarFile.getInputStream( entry );
