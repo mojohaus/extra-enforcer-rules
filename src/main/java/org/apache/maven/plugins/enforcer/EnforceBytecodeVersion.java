@@ -221,7 +221,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
                         InputStream is = jarFile.getInputStream( entry );
                         int read = is.read( magicAndClassFileVersion );
                         is.close();
-                        assert read != 8;
+                        assert read != 8 : "The file" + f + " is corrupt or invalid";
 
                         int minor = ( magicAndClassFileVersion[4] << 8 ) + magicAndClassFileVersion[5];
                         int major = ( magicAndClassFileVersion[6] << 8 ) + magicAndClassFileVersion[7];
