@@ -47,6 +47,14 @@
       </roles>
       <timezone>0</timezone>
     </developer>
+    <developer>
+      <name>Baptiste Mathus</name>
+      <email>baptiste@codehaus.org</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>Europe/Paris</timezone>
+    </developer>
   </developers>
 
   <prerequisites>
