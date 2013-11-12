@@ -179,22 +179,23 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
         {
             Artifact artifact = it.next();
             getLog().debug( "Analyzing artifact " + artifact );
-            if ( isBadArtifact( artifact ) )
+            String problem = isBadArtifact( artifact );
+            if ( problem != null )
             {
-                getLog().info( "Artifact " + artifact + " contains .class compiled with incorrect version" );
+                getLog().info( "Artifact " + artifact + " contains " + problem + " compiled with incorrect version" );
                 problematic.add( artifact );
             }
         }
         return problematic;
     }
 
-    private boolean isBadArtifact( Artifact a )
+    private String isBadArtifact( Artifact a )
         throws EnforcerRuleException
     {
         File f = a.getFile();
         if ( !f.getName().endsWith( ".jar" ) )
         {
-            return false;
+            return null;
         }
         try
         {
@@ -231,7 +232,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
                         if ( ( major > maxJavaMajorVersionNumber )
                             || ( major == maxJavaMajorVersionNumber && minor > maxJavaMinorVersionNumber ) )
                         {
-                            return true;
+                            return entry.getName();
                         }
                     }
                 }
@@ -245,7 +246,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
         {
             throw new EnforcerRuleException( "Error while reading jar file", e );
         }
-        return false;
+        return null;
     }
 
     public void setMaxJavaMajorVersionNumber( int maxJavaMajorVersionNumber )
