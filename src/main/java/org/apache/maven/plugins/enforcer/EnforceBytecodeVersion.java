@@ -174,6 +174,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
     protected Set<Artifact> checkDependencies( Set<Artifact> dependencies, Log log )
         throws EnforcerRuleException
     {
+        long beforeCheck = System.currentTimeMillis();
         Set<Artifact> problematic = new LinkedHashSet<Artifact>();
         for ( Iterator<Artifact> it = dependencies.iterator(); it.hasNext(); )
         {
@@ -186,6 +187,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
                 problematic.add( artifact );
             }
         }
+        getLog().debug( "Bytecode version analysis took " + ( System.currentTimeMillis() - beforeCheck ) + " ms" );
         return problematic;
     }
 
