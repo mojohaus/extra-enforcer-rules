@@ -10,5 +10,6 @@ assert text.contains("Found Banned Dependency: org.hibernate:hibernate-core:jar:
 assert text.contains("Found Banned Dependency: javax.transaction:jta:jar:1.1")
 assert text.contains("Found Banned Dependency: org.slf4j:slf4j-api:jar:1.4.2")
 assert text.contains("Found Banned Dependency: dom4j:dom4j:jar:1.6.1")
+assert text.contains("org/dom4j/Attribute.class")
 
 return true;
