@@ -63,6 +63,21 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.7", 51 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.8", 52 );
     }
+
+    static String renderVersion( int major, int minor )
+    {
+        if ( minor == 0 )
+        {
+            for ( Map.Entry<String, Integer> entry : JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.entrySet() )
+            {
+                if ( major == entry.getValue() )
+                {
+                    return "JDK " + entry.getKey();
+                }
+            }
+        }
+        return major + "." + minor;
+    }
     
     private String message;
 
@@ -184,7 +199,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
             String problem = isBadArtifact( artifact );
             if ( problem != null )
             {
-                getLog().info( "Artifact " + artifact + " contains " + problem + " compiled with incorrect version" );
+                getLog().info( problem );
                 problematic.add( artifact );
             }
         }
@@ -259,7 +274,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
                         if ( ( major > maxJavaMajorVersionNumber )
                             || ( major == maxJavaMajorVersionNumber && minor > maxJavaMinorVersionNumber ) )
                         {
-                            return entry.getName();
+                            return "Restricted to " + renderVersion( maxJavaMajorVersionNumber, maxJavaMinorVersionNumber ) + " yet " + a + " contains " + entry.getName() + " targeted to " + renderVersion( major, minor );
                         }
                     }
                 }
