@@ -20,6 +20,7 @@ package org.apache.maven.plugins.enforcer;
  */
 
 import java.io.File;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -221,10 +222,34 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
 
                         StringBuilder builder = new StringBuilder();
                         builder.append( "\t" ).append( entry.getName() ).append( " => " );
-                        InputStream is = jarFile.getInputStream( entry );
-                        int read = is.read( magicAndClassFileVersion );
-                        is.close();
-                        assert read != 8 : "The file" + f + " is corrupt or invalid";
+                        InputStream is = null;
+                        try
+                        {
+                            is = jarFile.getInputStream( entry );
+                            int total = magicAndClassFileVersion.length;
+                            while ( total > 0 )
+                            {
+                                int read = is.read( magicAndClassFileVersion, magicAndClassFileVersion.length - total,
+                                        total );
+
+                                if ( read == -1 )
+                                {
+                                    throw new EOFException( f.toString() );
+                                }
+
+                                total -= read;
+                            }
+
+                            is.close();
+                            is = null;
+                        }
+                        finally
+                        {
+                            if ( is != null )
+                            {
+                                is.close();
+                            }
+                        }
 
                         int minor = ( magicAndClassFileVersion[4] << 8 ) + magicAndClassFileVersion[5];
                         int major = ( magicAndClassFileVersion[6] << 8 ) + magicAndClassFileVersion[7];
