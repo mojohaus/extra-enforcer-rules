@@ -39,6 +39,8 @@ Enforce Bytecode Version
 
    * ignoreClasses - a list of classes to ignore bytecode version problems. Wildcards can be specified using the * character.
 
+   * ignoredScopes - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
+
    []
 
 Note 

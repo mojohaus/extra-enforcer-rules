@@ -24,6 +24,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -112,6 +113,12 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
      * List of classes to ignore. Wildcard at the end accepted
      */
     private String[] ignoreClasses;
+
+    /**
+     * Optional list of dependency scopes to ignore.
+     * {@code test} and {@code provided} make sense here.
+     */
+    private String[] ignoredScopes;
     
     private List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
 
@@ -321,7 +328,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
      */
     private Set<Artifact> filterArtifacts( Set<Artifact> dependencies )
     {
-        if ( includes == null && excludes == null )
+        if ( includes == null && excludes == null && ignoredScopes == null )
         {
             return dependencies;
         }
@@ -339,6 +346,10 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
         Set<Artifact> result = new HashSet<Artifact>();
         for ( Artifact artifact : dependencies )
         {
+            if ( ignoredScopes != null && Arrays.asList( ignoredScopes ).contains( artifact.getScope() ) )
+            {
+                continue;
+            }
             if ( filter.include( artifact ) )
             {
                 result.add( artifact );
