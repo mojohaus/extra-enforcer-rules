@@ -38,7 +38,7 @@ public class RequireProjectUrl implements EnforcerRule {
     /**
      * The regex that the url must match. Default is a non-empty URL
      */
-    private String regex = "^..*$";
+    private String regex = "^.+$";
 
     public void execute(EnforcerRuleHelper helper) throws EnforcerRuleException {
         MavenProject project;
