@@ -50,7 +50,9 @@ Ban Circular Dependencies
             </goals>
             <configuration>
               <rules>
-                <banCircularDependencies/>
+                <banCircularDependencies>
+                  <checkExclusions>true</checkExclusions>
+                </banCircularDependencies>
               </rules>
               <fail>true</fail>
             </configuration>
