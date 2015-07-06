@@ -44,6 +44,7 @@ under the License.
       <item name="Require Encoding" href="requireEncoding.html"/>
       <item name="Require Managed Deps" href="requireManagedDeps.html"/>
       <item name="Require Project URL" href="requireProjectUrl.html"/>
+      <item name="Ear Module Classpath" href="earModuleClasspath.html"/>
     </menu>
   </body>
 </site>
