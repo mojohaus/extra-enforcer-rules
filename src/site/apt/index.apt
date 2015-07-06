@@ -48,6 +48,8 @@ Extra Enforcer Rules
   
   * {{{./requireEncoding.html}requireEncoding}} - verifies that source files have a required encoding.
 
+  * {{{./earModuleClasspath.html}earModuleClasspath}} - verifies that Class-Path manifest entries in EJBs inside a EAR are valid.
+
   []
   
   <<NOTE: When using the Apache Maven Enforcer Plugin version 1.3 or later, be sure to use at least extra-enforcer-rules 1.0-beta-1>>
