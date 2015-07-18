@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
-    <version>35-SNAPSHOT</version>
+    <version>35</version>
     <relativePath>../mojo-parent</relativePath>
   </parent>
 
@@ -43,6 +43,22 @@
     <system>Travis</system>
     <url>https://travis-ci.org/mojohaus/extra-enforcer-rules</url>
   </ciManagement>
+
+  <repositories>
+    <repository>
+      <id>ossrh-snapshots</id>
+      <layout>default</layout>
+      <name>ossrh-snapshots</name>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <checksumPolicy>fail</checksumPolicy>
+        <enabled>true</enabled>
+      </snapshots>
+      <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
 
   <developers>
     <developer>
