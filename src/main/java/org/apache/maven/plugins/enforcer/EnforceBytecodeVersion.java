@@ -43,6 +43,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.artifact.filter.AbstractStrictPatternArtifactFilter;
 import org.apache.maven.shared.artifact.filter.StrictPatternExcludesArtifactFilter;
 import org.apache.maven.shared.artifact.filter.StrictPatternIncludesArtifactFilter;
+import org.codehaus.plexus.util.IOUtil;
 
 /**
  * Enforcer rule that will check the bytecode version of each class of each dependency.
@@ -83,7 +84,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
     private String message;
 
     /**
-     * JDK version as used for example in the maven-compiler-plugin : 1.5, 1.6 and so on. If in need of more precise
+     * JDK version as used for example in the maven-compiler-plugin: 1.5, 1.6 and so on. If in need of more precise
      * configuration please see {@link #maxJavaMajorVersionNumber} and {@link #maxJavaMinorVersionNumber} Mandatory if
      * {@link #maxJavaMajorVersionNumber} not specified.
      */
@@ -222,80 +223,94 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
         {
             return null;
         }
+        JarFile jarFile = null;
         try
         {
-            JarFile jarFile = new JarFile( f );
-            try
+            jarFile = new JarFile( f );
+            getLog().debug( f.getName() + " => " + f.getPath() );
+            byte[] magicAndClassFileVersion = new byte[8];
+            JAR:
+            for ( Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); )
             {
-                getLog().debug( f.getName() + " => " + f.getPath() );
-                byte[] magicAndClassFileVersion = new byte[8];
-                JAR:
-                for ( Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); )
+                JarEntry entry = e.nextElement();
+                if ( !entry.isDirectory() && entry.getName().endsWith( ".class" ) )
                 {
-                    JarEntry entry = e.nextElement();
-                    if ( !entry.isDirectory() && entry.getName().endsWith( ".class" ) )
+                    for ( IgnorableDependency i : ignorableDependencies )
                     {
-                        for ( IgnorableDependency i : ignorableDependencies ) {
-                            if ( i.matches(entry.getName()))
-                            {
-                                continue JAR;
-                            }
-                        }
-
-                        StringBuilder builder = new StringBuilder();
-                        builder.append( "\t" ).append( entry.getName() ).append( " => " );
-                        InputStream is = null;
-                        try
+                        if ( i.matches( entry.getName() ) )
                         {
-                            is = jarFile.getInputStream( entry );
-                            int total = magicAndClassFileVersion.length;
-                            while ( total > 0 )
-                            {
-                                int read = is.read( magicAndClassFileVersion, magicAndClassFileVersion.length - total,
-                                        total );
-
-                                if ( read == -1 )
-                                {
-                                    throw new EOFException( f.toString() );
-                                }
-
-                                total -= read;
-                            }
-
-                            is.close();
-                            is = null;
-                        }
-                        finally
-                        {
-                            if ( is != null )
-                            {
-                                is.close();
-                            }
-                        }
-
-                        int minor = ( magicAndClassFileVersion[4] << 8 ) + magicAndClassFileVersion[5];
-                        int major = ( magicAndClassFileVersion[6] << 8 ) + magicAndClassFileVersion[7];
-                        builder.append( "major=" ).append( major ).append( ",minor=" ).append( minor );
-                        getLog().debug( builder.toString() );
-
-                        if ( ( major > maxJavaMajorVersionNumber )
-                            || ( major == maxJavaMajorVersionNumber && minor > maxJavaMinorVersionNumber ) )
-                        {
-                            return "Restricted to " + renderVersion( maxJavaMajorVersionNumber, maxJavaMinorVersionNumber ) + " yet " + a + " contains " + entry.getName() + " targeted to " + renderVersion( major, minor );
+                            continue JAR;
                         }
                     }
+
+                    InputStream is = null;
+                    try
+                    {
+                        is = jarFile.getInputStream( entry );
+                        int total = magicAndClassFileVersion.length;
+                        while ( total > 0 )
+                        {
+                            int read = is.read( magicAndClassFileVersion, magicAndClassFileVersion.length - total,
+                                    total );
+
+                            if ( read == -1 )
+                            {
+                                throw new EOFException( f.toString() );
+                            }
+
+                            total -= read;
+                        }
+
+                        is.close();
+                        is = null;
+                    }
+                    finally
+                    {
+                        IOUtil.close( is );
+                    }
+
+                    int minor = ( magicAndClassFileVersion[4] << 8 ) + magicAndClassFileVersion[5];
+                    int major = ( magicAndClassFileVersion[6] << 8 ) + magicAndClassFileVersion[7];
+
+                    if ( getLog().isDebugEnabled() )
+                    {
+                        getLog().debug( "\t" + entry.getName() + " => major=" + major + ",minor=" + minor );
+                    }
+
+                    if ( ( major > maxJavaMajorVersionNumber )
+                        || ( major == maxJavaMajorVersionNumber && minor > maxJavaMinorVersionNumber ) )
+                    {
+                        return "Restricted to " + renderVersion( maxJavaMajorVersionNumber, maxJavaMinorVersionNumber )
+                            + " yet " + a + " contains " + entry.getName() + " targeted to "
+                            + renderVersion( major, minor );
+                    }
                 }
-            }
-            finally
-            {
-                jarFile.close();
             }
         }
         catch ( IOException e )
         {
-            throw new EnforcerRuleException( "Error while reading jar file", e );
+            throw new EnforcerRuleException( "IOException while reading " + jarFile.getName(), e );
+        }
+        finally
+        {
+            closeQuietly( jarFile );
         }
         return null;
+    }
+
+    private void closeQuietly( JarFile jarFile )
+    {
+        if ( jarFile != null )
+        {
+            try
+            {
+                jarFile.close();
+            }
+            catch ( IOException ioe )
+            {
+                getLog().warn( "Exception catched while closing " + jarFile.getName(), ioe );
+            }
+        }
     }
 
     public void setMaxJavaMajorVersionNumber( int maxJavaMajorVersionNumber )
