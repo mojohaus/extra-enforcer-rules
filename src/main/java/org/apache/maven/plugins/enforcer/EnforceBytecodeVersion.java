@@ -51,9 +51,11 @@ import org.codehaus.plexus.util.IOUtil;
  * @see <a href="http://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
  * @since 1.0-alpha-4
  */
-public class EnforceBytecodeVersion extends AbstractResolveDependencies
+public class EnforceBytecodeVersion
+    extends AbstractResolveDependencies
 {
     private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new HashMap<String, Integer>();
+
     static
     {
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.1", 45 );
@@ -80,7 +82,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
         }
         return major + "." + minor;
     }
-    
+
     private String message;
 
     /**
@@ -107,7 +109,9 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
     /** Specify if transitive dependencies should be searched (default) or only look at direct dependencies. */
     private boolean searchTransitive = true;
 
-    /** @see AbstractStrictPatternArtifactFilter */
+    /**
+     * @see AbstractStrictPatternArtifactFilter
+     */
     private List<String> includes, excludes;
 
     /**
@@ -116,11 +120,10 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
     private String[] ignoreClasses;
 
     /**
-     * Optional list of dependency scopes to ignore.
-     * {@code test} and {@code provided} make sense here.
+     * Optional list of dependency scopes to ignore. {@code test} and {@code provided} make sense here.
      */
     private String[] ignoredScopes;
-    
+
     private List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
 
     @Override
@@ -149,7 +152,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
             throw new EnforcerRuleException( message );
         }
     }
-    
+
     @Override
     protected boolean isSearchTransitive()
     {
@@ -219,6 +222,13 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
         throws EnforcerRuleException
     {
         File f = a.getFile();
+        getLog().debug( "isBadArtifact() a:" + a + " Artifact getFile():" + a.getFile() );
+        if ( f == null )
+        {
+            // This happens if someone defines dependencies instead of dependencyManagement in a pom file
+            // which packaging type is pom.
+            return null;
+        }
         if ( !f.getName().endsWith( ".jar" ) )
         {
             return null;
@@ -229,8 +239,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
             jarFile = new JarFile( f );
             getLog().debug( f.getName() + " => " + f.getPath() );
             byte[] magicAndClassFileVersion = new byte[8];
-            JAR:
-            for ( Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); )
+            JAR: for ( Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); )
             {
                 JarEntry entry = e.nextElement();
                 if ( !entry.isDirectory() && entry.getName().endsWith( ".class" ) )
@@ -250,8 +259,8 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
                         int total = magicAndClassFileVersion.length;
                         while ( total > 0 )
                         {
-                            int read = is.read( magicAndClassFileVersion, magicAndClassFileVersion.length - total,
-                                    total );
+                            int read =
+                                is.read( magicAndClassFileVersion, magicAndClassFileVersion.length - total, total );
 
                             if ( read == -1 )
                             {
@@ -322,7 +331,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
     {
         this.maxJavaMinorVersionNumber = maxJavaMinorVersionNumber;
     }
-    
+
     /**
      * Sets the search transitive.
      *
@@ -335,9 +344,8 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
 
     // copied from RequireReleaseDeps
     /*
-     * Filter the dependency artifacts according to the includes and excludes
-     * If includes and excludes are both null, the original set is returned.
-     *
+     * Filter the dependency artifacts according to the includes and excludes If includes and excludes are both null,
+     * the original set is returned.
      * @param dependencies the list of dependencies to filter
      * @return the resulting set of dependencies
      */
@@ -348,7 +356,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies
             return dependencies;
         }
 
-        AndArtifactFilter filter = new AndArtifactFilter( );
+        AndArtifactFilter filter = new AndArtifactFilter();
         if ( includes != null )
         {
             filter.add( new StrictPatternIncludesArtifactFilter( includes ) );
