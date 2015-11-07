@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="Date-Revision-yyyymmdd" content="20151107" />
     <meta http-equiv="Content-Language" content="en" />
-    <title>Extra Enforcer Rules &#x2013; PMD Results</title>
+    <title>Extra Enforcer Rules &#x2013; Invoker Report</title>
     <link rel="stylesheet" href="./css/apache-maven-fluido-1.4.min.css" />
     <link rel="stylesheet" href="./css/site.css" />
     <link rel="stylesheet" href="./css/print.css" media="print" />
@@ -65,7 +65,7 @@
         Extra Enforcer Rules</a>
                     <span class="divider">/</span>
       </li>
-        <li class="active ">PMD Results</li>
+        <li class="active ">Invoker Report</li>
         
                 
                     
@@ -214,10 +214,12 @@
         Test Source Xref</a>
             </li>
                     
-      <li class="active">
+      <li>
   
-            <a href="#"><span class="none"></span>PMD</a>
-          </li>
+                          <a href="pmd.html" title="PMD">
+          <span class="none"></span>
+        PMD</a>
+            </li>
                     
       <li>
   
@@ -240,12 +242,10 @@
         Tag List</a>
             </li>
                     
-      <li>
+      <li class="active">
   
-                          <a href="invoker-report.html" title="Invoker Build Results">
-          <span class="none"></span>
-        Invoker Build Results</a>
-            </li>
+            <a href="#"><span class="none"></span>Invoker Build Results</a>
+          </li>
               </ul>
         </li>
             </ul>
@@ -276,40 +276,175 @@
         <div id="bodyColumn"  class="span10" >
                                   
             <div class="section">
-<h2><a name="PMD_Results"></a>PMD Results</h2>
-<p>The following document contains the results of <a class="externalLink" href="http://pmd.sourceforge.net/">PMD</a> 5.3.2.</p></div>
+<h2><a name="Invoker_Report"></a>Invoker Report</h2>
+<p>The results of the Maven invocations.</p></div>
 <div class="section">
-<h2><a name="Files"></a>Files</h2>
-<div class="section">
-<h3><a name="orgapachemavenpluginsenforcerAbstractRequireRoles.java"></a>org/apache/maven/plugins/enforcer/AbstractRequireRoles.java</h3>
+<h3><a name="Summary"></a>Summary</h3></div>
 <table border="0" class="table table-striped">
 <tr class="a">
-<th>Violation</th>
-<th>Line</th></tr>
+<th>Builds</th>
+<th>Success</th>
+<th>Failures</th>
+<th>Skipped</th>
+<th>Success Rate</th>
+<th>Total Time</th>
+<th>Avg Time</th></tr>
 <tr class="b">
-<td>Avoid unused private fields such as 'message'.</td>
-<td><a href="./xref/org/apache/maven/plugins/enforcer/AbstractRequireRoles.html#L46">46</a></td></tr></table></div>
+<td>28</td>
+<td>28</td>
+<td>0</td>
+<td>0</td>
+<td>100.0%</td>
+<td>106.0&#xa0;s</td>
+<td>3.8&#xa0;s</td></tr></table>
 <div class="section">
-<h3><a name="orgapachemavenpluginsenforcerBanDuplicateClasses.java"></a>org/apache/maven/plugins/enforcer/BanDuplicateClasses.java</h3>
+<h3><a name="Build_Details"></a>Build Details</h3></div>
 <table border="0" class="table table-striped">
 <tr class="a">
-<th>Violation</th>
-<th>Line</th></tr>
+<th>Name</th>
+<th>Result</th>
+<th>Time</th>
+<th>Message</th></tr>
 <tr class="b">
-<td>Avoid empty catch blocks</td>
-<td><a href="./xref/org/apache/maven/plugins/enforcer/BanDuplicateClasses.html#L160">160</a>&#x2013;<a href="./xref/org/apache/maven/plugins/enforcer/BanDuplicateClasses.html#L163">163</a></td></tr></table></div>
-<div class="section">
-<h3><a name="orgapachemavenpluginsenforcerEnforceBytecodeVersion.java"></a>org/apache/maven/plugins/enforcer/EnforceBytecodeVersion.java</h3>
-<table border="0" class="table table-striped">
+<td>circular-simple/pom.xml</td>
+<td>success</td>
+<td>2.2&#xa0;s</td>
+<td></td></tr>
 <tr class="a">
-<th>Violation</th>
-<th>Line</th></tr>
+<td>compiling/pom.xml</td>
+<td>success</td>
+<td>3.5&#xa0;s</td>
+<td></td></tr>
 <tr class="b">
-<td>Useless parentheses.</td>
-<td><a href="./xref/org/apache/maven/plugins/enforcer/EnforceBytecodeVersion.html#L289">289</a></td></tr>
+<td>enforce-bytecode-version-excluded-deps/pom.xml</td>
+<td>success</td>
+<td>5.5&#xa0;s</td>
+<td></td></tr>
 <tr class="a">
-<td>Useless parentheses.</td>
-<td><a href="./xref/org/apache/maven/plugins/enforcer/EnforceBytecodeVersion.html#L290">290</a></td></tr></table></div></div>
+<td>enforce-bytecode-version-excluding-tests-nonmatch/pom.xml</td>
+<td>success</td>
+<td>2.4&#xa0;s</td>
+<td></td></tr>
+<tr class="b">
+<td>enforce-bytecode-version-excluding-tests/pom.xml</td>
+<td>success</td>
+<td>3.6&#xa0;s</td>
+<td></td></tr>
+<tr class="a">
+<td>enforce-bytecode-version-jdkVersionOption-with-ignore/pom.xml</td>
+<td>success</td>
+<td>3.6&#xa0;s</td>
+<td></td></tr>
+<tr class="b">
+<td>enforce-bytecode-version-jdkVersionOption/pom.xml</td>
+<td>success</td>
+<td>2.7&#xa0;s</td>
+<td></td></tr>
+<tr class="a">
+<td>enforce-bytecode-version-missing-config/pom.xml</td>
+<td>success</td>
+<td>2.7&#xa0;s</td>
+<td></td></tr>
+<tr class="b">
+<td>enforce-bytecode-version-only-one-option-allowed/pom.xml</td>
+<td>success</td>
+<td>2.6&#xa0;s</td>
+<td></td></tr>
+<tr class="a">
+<td>enforce-bytecode-version-with-banned-deps/pom.xml</td>
+<td>success</td>
+<td>2.6&#xa0;s</td>
+<td></td></tr>
+<tr class="b">
+<td>enforce-bytecode-version-wo-banned-deps/pom.xml</td>
+<td>success</td>
+<td>3.7&#xa0;s</td>
+<td></td></tr>
+<tr class="a">
+<td>ignores/pom.xml</td>
+<td>success</td>
+<td>2.5&#xa0;s</td>
+<td></td></tr>
+<tr class="b">
+<td>mojo-1682/pom.xml</td>
+<td>success</td>
+<td>2.6&#xa0;s</td>
+<td></td></tr>
+<tr class="a">
+<td>mojo-1731/pom.xml</td>
+<td>success</td>
+<td>2.8&#xa0;s</td>
+<td></td></tr>
+<tr class="b">
+<td>mojo-1744/pom.xml</td>
+<td>success</td>
+<td>2.7&#xa0;s</td>
+<td></td></tr>
+<tr class="a">
+<td>mojo-1769/pom.xml</td>
+<td>success</td>
+<td>2.6&#xa0;s</td>
+<td></td></tr>
+<tr class="b">
+<td>mojo-1799/pom.xml</td>
+<td>success</td>
+<td>3.2&#xa0;s</td>
+<td></td></tr>
+<tr class="a">
+<td>mojo-1853/pom.xml</td>
+<td>success</td>
+<td>8.8&#xa0;s</td>
+<td></td></tr>
+<tr class="b">
+<td>mojo-1929/pom.xml</td>
+<td>success</td>
+<td>8.6&#xa0;s</td>
+<td></td></tr>
+<tr class="a">
+<td>require-project-url-missing/pom.xml</td>
+<td>success</td>
+<td>2.2&#xa0;s</td>
+<td></td></tr>
+<tr class="b">
+<td>require-project-url-present/pom.xml</td>
+<td>success</td>
+<td>2.6&#xa0;s</td>
+<td></td></tr>
+<tr class="a">
+<td>require-project-url-regex/pom.xml</td>
+<td>success</td>
+<td>3.2&#xa0;s</td>
+<td></td></tr>
+<tr class="b">
+<td>require-property-diverges/pom.xml</td>
+<td>success</td>
+<td>15.8&#xa0;s</td>
+<td></td></tr>
+<tr class="a">
+<td>require-roles-all-roles-defined/pom.xml</td>
+<td>success</td>
+<td>2.4&#xa0;s</td>
+<td></td></tr>
+<tr class="b">
+<td>require-roles-missing-contributor/pom.xml</td>
+<td>success</td>
+<td>3.0&#xa0;s</td>
+<td></td></tr>
+<tr class="a">
+<td>require-roles-no-definitions/pom.xml</td>
+<td>success</td>
+<td>2.5&#xa0;s</td>
+<td></td></tr>
+<tr class="b">
+<td>require-roles-requiredRoles-but-not-specified-in-validRoles/pom.xml</td>
+<td>success</td>
+<td>2.3&#xa0;s</td>
+<td></td></tr>
+<tr class="a">
+<td>smokes/pom.xml</td>
+<td>success</td>
+<td>3.3&#xa0;s</td>
+<td></td></tr></table>
                   </div>
             </div>
           </div>
