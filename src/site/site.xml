@@ -31,6 +31,7 @@ under the License.
       <item name="Require Contributor Roles" href="requireContributorRoles.html"/>
       <item name="Enforce Bytecode Version" href="enforceBytecodeVersion.html"/>
       <item name="Ban Circular Dependencies" href="banCircularDependencies.html"/>
+      <item name="Require Encoding" href="requireEncoding.html"/>
     </menu>
   </body>
 </project>

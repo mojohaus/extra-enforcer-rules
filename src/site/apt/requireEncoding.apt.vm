@@ -1,0 +1,93 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one
+~~ or more contributor license agreements.  See the NOTICE file
+~~ distributed with this work for additional information
+~~ regarding copyright ownership.  The ASF licenses this file
+~~ to you under the Apache License, Version 2.0 (the
+~~ "License"); you may not use this file except in compliance
+~~ with the License.  You may obtain a copy of the License at
+~~
+~~ http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing,
+~~ software distributed under the License is distributed on an
+~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~~ KIND, either express or implied.  See the License for the
+~~ specific language governing permissions and limitations
+~~ under the License.
+
+  ------
+  Require Encoding
+  ------
+  July 2015
+  ------
+
+Require Encoding
+
+  This rule checks files for a required encoding and fails if the guessed encoding doesn't match the required one.
+  
+  <<Note that this rule uses icu4j to guess the source encoding of a file. Use of US-ASCII is hard to detect 
+  and should not be used as a required encoding.>>
+
+    []
+
+  The following parameters are supported by this rule:
+
+   * <<<encoding>>> - Required encoding. Default value <<<$\{project.builder.sourceEncoding\}>>>.
+   
+   * <<<includes>>> - List of files to include, separated by comma or pipe
+
+   * <<<excludes>>> - List of files to exclude, separated by comma or pipe
+
+   * <<<useDefaultExcludes>>> - enable SCM file exclusions, enbled by default.
+
+   * <<<failFast>>> - Should the rule fail after the first error or should the errors be aggregated. Default true.
+   
+   []
+
+
+  Sample Plugin Configuration:
+
++---+
+<project>
+  [...]
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>${enforcerApiVersion}</version> <!-- find the latest version at http://maven.apache.org/plugins/maven-enforcer-plugin/ -->
+        <executions>
+          <execution>
+            <id>require-utf-8</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireEncoding>
+                  <encoding>UTF-8</encoding>
+                  <includes>src/main/resources/**,src/test/resources/**</includes>
+                </requireEncoding>
+              </rules>
+              <fastFail>false</fastFail>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>${project.artifactId}</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+  [...]
+</project>
++---+
+
+
+* Trademarks
+
+  Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.

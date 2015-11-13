@@ -152,6 +152,12 @@
       <artifactId>maven-common-artifact-filters</artifactId>
       <version>1.4</version>
     </dependency>
+    <dependency>
+    	<groupId>com.ibm.icu</groupId>
+    	<artifactId>icu4j</artifactId>
+    	<version>56.1</version>
+    </dependency>
+    
   </dependencies>
 
   <build>
