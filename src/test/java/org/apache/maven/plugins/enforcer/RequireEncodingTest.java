@@ -34,7 +34,6 @@ public class RequireEncodingTest {
     when(helper.getLog()).thenReturn(mock(Log.class));
     
     rule.setIncludes("ascii.txt");
-    rule.setExcludes("*.ear");
 
     exception.expect(EnforcerRuleException.class);
     rule.execute(helper);

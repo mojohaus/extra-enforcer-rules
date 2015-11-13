@@ -22,8 +22,8 @@ import com.ibm.icu.text.CharsetMatch;
  * Checks file encodings to see if they match the project.build.sourceEncoding If file encoding can not be determined it
  * is skipped.
  *
- * @see https://github.com/mikedon/encoding-enforcer
- * @see https://github.com/ericbn/encoding-enforcer
+ * @see <a href="https://github.com/mikedon/encoding-enforcer">mikedon/encoding-enforcer</a>
+ * @see <a href="https://github.com/ericbn/encoding-enforcer">ericbn/encoding-enforcer</a>
  */
 public class RequireEncoding
     implements EnforcerRule
@@ -34,7 +34,7 @@ public class RequireEncoding
     private String encoding = "";
 
     /**
-     * Comma (or pipe) separated list of globs do incluide.
+     * Comma (or pipe) separated list of globs do include.
      */
     private String includes = "";
 
@@ -63,9 +63,9 @@ public class RequireEncoding
                 encoding = (String) helper.evaluate( "${project.build.sourceEncoding}" );
             }
             Log log = helper.getLog();
-            if ( encoding.equals( StandardCharsets.US_ASCII ) )
+            if ( encoding.equals( StandardCharsets.US_ASCII.name() ) )
             {
-                log.warn( "Encoding " + encoding + " is hard to detect. Use UTF-8 or ISO-8859-1" );
+                log.warn( "Encoding US-ASCII is hard to detect. Use UTF-8 or ISO-8859-1" );
             }
             String basedir = (String) helper.evaluate( "${basedir}" );
             DirectoryScanner ds = new DirectoryScanner();
@@ -86,7 +86,7 @@ public class RequireEncoding
             StringBuilder filesInMsg = new StringBuilder();
             for ( String file : ds.getIncludedFiles() )
             {
-                String fileEncoding = getEncoding( new File( basedir, file ), log );
+                String fileEncoding = getEncoding( encoding, new File( basedir, file ), log );
                 if ( log.isDebugEnabled() )
                 {
                     log.debug( file + "==>" + fileEncoding );
@@ -118,7 +118,7 @@ public class RequireEncoding
         }
     }
 
-    protected String getEncoding( File file, Log log )
+    protected String getEncoding( String requiredEncoding, File file, Log log )
         throws IOException
     {
         FileInputStream fis = null;
@@ -126,6 +126,7 @@ public class RequireEncoding
         {
             fis = new FileInputStream( file );
             CharsetDetector detector = new CharsetDetector();
+            detector.setDeclaredEncoding( requiredEncoding );
             detector.setText( new BufferedInputStream( fis ) );
             CharsetMatch[] charsets = detector.detectAll();
             if ( charsets == null )
