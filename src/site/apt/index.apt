@@ -46,7 +46,7 @@ Extra Enforcer Rules
   
   * {{{./banCircularDependencies.html}banCircularDependencies}} - verifies that there are no circular dependecies in the project.
   
-  * {{{./requireEncodng.html}requireEncoding}} - verifies that source files have a required encoding.
+  * {{{./requireEncoding.html}requireEncoding}} - verifies that source files have a required encoding.
 
   []
   
