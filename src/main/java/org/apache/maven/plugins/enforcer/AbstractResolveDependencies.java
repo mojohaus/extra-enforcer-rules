@@ -122,17 +122,20 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
             {
                 try
                 {
-                    Artifact artifact = depNode.getArtifact();
-    
-                    resolver.resolve( artifact, remoteRepositories, localRepository );
-                    
-                    children.add( artifact );
-    
-                    Set<Artifact> subNodes = getAllDescendants( depNode );
-                    
-                    if( subNodes != null )
+                    if ( depNode.getState() == DependencyNode.INCLUDED )
                     {
-                        children.addAll(subNodes);
+                        Artifact artifact = depNode.getArtifact();
+
+                        resolver.resolve( artifact, remoteRepositories, localRepository );
+
+                        children.add( artifact );
+
+                        Set<Artifact> subNodes = getAllDescendants( depNode );
+
+                        if( subNodes != null )
+                        {
+                            children.addAll(subNodes);
+                        }
                     }
                 }
                 catch ( ArtifactResolutionException e )
