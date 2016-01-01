@@ -8,15 +8,17 @@
   <name>Transitive test</name>
 
   <dependencies>
+    <!-- Depends on 'org.apache.tomcat:tomcat-annotations-api' which bundles some javax.servlet classes -->
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>2.5.6</version>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-catalina</artifactId>
+      <version>7.0.61</version>
     </dependency>
+    <!-- Depends on 'org.jboss.spec.javax.servlet:jboss-servlet-api_3.0_spec' which contains javax.servlet classes -->
     <dependency>
-      <groupId>springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>1.2.6</version>
+      <groupId>org.jboss.spec.javax.security.jacc</groupId>
+      <artifactId>jboss-jacc-api_1.4_spec</artifactId>
+      <version>1.0.3.Final</version>
     </dependency>
   </dependencies>
 
