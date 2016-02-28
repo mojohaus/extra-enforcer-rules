@@ -3,24 +3,17 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.codehaus.mojo.extra-enforcer-rules.it</groupId>
-  <artifactId>mojo-1682</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <name>Transitive test</name>
+  <artifactId>issue-7</artifactId>
+    <version>0.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-  <dependencies>
-    <!-- Depends on 'org.apache.tomcat:tomcat-annotations-api' which bundles some javax.servlet classes -->
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-catalina</artifactId>
-      <version>7.0.61</version>
-    </dependency>
-    <!-- Depends on 'org.jboss.spec.javax.servlet:jboss-servlet-api_3.0_spec' which contains javax.servlet classes -->
-    <dependency>
-      <groupId>org.jboss.spec.javax.security.jacc</groupId>
-      <artifactId>jboss-jacc-api_1.4_spec</artifactId>
-      <version>1.0.3.Final</version>
-    </dependency>
-  </dependencies>
+  <name>Multiple versions test</name>
+
+    <modules>
+        <module>green-eggs</module>
+        <module>ham</module>
+        <module>sam-i-am</module>
+    </modules>
 
   <build>
     <plugins>
@@ -35,6 +28,15 @@
             <version>@project.version@</version>
           </dependency>
         </dependencies>
+                <executions>
+                    <execution>
+                        <id>enforce-rules</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                    </execution>
+                </executions>
         <configuration>
           <rules>
             <banDuplicateClasses/>
