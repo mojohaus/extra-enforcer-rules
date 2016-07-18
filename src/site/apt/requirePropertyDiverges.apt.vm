@@ -20,7 +20,7 @@
   ------
   Mirko Friedenhagen
   ------
-  March 2012
+  2012-03-01
   ------
 
 Require Property Diverges
@@ -55,10 +55,10 @@ Require Property Diverges
 
    * define a <<<regex>>> for these as well, see the rule definition for the property
    <<<just.a.property.with.dots>>> in the
-   {{{https://svn.codehaus.org/mojo/trunk/mojo/extra-enforcer-rules/src/it/mojo-1853/}<<mojo-1853>>}}
+   {{{https://github.com/mojohaus/extra-enforcer-rules/tree/master/src/it/mojo-1853}<<mojo-1853>>}}
    integration test when the property name contains a dot.
 
-   * use an {{{http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/introspection/ReflectionValueExtractor.html#evaluate(java.lang.String, java.lang.Object)}alternative syntax}} 
+   * use an {{{http://codehaus-plexus.github.io//plexus-utils/apidocs/org/codehaus/plexus/util/introspection/ReflectionValueExtractor.html\#evaluate}alternative syntax}} 
    ala <<<project.properties(justAProperty)>>> when the property name does not
    contain a dot.
 
