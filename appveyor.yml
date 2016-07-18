@@ -19,6 +19,6 @@ install:
   - cmd: mvn --version
   - cmd: java -version
 build_script:
-  - mvn -B -Prun-its clean verify
+  - mvn -B clean verify
 cache:
   - C:\Users\appveyor\.m2
