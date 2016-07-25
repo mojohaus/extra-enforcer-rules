@@ -29,7 +29,7 @@ Enforce Bytecode Version
 
    The following parameters are supported by this rule:
 
-   * maxJdkVersion - the maximum target jdk version in the 1.x form (e.g. 1.6, 1.7, 1.8...) 
+   * maxJdkVersion - the maximum target jdk version in the 1.x form (e.g. 1.6, 1.7, 1.8, 1.9 or 6, 7, 8, 9...) 
 
    * maxJavaMajorVersionNumber - an integer indicating the maximum bytecode major version number (cannot be specified if maxJdkVersion is present)
 
@@ -64,7 +64,7 @@ Note
             <configuration>
               <rules>
                 <enforceBytecodeVersion>
-                  <maxJdkVersion>1.5</maxJdkVersion>
+                  <maxJdkVersion>1.7</maxJdkVersion>
                   <excludes>
                     <exclude>org.mindrot:jbcrypt</exclude>
                   </excludes>
