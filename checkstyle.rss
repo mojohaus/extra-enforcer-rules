@@ -23,11 +23,11 @@ under the License.
     <link>http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules</link>
     <description>Extra Enforcer Rules - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2011 - 2015 MojoHaus</copyright>
+    <copyright>&#169;2011 - 2016 MojoHaus</copyright>
     <item>
-      <title>File: 10,
-             Errors: 83,
-             Warnings: 18,
+      <title>File: 11,
+             Errors: 91,
+             Warnings: 32,
              Infos: 5
       </title>
             <link>http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html</link>
@@ -144,6 +144,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireEncoding.java">org/apache/maven/plugins/enforcer/RequireEncoding.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  14
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireContributorRoles.java">org/apache/maven/plugins/enforcer/RequireContributorRoles.java</a>
                 </td>
                 <td>
@@ -181,7 +195,7 @@ under the License.
                   4
                 </td>
                 <td>
-                  9
+                  16
                 </td>
               </tr>
                       </tbody>
