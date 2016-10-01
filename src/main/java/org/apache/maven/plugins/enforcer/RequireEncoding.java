@@ -29,7 +29,7 @@ public class RequireEncoding
     implements EnforcerRule
 {
     /**
-     * Validate files match this encoding. If not specified then default to ${project.builder.sourceEncoding}.
+     * Validate files match this encoding. If not specified then default to ${project.build.sourceEncoding}.
      */
     private String encoding = "";
 
