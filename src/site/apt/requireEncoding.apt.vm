@@ -32,7 +32,7 @@ Require Encoding
 
   The following parameters are supported by this rule:
 
-   * <<<encoding>>> - Required encoding. Default value <<<$\{project.builder.sourceEncoding\}>>>.
+   * <<<encoding>>> - Required encoding. Default value <<<$\{project.build.sourceEncoding\}>>>.
    
    * <<<includes>>> - List of files to include, separated by comma or pipe
 
