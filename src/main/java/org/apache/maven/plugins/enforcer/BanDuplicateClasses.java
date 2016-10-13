@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+import org.codehaus.mojo.enforcer.Dependency;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
