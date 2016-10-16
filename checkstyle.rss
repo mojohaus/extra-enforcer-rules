@@ -46,7 +46,35 @@ under the License.
           <tbody>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireDeveloperRoles.java">org/apache/maven/plugins/enforcer/RequireDeveloperRoles.java</a>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireEncoding.java">org/apache/maven/plugins/enforcer/RequireEncoding.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  14
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireProjectUrl.java">org/apache/maven/plugins/enforcer/RequireProjectUrl.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  37
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequirePropertyDiverges.java">org/apache/maven/plugins/enforcer/RequirePropertyDiverges.java</a>
                 </td>
                 <td>
                   0
@@ -55,7 +83,35 @@ under the License.
                   0
                 </td>
                 <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.EnforceBytecodeVersion.java">org/apache/maven/plugins/enforcer/EnforceBytecodeVersion.java</a>
+                </td>
+                <td>
                   0
+                </td>
+                <td>
+                  4
+                </td>
+                <td>
+                  16
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.BanCircularDependencies.java">org/apache/maven/plugins/enforcer/BanCircularDependencies.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  7
                 </td>
               </tr>
                           <tr>
@@ -70,20 +126,6 @@ under the License.
                 </td>
                 <td>
                   5
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.Dependency.java">org/apache/maven/plugins/enforcer/Dependency.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
                 </td>
               </tr>
                           <tr>
@@ -116,21 +158,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.BanCircularDependencies.java">org/apache/maven/plugins/enforcer/BanCircularDependencies.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  1
-                </td>
-                <td>
-                  7
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequirePropertyDiverges.java">org/apache/maven/plugins/enforcer/RequirePropertyDiverges.java</a>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireDeveloperRoles.java">org/apache/maven/plugins/enforcer/RequireDeveloperRoles.java</a>
                 </td>
                 <td>
                   0
@@ -139,21 +167,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  2
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireEncoding.java">org/apache/maven/plugins/enforcer/RequireEncoding.java</a>
-                </td>
-                <td>
                   0
-                </td>
-                <td>
-                  14
-                </td>
-                <td>
-                  1
                 </td>
               </tr>
                           <tr>
@@ -172,30 +186,16 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireProjectUrl.java">org/apache/maven/plugins/enforcer/RequireProjectUrl.java</a>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.codehaus.mojo.enforcer.Dependency.java">org/codehaus/mojo/enforcer/Dependency.java</a>
                 </td>
                 <td>
                   0
                 </td>
                 <td>
-                  1
-                </td>
-                <td>
-                  37
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.EnforceBytecodeVersion.java">org/apache/maven/plugins/enforcer/EnforceBytecodeVersion.java</a>
-                </td>
-                <td>
                   0
                 </td>
                 <td>
-                  4
-                </td>
-                <td>
-                  16
+                  0
                 </td>
               </tr>
                       </tbody>
