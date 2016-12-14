@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
@@ -53,6 +52,8 @@ public class RequireEncoding
      */
     private boolean failFast = true;
 
+    final private static String US_ASCII = "US-ASCII";
+
     public void execute( EnforcerRuleHelper helper )
         throws EnforcerRuleException
     {
@@ -63,7 +64,7 @@ public class RequireEncoding
                 encoding = (String) helper.evaluate( "${project.build.sourceEncoding}" );
             }
             Log log = helper.getLog();
-            if ( encoding.equals( StandardCharsets.US_ASCII.name() ) )
+            if ( encoding.equals( US_ASCII ) )
             {
                 log.warn( "Encoding US-ASCII is hard to detect. Use UTF-8 or ISO-8859-1" );
             }
