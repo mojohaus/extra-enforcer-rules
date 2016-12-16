@@ -202,6 +202,7 @@
           <showErrors>true</showErrors>
           <streamLogs>true</streamLogs>
           <settingsFile>src/it/settings.xml</settingsFile>
+          <preBuildHookScript>setup</preBuildHookScript>
           <postBuildHookScript>verify</postBuildHookScript>
           <addTestClassPath>true</addTestClassPath>
           <filterProperties>
