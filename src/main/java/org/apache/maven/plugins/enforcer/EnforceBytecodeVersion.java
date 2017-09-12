@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -36,6 +35,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
@@ -56,6 +57,8 @@ public class EnforceBytecodeVersion
     extends AbstractResolveDependencies
 {
     private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new LinkedHashMap<String, Integer>();
+    
+    private final Pattern MULTIRELEASE = Pattern.compile( "META-INF/versions/(\\d+)/.*" );
 
     static
     {
@@ -295,13 +298,31 @@ public class EnforceBytecodeVersion
                     {
                         getLog().debug( "\t" + entry.getName() + " => major=" + major + ",minor=" + minor );
                     }
-
+                    
+                    // Assuming regex match is more expensive, verify bytecode versions first
+                    
                     if ( ( major > maxJavaMajorVersionNumber )
                         || ( major == maxJavaMajorVersionNumber && minor > maxJavaMinorVersionNumber ) )
                     {
-                        return "Restricted to " + renderVersion( maxJavaMajorVersionNumber, maxJavaMinorVersionNumber )
+                        
+                        Matcher matcher = MULTIRELEASE.matcher( entry.getName() );
+                        
+                        if ( matcher.matches() )
+                        {
+                            int expectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( matcher.group( 1 ) );
+                            
+                            if ( major != expectedMajor )
+                            {
+                                getLog().warn( "Invalid bytecodeVersion for " + entry.getName() + ": expected "
+                                                + expectedMajor + ", but was " + major );
+                            }
+                        }
+                        else
+                        {
+                            return "Restricted to " + renderVersion( maxJavaMajorVersionNumber, maxJavaMinorVersionNumber )
                             + " yet " + a + " contains " + entry.getName() + " targeted to "
                             + renderVersion( major, minor );
+                        }
                     }
                 }
             }
