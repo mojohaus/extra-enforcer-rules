@@ -21,7 +21,7 @@ public class RequireLicense implements EnforcerRule {
         Log log = helper.getLog();
         try {
             MavenProject project = (MavenProject) helper.evaluate( "${project}" );
-            if (!project.getPackaging().equals("pom")) {
+            if (!"pom".equals(project.getPackaging())) {
                 List<License> licenses = getLicenses(project);
                 if (licenses.size() == 0) {
                     throw new EnforcerRuleException("You must set a license for this project");
@@ -30,7 +30,7 @@ public class RequireLicense implements EnforcerRule {
                 log.info("Ignoring " + this.getClass().getSimpleName() + " in this project");
             }
         } catch (ExpressionEvaluationException eee) {
-            throw new EnforcerRuleException( "Unable to get project.", eee);
+            throw new EnforcerRuleException("Unable to get project.", eee);
         }
     }
 
