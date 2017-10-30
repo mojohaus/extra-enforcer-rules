@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Checks if the Maven project has set at least a license.
+ *
+ * It can happen by using {@code <licenses />} in the POM file itself, or inheriting it from its parent POM.
+ *
  * @author Manuel Recena
  * @since TODO
  */
