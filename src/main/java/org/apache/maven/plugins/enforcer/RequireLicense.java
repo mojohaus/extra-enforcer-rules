@@ -7,6 +7,7 @@ import org.apache.maven.model.License;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.util.DirectoryScanner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,10 @@ public class RequireLicense implements EnforcerRule {
             if (!"pom".equals(project.getPackaging())) {
                 List<License> licenses = getLicenses(project);
                 if (licenses.size() == 0) {
-                    throw new EnforcerRuleException("You must set a license for this project");
+                    if (hasLicenseFile(project)) {
+                        log.warn("License file found in the root of your project");
+                    }
+                    throw new EnforcerRuleException("You must set a license for this project. Please read: https://maven.apache.org/pom.html#Licenses");
                 }
             } else {
                 log.info("Ignoring " + this.getClass().getSimpleName() + " in this project");
@@ -47,6 +51,16 @@ public class RequireLicense implements EnforcerRule {
             parent = parent.getParent();
         }
         return licenses;
+    }
+
+    boolean hasLicenseFile(MavenProject project) {
+        DirectoryScanner ds = new DirectoryScanner();
+        ds.setBasedir(project.getBasedir());
+        String[] includes = {"LICENSE.*"};
+        ds.setIncludes(includes);
+        ds.setCaseSensitive(true);
+        ds.scan();
+        return ds.getIncludedFiles().length > 0 ? true : false;
     }
 
     public boolean isCacheable() {
