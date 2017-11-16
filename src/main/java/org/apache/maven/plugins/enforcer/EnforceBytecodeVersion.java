@@ -59,6 +59,7 @@ public class EnforceBytecodeVersion
     private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new LinkedHashMap<String, Integer>();
     
     private final Pattern MULTIRELEASE = Pattern.compile( "META-INF/versions/(\\d+)/.*" );
+    private final String MODULE_INFO_CLASS = "module-info.class";
 
     static
     {
@@ -307,7 +308,11 @@ public class EnforceBytecodeVersion
                         
                         Matcher matcher = MULTIRELEASE.matcher( entry.getName() );
                         
-                        if ( matcher.matches() )
+                        if ( MODULE_INFO_CLASS.equals( entry.getName() ) ) {
+                            getLog().warn( "Invalid bytecodeVersion for " + entry.getName() + ": expected "
+                                            + maxJavaMajorVersionNumber + ", but was " + major);
+                        }
+                        else if ( matcher.matches() )
                         {
                             int expectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( matcher.group( 1 ) );
                             
