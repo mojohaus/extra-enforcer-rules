@@ -46,6 +46,13 @@ public class BanDuplicateClasses
 {
 
     /**
+     * Default ignores which are needed for JDK 9, cause in JDK 9 and above the <code>module-info.class</code> will be
+     * duplicated in any jar file. Furthermore in use cases for multi release jars the <code>module-info.class</code> is
+     * also contained several times.
+     */
+    private static final String[] DEFAULT_CLASSES_IGNORES = { "module-info", "META-INF/versions/*/module-info" };
+    
+    /**
      * The failure message
      */
     private String message;
@@ -72,12 +79,15 @@ public class BanDuplicateClasses
     protected void handleArtifacts( Set<Artifact> artifacts ) throws EnforcerRuleException
     {
         List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
+
+        IgnorableDependency ignoreableClasses = new IgnorableDependency();
+        ignoreableClasses.applyIgnoreClasses( DEFAULT_CLASSES_IGNORES, false );
         if ( ignoreClasses != null )
         {
-            IgnorableDependency ignorableDependency = new IgnorableDependency();
-            ignorableDependency.applyIgnoreClasses( ignoreClasses, false );
-            ignorableDependencies.add( ignorableDependency );
+            ignoreableClasses.applyIgnoreClasses( ignoreClasses, false );
         }
+        ignorableDependencies.add( ignoreableClasses );
+
         if ( dependencies != null )
         {
             for ( Dependency dependency : dependencies )
