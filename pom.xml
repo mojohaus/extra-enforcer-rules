@@ -78,10 +78,6 @@
     </developer>
   </developers>
 
-  <prerequisites>
-    <maven>${maven.version}</maven>
-  </prerequisites>
-
   <properties>
     <enforcerApiVersion>1.0</enforcerApiVersion>
     <enforcerPluginVersion>1.4</enforcerPluginVersion>
@@ -159,6 +155,9 @@
             </goals>
             <configuration>
               <rules>
+                <requireMavenVersion>
+                  <version>${maven.version}</version>
+                </requireMavenVersion>
                 <bannedDependencies>
                   <excludes>
                     <exclude>org.apache.maven.enforcer:enforcer-rules</exclude>
