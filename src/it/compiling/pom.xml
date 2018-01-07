@@ -8,6 +8,10 @@
   <packaging>pom</packaging>
   <name>Check that compile scope works</name>
 
+  <properties>
+    <maven.compiler.target>1.6</maven.compiler.target>
+    <maven.compiler.source>1.6</maven.compiler.source>
+  </properties>
   <modules>
     <module>child-a</module>
     <module>child-b</module>
