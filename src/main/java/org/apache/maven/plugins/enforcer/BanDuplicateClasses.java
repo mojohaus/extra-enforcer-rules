@@ -127,7 +127,7 @@ public class BanDuplicateClasses
             {
                 try
                 {
-                    for ( String name : (List<String>) FileUtils.getFileNames( file, null, null, false ) )
+                    for ( String name : FileUtils.getFileNames( file, null, null, false ) )
                     {
                         getLog().debug( "  " + name );
                         checkAndAddName( o, name, classNames, duplicates, ignorableDependencies );
