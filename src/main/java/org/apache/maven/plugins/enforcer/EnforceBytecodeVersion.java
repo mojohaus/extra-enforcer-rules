@@ -329,7 +329,7 @@ public class EnforceBytecodeVersion
         }
         catch ( IOException e )
         {
-            throw new EnforcerRuleException( "IOException while reading " + jarFile.getName(), e );
+            throw new EnforcerRuleException( "IOException while reading " + f, e );
         }
         finally
         {
