@@ -308,7 +308,7 @@ public class EnforceBytecodeVersion
         }
         catch ( IOException e )
         {
-            throw new EnforcerRuleException( "IOException while reading " + f.getAbsolutePath(), e );
+            throw new EnforcerRuleException( "IOException while reading " + f, e );
         }
         finally
         {
