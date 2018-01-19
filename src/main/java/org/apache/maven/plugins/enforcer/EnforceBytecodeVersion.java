@@ -331,6 +331,10 @@ public class EnforceBytecodeVersion
         {
             throw new EnforcerRuleException( "IOException while reading " + f, e );
         }
+        catch ( IllegalArgumentException e )
+        {
+            throw new EnforcerRuleException( "Error while reading " + f, e );
+        }
         finally
         {
             closeQuietly( jarFile );
