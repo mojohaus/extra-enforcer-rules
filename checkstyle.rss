@@ -23,10 +23,10 @@ under the License.
     <link>http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules</link>
     <description>Extra Enforcer Rules - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2011 - 2016 MojoHaus</copyright>
+    <copyright>&#169;2011 - 2018 MojoHaus</copyright>
     <item>
       <title>File: 11,
-             Errors: 91,
+             Errors: 92,
              Warnings: 32,
              Infos: 5
       </title>
@@ -46,16 +46,16 @@ under the License.
           <tbody>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireEncoding.java">org/apache/maven/plugins/enforcer/RequireEncoding.java</a>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequirePropertyDiverges.java">org/apache/maven/plugins/enforcer/RequirePropertyDiverges.java</a>
                 </td>
                 <td>
                   0
                 </td>
                 <td>
-                  14
+                  0
                 </td>
                 <td>
-                  1
+                  2
                 </td>
               </tr>
                           <tr>
@@ -74,16 +74,16 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequirePropertyDiverges.java">org/apache/maven/plugins/enforcer/RequirePropertyDiverges.java</a>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireEncoding.java">org/apache/maven/plugins/enforcer/RequireEncoding.java</a>
                 </td>
                 <td>
                   0
                 </td>
                 <td>
-                  0
+                  14
                 </td>
                 <td>
-                  2
+                  1
                 </td>
               </tr>
                           <tr>
@@ -97,7 +97,7 @@ under the License.
                   4
                 </td>
                 <td>
-                  16
+                  17
                 </td>
               </tr>
                           <tr>
@@ -144,20 +144,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.AbstractRequireRoles.java">org/apache/maven/plugins/enforcer/AbstractRequireRoles.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  2
-                </td>
-                <td>
-                  6
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireDeveloperRoles.java">org/apache/maven/plugins/enforcer/RequireDeveloperRoles.java</a>
                 </td>
                 <td>
@@ -168,6 +154,20 @@ under the License.
                 </td>
                 <td>
                   0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.AbstractRequireRoles.java">org/apache/maven/plugins/enforcer/AbstractRequireRoles.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+                <td>
+                  6
                 </td>
               </tr>
                           <tr>
