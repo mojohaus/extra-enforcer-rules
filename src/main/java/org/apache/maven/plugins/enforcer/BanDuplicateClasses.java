@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +37,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.codehaus.mojo.enforcer.Dependency;
 import org.codehaus.plexus.util.FileUtils;
+
+import static org.apache.maven.plugins.enforcer.JarUtils.isJarFile;
 
 /**
  * Bans duplicate classes on the classpath.
@@ -51,7 +53,7 @@ public class BanDuplicateClasses
      * also contained several times.
      */
     private static final String[] DEFAULT_CLASSES_IGNORES = { "module-info", "META-INF/versions/*/module-info" };
-    
+
     /**
      * The failure message
      */
@@ -74,6 +76,12 @@ public class BanDuplicateClasses
      * Only verify dependencies with one of these scopes
      */
     private List<String> scopes;
+
+    /**
+     * If {@code true} do not fail the build when duplicate classes exactly match each other. In other words, ignore
+     * duplication if the bytecode in the class files match. Default is {@code false}.
+     */
+    private boolean ignoreWhenIdentical;
 
     @Override
     protected void handleArtifacts( Set<Artifact> artifacts ) throws EnforcerRuleException
@@ -114,9 +122,9 @@ public class BanDuplicateClasses
                 ignorableDependencies.add( ignorableDependency );
             }
         }
-        
-        Map<String, Artifact> classNames = new HashMap<String, Artifact>();
-        Map<String, Set<Artifact>> duplicates = new HashMap<String, Set<Artifact>>();
+
+        Map<String, ClassesWithSameName> classesSeen = new HashMap<String, ClassesWithSameName>();
+        Set<String> duplicateClassNames = new HashSet<String>();
         for ( Artifact o : artifacts )
         {
             if( scopes != null && !scopes.contains( o.getScope() ) )
@@ -140,7 +148,7 @@ public class BanDuplicateClasses
                     for ( String name : FileUtils.getFileNames( file, null, null, false ) )
                     {
                         getLog().debug( "  " + name );
-                        checkAndAddName( o, name, classNames, duplicates, ignorableDependencies );
+                        checkAndAddName( o, name, classesSeen, duplicateClassNames, ignorableDependencies );
                     }
                 }
                 catch ( IOException e )
@@ -149,7 +157,7 @@ public class BanDuplicateClasses
                         "Unable to process dependency " + o.toString() + " due to " + e.getLocalizedMessage(), e );
                 }
             }
-            else if ( file.isFile() && "jar".equals( o.getType() ) )
+            else if ( isJarFile( o ) )
             {
                 try
                 {
@@ -159,7 +167,7 @@ public class BanDuplicateClasses
                     {
                         for ( JarEntry entry : Collections.<JarEntry>list( jar.entries() ) )
                         {
-                            checkAndAddName( o, entry.getName(), classNames, duplicates, ignorableDependencies );
+                            checkAndAddName( o, entry.getName(), classesSeen, duplicateClassNames, ignorableDependencies );
                         }
                     }
                     finally
@@ -181,18 +189,21 @@ public class BanDuplicateClasses
                 }
             }
         }
-        if ( !duplicates.isEmpty() )
+        if ( !duplicateClassNames.isEmpty() )
         {
             Map<Set<Artifact>, List<String>> inverted = new HashMap<Set<Artifact>, List<String>>();
-            for ( Map.Entry<String, Set<Artifact>> entry : duplicates.entrySet() )
+            for ( String className : duplicateClassNames )
             {
-                List<String> s = inverted.get( entry.getValue() );
+                ClassesWithSameName classesWithSameName = classesSeen.get( className );
+                Set<Artifact> artifactsOfDuplicateClass = classesWithSameName.getAllArtifactsThisClassWasFoundIn();
+
+                List<String> s = inverted.get( artifactsOfDuplicateClass );
                 if ( s == null )
                 {
                     s = new ArrayList<String>();
                 }
-                s.add( entry.getKey() );
-                inverted.put( entry.getValue(), s );
+                s.add( classesWithSameName.toOutputString( ignoreWhenIdentical ) );
+                inverted.put( artifactsOfDuplicateClass, s );
             }
             StringBuilder buf = new StringBuilder( message == null ? "Duplicate classes found:" : message );
             buf.append( '\n' );
@@ -205,10 +216,10 @@ public class BanDuplicateClasses
                     buf.append( a );
                 }
                 buf.append( "\n  Duplicate classes:" );
-                for ( String className : entry.getValue() )
+                for ( String classNameWithDuplicationInfo : entry.getValue() )
                 {
                     buf.append( "\n    " );
-                    buf.append( className );
+                    buf.append( classNameWithDuplicationInfo );
                 }
                 buf.append( '\n' );
             }
@@ -217,73 +228,65 @@ public class BanDuplicateClasses
 
     }
 
-    private void checkAndAddName( Artifact artifact, String name, Map<String, Artifact> classNames,
-                                  Map<String, Set<Artifact>> duplicates, Collection<IgnorableDependency> ignores )
+    private void checkAndAddName( Artifact artifact, String pathToClassFile, Map<String, ClassesWithSameName> classesSeen,
+                                  Set<String> duplicateClasses, Collection<IgnorableDependency> ignores )
         throws EnforcerRuleException
     {
-        if ( !name.endsWith( ".class" ) )
+        if ( !pathToClassFile.endsWith( ".class" ) )
         {
             return;
         }
-        
+
         for ( IgnorableDependency c : ignores )
         {
-            if ( c.matchesArtifact( artifact ) && c.matches( name ) )
+            if ( c.matchesArtifact( artifact ) && c.matches( pathToClassFile ) )
             {
-                if( classNames.containsKey( name ) )
+                if ( classesSeen.containsKey( pathToClassFile ) )
                 {
-                    getLog().debug( "Ignoring excluded class " + name );
+                    getLog().debug( "Ignoring excluded class " + pathToClassFile );
                 }
                 return;
             }
         }
 
-        if ( classNames.containsKey( name ) )
+        ClassesWithSameName classesWithSameName = classesSeen.get( pathToClassFile );
+        boolean isFirstTimeSeeingThisClass = ( classesWithSameName == null );
+        ClassFile classFile = new ClassFile( pathToClassFile, artifact );
+
+        if ( isFirstTimeSeeingThisClass )
         {
-            Artifact dup = classNames.put( name, artifact );
-            if ( !( findAllDuplicates && duplicates.containsKey( name ) ) )
-            {
-                for ( IgnorableDependency c : ignores )
-                {
-                    if ( c.matchesArtifact( artifact ) && c.matches(name) )
-                    {
-                        getLog().debug( "Ignoring duplicate class " + name );
-                        return;
-                    }
-                }
-            }
-            
-            if ( findAllDuplicates )
-            {
-                Set<Artifact> dups = duplicates.get( name );
-                if ( dups == null )
-                {
-                    dups = new LinkedHashSet<Artifact>();
-                    dups.add( dup );
-                }
-                dups.add( artifact );
-                duplicates.put( name, dups );
-            }
-            else
-            {
-                StringBuilder buf = new StringBuilder( message == null ? "Duplicate class found:" : message );
-                buf.append( '\n' );
-                buf.append( "\n  Found in:" );
-                buf.append( "\n    " );
-                buf.append( dup );
-                buf.append( "\n    " );
-                buf.append( artifact );
-                buf.append( "\n  Duplicate classes:" );
-                buf.append( "\n    " );
-                buf.append( name );
-                buf.append( '\n' );
-                buf.append( "There may be others but <findAllDuplicates> was set to false, so failing fast" );
-                throw new EnforcerRuleException( buf.toString() );
-            }
+            classesSeen.put( pathToClassFile, new ClassesWithSameName( getLog(), classFile ) );
+            return;
         }
-        else 
+
+        classesWithSameName.add( classFile );
+
+        if ( !classesWithSameName.hasDuplicates( ignoreWhenIdentical ) )
         {
-            classNames.put( name, artifact );
+            return;
+        }
+
+        if ( findAllDuplicates )
+        {
+            duplicateClasses.add( pathToClassFile );
+        }
+        else
+        {
+            Artifact previousArtifact = classesWithSameName.previous().getArtifactThisClassWasFoundIn();
+
+            StringBuilder buf = new StringBuilder( message == null ? "Duplicate class found:" : message );
+            buf.append( '\n' );
+            buf.append( "\n  Found in:" );
+            buf.append( "\n    " );
+            buf.append( previousArtifact );
+            buf.append( "\n    " );
+            buf.append( artifact );
+            buf.append( "\n  Duplicate classes:" );
+            buf.append( "\n    " );
+            buf.append( pathToClassFile );
+            buf.append( '\n' );
+            buf.append( "There may be others but <findAllDuplicates> was set to false, so failing fast" );
+            throw new EnforcerRuleException( buf.toString() );
         }
     }
 }
