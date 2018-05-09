@@ -295,11 +295,6 @@ public class EnforceBytecodeVersion
                     int minor = ( magicAndClassFileVersion[4] << 8 ) + magicAndClassFileVersion[5];
                     int major = ( magicAndClassFileVersion[6] << 8 ) + magicAndClassFileVersion[7];
 
-                    if ( getLog().isDebugEnabled() )
-                    {
-                        getLog().debug( "\t" + entry.getName() + " => major=" + major + ",minor=" + minor );
-                    }
-                    
                     // Assuming regex match is more expensive, verify bytecode versions first
                     
                     if ( ( major > maxJavaMajorVersionNumber )

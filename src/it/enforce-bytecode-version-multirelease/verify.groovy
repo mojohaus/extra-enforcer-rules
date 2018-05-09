@@ -3,7 +3,6 @@ assert file.exists();
 
 String text = file.getText("utf-8");
 
-assert text.contains( "[DEBUG] 	META-INF/versions/9/org/apache/logging/log4j/util/ProcessIdUtil.class => major=53,minor=0" )
-assert text.contains( "[DEBUG] 	META-INF/versions/9/org/apache/logging/log4j/util/StackLocator.class => major=53,minor=0" )
+assert text.contains( '[DEBUG] log4j-api-2.9.0.jar => ' )
 
 return true;
