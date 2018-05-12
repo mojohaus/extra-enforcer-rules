@@ -56,9 +56,11 @@ import org.codehaus.plexus.util.IOUtil;
 public class EnforceBytecodeVersion
     extends AbstractResolveDependencies
 {
-    private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new LinkedHashMap<String, Integer>();
-    
+    private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING =
+        new LinkedHashMap<String, Integer>();
+
     private final Pattern MULTIRELEASE = Pattern.compile( "META-INF/versions/(\\d+)/.*" );
+
     private final String MODULE_INFO_CLASS = "module-info.class";
 
     static
@@ -137,6 +139,12 @@ public class EnforceBytecodeVersion
      * Optional list of dependency scopes to ignore. {@code test} and {@code provided} make sense here.
      */
     private String[] ignoredScopes;
+
+    /**
+     * Ignore all dependencies which have {@code &lt;optional&gt;true&lt;/optional&gt;}.
+     * @since 1.0.0
+     */
+    private boolean ignoreOptionals = false;
 
     private List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
 
@@ -299,34 +307,35 @@ public class EnforceBytecodeVersion
                     {
                         getLog().debug( "\t" + entry.getName() + " => major=" + major + ",minor=" + minor );
                     }
-                    
+
                     // Assuming regex match is more expensive, verify bytecode versions first
-                    
+
                     if ( ( major > maxJavaMajorVersionNumber )
                         || ( major == maxJavaMajorVersionNumber && minor > maxJavaMinorVersionNumber ) )
                     {
-                        
+
                         Matcher matcher = MULTIRELEASE.matcher( entry.getName() );
-                        
-                        if ( MODULE_INFO_CLASS.equals( entry.getName() ) ) {
+
+                        if ( MODULE_INFO_CLASS.equals( entry.getName() ) )
+                        {
                             getLog().warn( "Invalid bytecodeVersion for " + entry.getName() + ": expected "
-                                            + maxJavaMajorVersionNumber + ", but was " + major);
+                                + maxJavaMajorVersionNumber + ", but was " + major );
                         }
                         else if ( matcher.matches() )
                         {
                             int expectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( matcher.group( 1 ) );
-                            
+
                             if ( major != expectedMajor )
                             {
                                 getLog().warn( "Invalid bytecodeVersion for " + entry.getName() + ": expected "
-                                                + expectedMajor + ", but was " + major );
+                                    + expectedMajor + ", but was " + major );
                             }
                         }
                         else
                         {
-                            return "Restricted to " + renderVersion( maxJavaMajorVersionNumber, maxJavaMinorVersionNumber )
-                            + " yet " + a + " contains " + entry.getName() + " targeted to "
-                            + renderVersion( major, minor );
+                            return "Restricted to "
+                                + renderVersion( maxJavaMajorVersionNumber, maxJavaMinorVersionNumber ) + " yet " + a
+                                + " contains " + entry.getName() + " targeted to " + renderVersion( major, minor );
                         }
                     }
                 }
@@ -413,11 +422,16 @@ public class EnforceBytecodeVersion
             {
                 continue;
             }
+            if ( ignoreOptionals && artifact.isOptional() )
+            {
+                continue;
+            }
             if ( filter.include( artifact ) )
             {
                 result.add( artifact );
             }
         }
+
         return result;
     }
 
