@@ -167,7 +167,8 @@ public class BanDuplicateClasses
                     {
                         for ( JarEntry entry : Collections.<JarEntry>list( jar.entries() ) )
                         {
-                            checkAndAddName( o, entry.getName(), classesSeen, duplicateClassNames, ignorableDependencies );
+                            String fileName = entry.getName();
+                            checkAndAddName( o, fileName, classesSeen, duplicateClassNames, ignorableDependencies );
                         }
                     }
                     finally
@@ -228,8 +229,9 @@ public class BanDuplicateClasses
 
     }
 
-    private void checkAndAddName( Artifact artifact, String pathToClassFile, Map<String, ClassesWithSameName> classesSeen,
-                                  Set<String> duplicateClasses, Collection<IgnorableDependency> ignores )
+    private void checkAndAddName( Artifact artifact, String pathToClassFile, Map<String,
+                                  ClassesWithSameName> classesSeen, Set<String> duplicateClasses,
+                                  Collection<IgnorableDependency> ignores )
         throws EnforcerRuleException
     {
         if ( !pathToClassFile.endsWith( ".class" ) )

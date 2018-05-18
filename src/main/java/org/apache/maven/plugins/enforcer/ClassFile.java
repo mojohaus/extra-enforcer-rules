@@ -1,5 +1,24 @@
 package org.apache.maven.plugins.enforcer;
 
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 import org.apache.maven.artifact.Artifact;
 
 /**
@@ -28,6 +47,11 @@ public class ClassFile
     private final Hasher hasher;
     private String lazilyComputedHash;
 
+    /**
+     * Constructor.
+     * @param classFilePath path to the class file. Example: org/apache/maven/Stuff.class
+     * @param artifactThisClassWasFoundIn the maven artifact the class appeared in (example: a jar file)
+     */
     public ClassFile( String classFilePath, Artifact artifactThisClassWasFoundIn )
     {
         this.classFilePath = classFilePath;
@@ -36,18 +60,25 @@ public class ClassFile
     }
 
     /**
-     * The path to the .class file. Example: org/apache/maven/Stuff.class
+     * @return the path to the .class file. Example: org/apache/maven/Stuff.class
      */
     public String getClassFilePath()
     {
         return classFilePath;
     }
 
+    /**
+     * @return the maven artifact the class appeared in (example: a jar file)
+     */
     public Artifact getArtifactThisClassWasFoundIn()
     {
         return artifactThisClassWasFoundIn;
     }
 
+    /**
+     * @return a hash or checksum of the binary file. If two files have the same hash
+     * then they are the same binary file.
+     */
     public String getHash()
     {
         if ( lazilyComputedHash == null )

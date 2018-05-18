@@ -1,5 +1,24 @@
 package org.apache.maven.plugins.enforcer;
 
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -51,6 +70,12 @@ public class ClassesWithSameName
         }
     }
 
+    /**
+     * @return the previous ClassFile, meaning, the one added before the most recent one. Psuedo-code:
+     *         add("Class1.class")
+     *         add("Class2.class")
+     *         previous()   // returns "Class1.class"
+     */
     public ClassFile previous()
     {
         if ( list.size() > 1 )
@@ -60,11 +85,16 @@ public class ClassesWithSameName
         }
         else
         {
-            throw new IllegalArgumentException( "there was only " + list.size() +
-                " element(s) in the list, so there is no 2nd-to-last element to retrieve " );
+            throw new IllegalArgumentException( "there was only " + list.size()
+                + " element(s) in the list, so there is no 2nd-to-last element to retrieve " );
         }
     }
 
+    /**
+     * Add a new .class file with the same exact path and name as the other classes this file represents
+     * (though the artifact can be different).
+     * @param classFile The path to the .class file. Example: org/apache/maven/Stuff.class
+     */
     public void add( ClassFile classFile )
     {
         throwIfClassNameDoesNotMatch( classFile, classFilePath );
@@ -87,6 +117,14 @@ public class ClassesWithSameName
         return result;
     }
 
+    /**
+     * Main logic to determine if this object represents more than one of the exact same class
+     * on the classpath.
+     * @param ignoreWhenIdentical True if we should ignore two or more classes when they have the
+     *                            exact same bytecode; false means fail whenever there's more than
+     *                            one of the same class, regardless of bytecode.
+     * @return true if there are duplicates, false if not.
+     */
     public boolean hasDuplicates( boolean ignoreWhenIdentical )
     {
         boolean compareJustClassNames = !ignoreWhenIdentical;
@@ -115,6 +153,18 @@ public class ClassesWithSameName
         return false;
     }
 
+    /**
+     * @param ignoreWhenIdentical True if we should ignore two or more classes when they have the
+     *                            exact same bytecode; false means fail whenever there's more than
+     *                            one of the same class, regardless of bytecode.
+     * @return the output string displayed on the command line when there are duplicate classes.
+     *
+     *         Example (ignoreWhenIdentical = false):
+     *         org/apache/maven/Stuff.class
+     *
+     *         Example (ignoreWhenIdentical = true):
+     *         org/apache/maven/Stuff.class  -- the bytecode exactly matches in these: a.jar and b.jar
+     */
     public String toOutputString( boolean ignoreWhenIdentical )
     {
         String result = classFilePath;
@@ -151,8 +201,8 @@ public class ClassesWithSameName
     {
         if ( !classFile.getClassFilePath().equals( otherClassFilePath ) )
         {
-            throw new IllegalArgumentException( "Expected class " + otherClassFilePath +
-                " but got " + classFile.getClassFilePath() );
+            throw new IllegalArgumentException( "Expected class " + otherClassFilePath
+                + " but got " + classFile.getClassFilePath() );
         }
     }
 
