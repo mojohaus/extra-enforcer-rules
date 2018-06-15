@@ -80,6 +80,10 @@ public class EnforceBytecodeVersion
         // Java9
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.9", 53 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "9", 53 );
+
+        // Java10
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.10", 54 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "10", 54 );
     }
 
     static String renderVersion( int major, int minor )
