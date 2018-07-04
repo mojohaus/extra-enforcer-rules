@@ -16,9 +16,9 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.dependency.tree.DependencyNode;
-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -31,7 +31,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 public abstract class AbstractResolveDependencies implements EnforcerRule
 {
 
-    private transient DependencyTreeBuilder treeBuilder;
+    private transient DependencyGraphBuilder graphBuilder;
     
     private transient ArtifactResolver resolver;
     
@@ -50,7 +50,7 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
         {
             resolver = (ArtifactResolver) helper.getComponent( ArtifactResolver.class );
             
-            treeBuilder = (DependencyTreeBuilder) helper.getComponent( DependencyTreeBuilder.class );
+            graphBuilder = (DependencyGraphBuilder) helper.getComponent(DependencyGraphBuilder.class );
         }
         catch ( ComponentLookupException e )
         {
@@ -72,7 +72,7 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
             throw new EnforcerRuleException( "Unable to lookup an expression " + e.getLocalizedMessage(), e );
         }
         
-        Set<Artifact> artifacts = getDependenciesToCheck( project, localRepository );
+        Set<Artifact> artifacts = getDependenciesToCheck( project);
         
         handleArtifacts( artifacts ); 
     }
@@ -84,12 +84,12 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
         return true;
     }
         
-    private Set<Artifact> getDependenciesToCheck( MavenProject project, ArtifactRepository localRepository )
+    private Set<Artifact> getDependenciesToCheck( MavenProject project )
     {
         Set<Artifact> dependencies = null;
         try
         {
-            DependencyNode node = treeBuilder.buildDependencyTree( project, localRepository, null );
+            DependencyNode node = graphBuilder.buildDependencyGraph( project ,null);
             
             if( isSearchTransitive() )
             {
@@ -104,7 +104,7 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
                 }
             }
         }
-        catch ( DependencyTreeBuilderException e )
+        catch ( DependencyGraphBuilderException e )
         {
             // otherwise we need to change the signature of this protected method
             throw new RuntimeException( e );
@@ -122,20 +122,17 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
             {
                 try
                 {
-                    if ( depNode.getState() == DependencyNode.INCLUDED )
+                    Artifact artifact = depNode.getArtifact();
+
+                    resolver.resolve( artifact, remoteRepositories, localRepository );
+
+                    children.add( artifact );
+
+                    Set<Artifact> subNodes = getAllDescendants( depNode );
+
+                    if( subNodes != null )
                     {
-                        Artifact artifact = depNode.getArtifact();
-
-                        resolver.resolve( artifact, remoteRepositories, localRepository );
-
-                        children.add( artifact );
-
-                        Set<Artifact> subNodes = getAllDescendants( depNode );
-
-                        if( subNodes != null )
-                        {
-                            children.addAll(subNodes);
-                        }
+                        children.addAll(subNodes);
                     }
                 }
                 catch ( ArtifactResolutionException e )
