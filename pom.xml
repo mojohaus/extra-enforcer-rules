@@ -157,6 +157,10 @@
           <artifactId>maven-site-plugin</artifactId>
           <version>3.7.1</version>
         </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.0</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -241,4 +245,17 @@
         </plugin>
       </plugins>
   </reporting>
+  <profiles>
+    <profile>
+      <id>java12</id>
+      <activation>
+        <jdk>[12,)</jdk>
+      </activation>
+      <properties>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.release>7</maven.compiler.release>
+      </properties>
+    </profile>
+  </profiles>
 </project>
