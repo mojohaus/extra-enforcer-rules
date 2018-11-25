@@ -84,6 +84,9 @@ public class EnforceBytecodeVersion
         // Java10
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.10", 54 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "10", 54 );
+
+        // Java11
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "11", 55 );
     }
 
     static String renderVersion( int major, int minor )
@@ -200,7 +203,8 @@ public class EnforceBytecodeVersion
             Integer needle = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( maxJdkVersion );
             if ( needle == null )
             {
-                throw new IllegalArgumentException( "Unknown JDK version given. Should be something like \"1.7\"" );
+                throw new IllegalArgumentException( "Unknown JDK version given. Should be something like " +
+                        "\"1.7\", \"8\", \"11\"" );
             }
             maxJavaMajorVersionNumber = needle;
         }
