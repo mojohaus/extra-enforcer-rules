@@ -7,6 +7,7 @@ jdk:
   - openjdk7
   - openjdk8
   - openjdk11
+  - openjdk-ea
 install:
   - "mvn --show-version --errors --batch-mode validate dependency:go-offline"
 script: "mvn --show-version --errors --batch-mode clean verify"
