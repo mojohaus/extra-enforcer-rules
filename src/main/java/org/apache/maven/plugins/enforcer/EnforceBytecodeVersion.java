@@ -75,23 +75,23 @@ public class EnforceBytecodeVersion
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.7", 51 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "7", 51 );
         // Java8
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.8", 52 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "8", 52 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.8", 52 );
         // Java9
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.9", 53 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "9", 53 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.9", 53 );
 
         // Java10
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.10", 54 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "10", 54 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.10", 54 );
 
         // Java11
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.11", 55 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "11", 55 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.11", 55 );
 
         // Java 12
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.12", 56 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "12", 56 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.12", 56 );
     }
 
     static String renderVersion( int major, int minor )
