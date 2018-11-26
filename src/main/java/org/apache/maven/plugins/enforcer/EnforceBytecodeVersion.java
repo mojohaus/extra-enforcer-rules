@@ -86,9 +86,11 @@ public class EnforceBytecodeVersion
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "10", 54 );
 
         // Java11
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.11", 55 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "11", 55 );
 
         // Java 12
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.12", 56 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "12", 56 );
     }
 
