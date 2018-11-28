@@ -9,8 +9,10 @@ jdk:
   - openjdk11
   - openjdk-ea
 install:
-  - "mvn --show-version --errors --batch-mode validate dependency:go-offline"
-script: "mvn --show-version --errors --batch-mode clean verify"
+  - "mvn -N io.takari:maven:0.4.3:wrapper -Dmaven=${MAVEN_VERSION} -Dhttps.protocols=TLSv1.2"
+  - "./mvnw --show-version --errors --batch-mode validate dependency:go-offline"
+script:
+  - "./mvnw --show-version --errors --batch-mode clean verify"
 cache:
     directories:
     - $HOME/.m2
