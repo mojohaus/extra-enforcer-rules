@@ -150,6 +150,12 @@ public class EnforceBytecodeVersion
      */
     private String[] ignoredScopes;
 
+    /**
+     * Ignore all dependencies which have {@code &lt;optional&gt;true&lt;/optional&gt;}.
+     * @since 1.2
+     */
+    private boolean ignoreOptionals = false;
+
     private List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
 
     @Override
@@ -399,7 +405,7 @@ public class EnforceBytecodeVersion
      */
     private Set<Artifact> filterArtifacts( Set<Artifact> dependencies )
     {
-        if ( includes == null && excludes == null && ignoredScopes == null )
+        if ( includes == null && excludes == null && ignoredScopes == null && ignoreOptionals == false )
         {
             return dependencies;
         }
@@ -418,6 +424,10 @@ public class EnforceBytecodeVersion
         for ( Artifact artifact : dependencies )
         {
             if ( ignoredScopes != null && Arrays.asList( ignoredScopes ).contains( artifact.getScope() ) )
+            {
+                continue;
+            }
+            if ( ignoreOptionals && artifact.isOptional() )
             {
                 continue;
             }
