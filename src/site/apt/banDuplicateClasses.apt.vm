@@ -40,6 +40,8 @@ Ban Duplicate Classes
    
    * dependencies - a list of dependencies for which you want to ignore specific classes.
 
+   * scopes - only verify dependencies with one of these scopes
+
    []
 
 
@@ -70,6 +72,10 @@ Ban Duplicate Classes
                     <!-- example of ignoring with wildcards -->
                     <ignoreClass>org.apache.commons.logging.*</ignoreClass>
                   </ignoreClasses>
+                  <scopes>
+                      <scope>compile</scope>
+                      <scope>provided</scope>
+                  </scopes>
                   <findAllDuplicates>true</findAllDuplicates>
                   <ignoreWhenIdentical>true</ignoreWhenIdentical>
                 </banDuplicateClasses>
