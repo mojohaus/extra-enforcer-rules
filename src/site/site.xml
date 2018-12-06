@@ -27,6 +27,7 @@ under the License.
     <menu name="Rules">
       <item name="Ban Duplicate Classes" href="banDuplicateClasses.html"/>
       <item name="Require Property Diverges" href="requirePropertyDiverges.html"/>
+      <item name="Require Project URL" href="requireProjectUrl.html"/>
       <item name="Require Developer Roles" href="requireDeveloperRoles.html"/>
       <item name="Require Contributor Roles" href="requireContributorRoles.html"/>
       <item name="Enforce Bytecode Version" href="enforceBytecodeVersion.html"/>
