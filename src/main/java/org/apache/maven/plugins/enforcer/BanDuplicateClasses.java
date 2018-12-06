@@ -70,6 +70,9 @@ public class BanDuplicateClasses
      */
     private boolean findAllDuplicates;
 
+    /**
+     * List of dependencies for which you want to ignore specific classes.
+     */
     private List<Dependency> dependencies;
     
     /**
