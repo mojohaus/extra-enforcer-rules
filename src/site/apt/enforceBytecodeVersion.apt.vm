@@ -41,6 +41,8 @@ Enforce Bytecode Version
 
    * ignoredScopes - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
 
+   * ignoreOptionals - a boolean, if <<<true>>> all dependencies which have <<<<optional>true</optional>>>> are ignored.
+
    []
 
 Note 
