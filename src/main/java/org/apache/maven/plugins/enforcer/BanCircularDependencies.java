@@ -52,7 +52,7 @@ public class BanCircularDependencies
     
     private String message;
 
-	/**
+    /**
      * If {@code false} then the rule will only check the dependency hierarchy.
      * If {@code true} then the rule will also verify there are no exclusions used to get around the rule.
      */
