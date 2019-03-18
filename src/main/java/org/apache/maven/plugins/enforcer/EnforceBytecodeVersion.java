@@ -272,6 +272,8 @@ public class EnforceBytecodeVersion
             jarFile = new JarFile( f );
             getLog().debug( f.getName() + " => " + f.getPath() );
             byte[] magicAndClassFileVersion = new byte[8];
+            StringBuilder artifactInfo = new StringBuilder();
+            artifactInfo.append( "(" ).append( a.getGroupId() ).append( ":" ).append( a.getArtifactId() ).append( ") " );
             JAR: for ( Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); )
             {
                 JarEntry entry = e.nextElement();
@@ -323,8 +325,10 @@ public class EnforceBytecodeVersion
                         Matcher matcher = MULTIRELEASE.matcher( entry.getName() );
                         
                         if ( MODULE_INFO_CLASS.equals( entry.getName() ) ) {
-                            getLog().warn( "Invalid bytecodeVersion for " + entry.getName() + ": expected "
-                                            + maxJavaMajorVersionNumber + ", but was " + major);
+                            if ( major > maxJavaMajorVersionNumber ) {
+                                getLog().warn( artifactInfo + "Invalid bytecodeVersion for " + MODULE_INFO_CLASS + ": expected "
+                                        + maxJavaMajorVersionNumber + ", but was " + major);
+                            }
                         }
                         else if ( matcher.matches() )
                         {
@@ -332,7 +336,7 @@ public class EnforceBytecodeVersion
                             
                             if ( major != expectedMajor )
                             {
-                                getLog().warn( "Invalid bytecodeVersion for " + entry.getName() + ": expected "
+                                getLog().warn( artifactInfo + "Invalid bytecodeVersion for " + entry.getName() + ": expected "
                                                 + expectedMajor + ", but was " + major );
                             }
                         }
