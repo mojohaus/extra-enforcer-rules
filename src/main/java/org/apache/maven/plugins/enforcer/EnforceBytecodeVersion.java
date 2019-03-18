@@ -349,7 +349,13 @@ public class EnforceBytecodeVersion
                         
                         Matcher matcher = MULTIRELEASE.matcher( entry.getName() );
                         
-                        if ( matcher.matches() )
+                        if ( MODULE_INFO_CLASS.equals( entry.getName() ) ) {
+                            if ( major > maxJavaMajorVersionNumber ) {
+                                getLog().warn("Invalid bytecodeVersion for " + MODULE_INFO_CLASS + ": expected "
+                                        + maxJavaMajorVersionNumber + ", but was " + major);
+                            }
+                        }
+                        else if ( matcher.matches() )
                         {
                             Integer expectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( matcher.group( 1 ) );
                             
