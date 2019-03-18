@@ -323,8 +323,10 @@ public class EnforceBytecodeVersion
                         Matcher matcher = MULTIRELEASE.matcher( entry.getName() );
                         
                         if ( MODULE_INFO_CLASS.equals( entry.getName() ) ) {
-                            getLog().warn( "Invalid bytecodeVersion for " + entry.getName() + ": expected "
-                                            + maxJavaMajorVersionNumber + ", but was " + major);
+                            if ( major > maxJavaMajorVersionNumber ) {
+                                getLog().warn("Invalid bytecodeVersion for " + MODULE_INFO_CLASS + ": expected "
+                                        + maxJavaMajorVersionNumber + ", but was " + major);
+                            }
                         }
                         else if ( matcher.matches() )
                         {
