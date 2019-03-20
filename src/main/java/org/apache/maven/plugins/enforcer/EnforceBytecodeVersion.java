@@ -57,9 +57,12 @@ public class EnforceBytecodeVersion
     extends AbstractResolveDependencies
 {
     private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new LinkedHashMap<String, Integer>();
-    
+    /**
+     * Default ignores when validating against jdk < 9 because <code>module-info.class</code> will always have level 1.9.
+     */
+    private static final String[] DEFAULT_CLASSES_IGNORE_BEFORE_JDK_9 = {"module-info"};
+
     private final Pattern MULTIRELEASE = Pattern.compile( "META-INF/versions/(\\d+)/.*" );
-    private final String MODULE_INFO_CLASS = "module-info.class";
 
     static
     {
@@ -218,6 +221,12 @@ public class EnforceBytecodeVersion
                         "\"1.7\", \"8\", \"11\", \"12\"" );
             }
             maxJavaMajorVersionNumber = needle;
+            if ( needle < 53 )
+            {
+                IgnorableDependency ignoreModuleInfoDependency = new IgnorableDependency();
+                ignoreModuleInfoDependency.applyIgnoreClasses(DEFAULT_CLASSES_IGNORE_BEFORE_JDK_9, false );
+                ignorableDependencies.add( ignoreModuleInfoDependency );
+            }
         }
         if ( maxJavaMajorVersionNumber == -1 )
         {
@@ -322,18 +331,14 @@ public class EnforceBytecodeVersion
                         
                         Matcher matcher = MULTIRELEASE.matcher( entry.getName() );
                         
-                        if ( MODULE_INFO_CLASS.equals( entry.getName() ) ) {
-                            getLog().warn( "Invalid bytecodeVersion for " + entry.getName() + ": expected "
-                                            + maxJavaMajorVersionNumber + ", but was " + major);
-                        }
-                        else if ( matcher.matches() )
+                        if ( matcher.matches() )
                         {
                             int expectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( matcher.group( 1 ) );
                             
                             if ( major != expectedMajor )
                             {
-                                getLog().warn( "Invalid bytecodeVersion for " + entry.getName() + ": expected "
-                                                + expectedMajor + ", but was " + major );
+                                getLog().warn( "Invalid bytecodeVersion for " + a + " : "
+                                        + entry.getName() + ": expected " + expectedMajor + ", but was " + major );
                             }
                         }
                         else

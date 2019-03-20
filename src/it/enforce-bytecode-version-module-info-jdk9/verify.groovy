@@ -3,7 +3,6 @@ assert file.exists();
 
 String text = file.getText("utf-8");
 
-assert text.contains( '[INFO] Adding ignore: module-info' )
-assert text.contains( '[DEBUG] log4j-api-2.9.0.jar => ' )
+assert ! text.contains( '[INFO] Adding ignore: module-info' )
 
 return true;
