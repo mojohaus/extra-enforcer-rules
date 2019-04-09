@@ -23,10 +23,10 @@ under the License.
     <link>http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules</link>
     <description>Extra Enforcer Rules - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2011 - 2018 MojoHaus</copyright>
+    <copyright>&#169;2011 - 2019 MojoHaus</copyright>
     <item>
       <title>File: 15,
-             Errors: 94,
+             Errors: 100,
              Warnings: 32,
              Infos: 5
       </title>
@@ -46,20 +46,6 @@ under the License.
           <tbody>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireProjectUrl.java">org/apache/maven/plugins/enforcer/RequireProjectUrl.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  1
-                </td>
-                <td>
-                  37
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequirePropertyDiverges.java">org/apache/maven/plugins/enforcer/RequirePropertyDiverges.java</a>
                 </td>
                 <td>
@@ -74,6 +60,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireProjectUrl.java">org/apache/maven/plugins/enforcer/RequireProjectUrl.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  37
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.EnforceBytecodeVersion.java">org/apache/maven/plugins/enforcer/EnforceBytecodeVersion.java</a>
                 </td>
                 <td>
@@ -83,7 +83,7 @@ under the License.
                   4
                 </td>
                 <td>
-                  22
+                  28
                 </td>
               </tr>
                           <tr>
