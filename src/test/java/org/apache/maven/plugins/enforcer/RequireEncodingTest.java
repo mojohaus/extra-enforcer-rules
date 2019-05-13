@@ -27,7 +27,7 @@ public class RequireEncodingTest {
   }
 
   @Test
-  public void failUTF8() throws Exception {
+    public void successUTF8ForSimpleAscii() throws Exception {
     
     when(helper.evaluate("${basedir}")).thenReturn(new File("src/test/resources").getAbsolutePath());
     when(helper.evaluate("${project.build.sourceEncoding}")).thenReturn("UTF-8");
@@ -35,7 +35,31 @@ public class RequireEncodingTest {
     
     rule.setIncludes("ascii.txt");
 
-    exception.expect(EnforcerRuleException.class);
-    rule.execute(helper);
-  }
+        rule.execute(helper);
+    }
+
+    @Test
+    public void failUTF8ForIso8591() throws Exception {
+
+        when(helper.evaluate("${basedir}")).thenReturn(new File("src/test/resources").getAbsolutePath());
+        when(helper.evaluate("${project.build.sourceEncoding}")).thenReturn("UTF-8");
+        when(helper.getLog()).thenReturn(mock(Log.class));
+
+        rule.setIncludes("iso88591.txt");
+
+        exception.expect(EnforcerRuleException.class);
+        rule.execute(helper);
+    }
+
+    @Test
+    public void successUTF8() throws Exception {
+
+        when(helper.evaluate("${basedir}")).thenReturn(new File("src/test/resources").getAbsolutePath());
+        when(helper.evaluate("${project.build.sourceEncoding}")).thenReturn("UTF-8");
+        when(helper.getLog()).thenReturn(mock(Log.class));
+
+        rule.setIncludes("utf8.txt");
+
+        rule.execute(helper);
+    }
 }

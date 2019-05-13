@@ -26,8 +26,9 @@ import com.ibm.icu.text.CharsetMatch;
  * @see <a href="https://github.com/ericbn/encoding-enforcer">ericbn/encoding-enforcer</a>
  */
 public class RequireEncoding
-    implements EnforcerRule
+        implements EnforcerRule
 {
+
     /**
      * Validate files match this encoding. If not specified then default to ${project.build.sourceEncoding}.
      */
@@ -54,20 +55,20 @@ public class RequireEncoding
     private boolean failFast = true;
 
     public void execute( EnforcerRuleHelper helper )
-        throws EnforcerRuleException
+            throws EnforcerRuleException
     {
         try
         {
             if ( StringUtils.isBlank( encoding ) )
             {
-                encoding = (String) helper.evaluate( "${project.build.sourceEncoding}" );
+                encoding = ( String ) helper.evaluate( "${project.build.sourceEncoding}" );
             }
             Log log = helper.getLog();
             if ( encoding.equals( StandardCharsets.US_ASCII.name() ) )
             {
                 log.warn( "Encoding US-ASCII is hard to detect. Use UTF-8 or ISO-8859-1" );
             }
-            String basedir = (String) helper.evaluate( "${basedir}" );
+            String basedir = ( String ) helper.evaluate( "${basedir}" );
             DirectoryScanner ds = new DirectoryScanner();
             ds.setBasedir( basedir );
             if ( StringUtils.isNotBlank( includes ) )
@@ -119,7 +120,7 @@ public class RequireEncoding
     }
 
     protected String getEncoding( String requiredEncoding, File file, Log log )
-        throws IOException
+            throws IOException
     {
         FileInputStream fis = null;
         try
@@ -135,6 +136,13 @@ public class RequireEncoding
             }
             else
             {
+                for ( CharsetMatch match : charsets )
+                {
+                    if ( match.getName().equals( requiredEncoding ) )
+                    {
+                        return requiredEncoding;
+                    }
+                }
                 return charsets[0].getName();
             }
         }
