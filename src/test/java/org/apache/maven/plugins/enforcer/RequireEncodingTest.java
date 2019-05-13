@@ -26,6 +26,11 @@ public class RequireEncodingTest {
     rule = new RequireEncoding();
   }
 
+    /**
+     * The file ascii.txt is a valid UTF-8 file. There are no special or control characters that are not representable.
+     *
+     * @throws Exception
+     */
   @Test
     public void successUTF8ForSimpleAscii() throws Exception {
     
