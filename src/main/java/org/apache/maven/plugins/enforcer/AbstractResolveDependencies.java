@@ -16,32 +16,32 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.dependency.tree.DependencyNode;
-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * Abstract rule for when the content of the artifacts matters.
- * 
+ *
  * @author Robert Scholte
  *
  */
 public abstract class AbstractResolveDependencies implements EnforcerRule
 {
 
-    private transient DependencyTreeBuilder treeBuilder;
-    
+    private transient DependencyGraphBuilder graphBuilder;
+
     private transient ArtifactResolver resolver;
-    
+
     private transient ArtifactRepository localRepository;
-    
+
     private transient List<ArtifactRepository> remoteRepositories;
-    
+
     private transient EnforcerRuleHelper helper;
     public void execute( EnforcerRuleHelper helper )
-        throws EnforcerRuleException
+            throws EnforcerRuleException
     {
         this.helper = helper;
 
@@ -49,48 +49,48 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
         try
         {
             resolver = (ArtifactResolver) helper.getComponent( ArtifactResolver.class );
-            
-            treeBuilder = (DependencyTreeBuilder) helper.getComponent( DependencyTreeBuilder.class );
+
+            graphBuilder = (DependencyGraphBuilder) helper.getComponent(DependencyGraphBuilder.class );
         }
         catch ( ComponentLookupException e )
         {
-                throw new EnforcerRuleException( "Unable to lookup DependencyTreeBuilder: ", e );
+            throw new EnforcerRuleException( "Unable to lookup DependencyTreeBuilder: ", e );
         }
-        
+
         // Resolve expressions
         MavenProject project;
         try
         {
             project = (MavenProject) helper.evaluate( "${project}" );
-            
+
             localRepository = (ArtifactRepository) helper.evaluate( "${localRepository}" );
-            
+
             remoteRepositories = (List<ArtifactRepository>) helper.evaluate( "${project.remoteArtifactRepositories}" );
         }
         catch ( ExpressionEvaluationException e )
         {
             throw new EnforcerRuleException( "Unable to lookup an expression " + e.getLocalizedMessage(), e );
         }
-        
-        Set<Artifact> artifacts = getDependenciesToCheck( project, localRepository );
-        
-        handleArtifacts( artifacts ); 
+
+        Set<Artifact> artifacts = getDependenciesToCheck( project);
+
+        handleArtifacts( artifacts );
     }
 
     protected abstract void handleArtifacts( Set<Artifact> artifacts ) throws EnforcerRuleException;
-    
+
     protected boolean isSearchTransitive()
     {
         return true;
     }
-        
-    private Set<Artifact> getDependenciesToCheck( MavenProject project, ArtifactRepository localRepository )
+
+    private Set<Artifact> getDependenciesToCheck( MavenProject project )
     {
         Set<Artifact> dependencies = null;
         try
         {
-            DependencyNode node = treeBuilder.buildDependencyTree( project, localRepository, null );
-            
+            DependencyNode node = graphBuilder.buildDependencyGraph( project ,null);
+
             if( isSearchTransitive() )
             {
                 dependencies  = getAllDescendants( node );
@@ -104,7 +104,7 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
                 }
             }
         }
-        catch ( DependencyTreeBuilderException e )
+        catch ( DependencyGraphBuilderException e )
         {
             // otherwise we need to change the signature of this protected method
             throw new RuntimeException( e );
@@ -114,7 +114,7 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
 
     private Set<Artifact> getAllDescendants( DependencyNode node )
     {
-        Set<Artifact> children = null; 
+        Set<Artifact> children = null;
         if( node.getChildren() != null )
         {
             children = new HashSet<Artifact>();
@@ -122,20 +122,17 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
             {
                 try
                 {
-                    if ( depNode.getState() == DependencyNode.INCLUDED )
+                    Artifact artifact = depNode.getArtifact();
+
+                    resolver.resolve( artifact, remoteRepositories, localRepository );
+
+                    children.add( artifact );
+
+                    Set<Artifact> subNodes = getAllDescendants( depNode );
+
+                    if( subNodes != null )
                     {
-                        Artifact artifact = depNode.getArtifact();
-
-                        resolver.resolve( artifact, remoteRepositories, localRepository );
-
-                        children.add( artifact );
-
-                        Set<Artifact> subNodes = getAllDescendants( depNode );
-
-                        if( subNodes != null )
-                        {
-                            children.addAll(subNodes);
-                        }
+                        children.addAll(subNodes);
                     }
                 }
                 catch ( ArtifactResolutionException e )
@@ -252,9 +249,9 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
         public boolean matchesArtifact( Artifact dup )
         {
             return ( artifactId == null || artifactId.matcher( dup.getArtifactId() ).matches() )
-                && ( groupId == null || groupId.matcher( dup.getGroupId() ).matches() )
-                && ( classifier == null || classifier.matcher( dup.getClassifier() ).matches() )
-                && ( type == null || type.matcher( dup.getType() ).matches() );
+                    && ( groupId == null || groupId.matcher( dup.getGroupId() ).matches() )
+                    && ( classifier == null || classifier.matcher( dup.getClassifier() ).matches() )
+                    && ( type == null || type.matcher( dup.getType() ).matches() );
         }
 
         public boolean matches(String className)
