@@ -97,7 +97,7 @@ public class EnforceBytecodeVersion
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.12", 56 );
 
 	JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "13", 57);
-	JDK_TO_MAKOR_VERSION_NUMBER_MAPPING.put( "1.13", 57 );
+	JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.13", 57 );
     }
 
     static String renderVersion( int major, int minor )
