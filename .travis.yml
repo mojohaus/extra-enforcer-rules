@@ -1,15 +1,18 @@
+# Need trusty distro to work with java <9
+dist: trusty
 language: java
 env:
   - MAVEN_VERSION=3.3.9
   - MAVEN_VERSION=3.5.4
-  - MAVEN_VERSION=3.6.0
+  - MAVEN_VERSION=3.6.3
 jdk:
   - openjdk7
   - openjdk8
   - openjdk11
   - openjdk-ea
 install:
-  - "mvn -N io.takari:maven:0.4.3:wrapper -Dmaven=${MAVEN_VERSION} -Dhttps.protocols=TLSv1.2"
+  # Specify version of io.takari:maven that supports Java 7
+  - "mvn -N io.takari:maven:0.5.0:wrapper -Dmaven=${MAVEN_VERSION} -Dhttps.protocols=TLSv1.2"
   - "./mvnw --show-version --errors --batch-mode validate dependency:go-offline"
 script:
   - "./mvnw --show-version --errors --batch-mode clean verify"
