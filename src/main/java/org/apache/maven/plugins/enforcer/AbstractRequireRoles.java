@@ -43,8 +43,6 @@ import org.codehaus.plexus.util.StringUtils;
  */
 abstract class AbstractRequireRoles<T extends Contributor> implements EnforcerRule
 {
-    private String message;
-
     /**
      * Specify the required roles as comma separated list.
      */
