@@ -12,10 +12,10 @@ jdk:
   - openjdk-ea
 install:
   # Specify version of io.takari:maven that supports Java 7
-  - "mvn -N io.takari:maven:0.5.0:wrapper -Dmaven=${MAVEN_VERSION} -Dhttps.protocols=TLSv1.2"
-  - "./mvnw --show-version --errors --batch-mode validate dependency:go-offline"
+  - "mvn -q -N io.takari:maven:0.5.0:wrapper -Dmaven=${MAVEN_VERSION} -Dhttps.protocols=TLSv1.2"
 script:
-  - "./mvnw --show-version --errors --batch-mode clean verify"
+  - 'export MAVEN_OPTS="-Xms64m -Xmx256m -Djava.awt.headless=true -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN"'
+  - './mvnw --show-version --errors --batch-mode clean verify'
 cache:
     directories:
     - $HOME/.m2
