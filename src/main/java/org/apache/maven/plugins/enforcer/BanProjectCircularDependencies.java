@@ -37,10 +37,12 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluatio
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
- * Bans circular dependencies on the classpath.
+ * Bans circular dependencies within the overall project.
+ *
+ * @since 1.0-alpha-4
  */
-public class BanCircularDependencies
-        extends AbstractMojoHausEnforcerRule
+public class BanProjectCircularDependencies
+    implements EnforcerRule
 {
 
     private transient DependencyGraphBuilder graphBuilder;
@@ -78,26 +80,40 @@ public class BanCircularDependencies
         try
         {
             MavenProject project = (MavenProject) helper.evaluate( "${project}" );
-
-            Set<Artifact> artifacts = getDependenciesToCheck( project );
-
-            if ( artifacts != null )
-            {
-                for ( Artifact artifact : artifacts )
-                {
-                    log.debug( "groupId: " + artifact.getGroupId() + project.getGroupId() );
-                    if ( artifact.getGroupId().equals( project.getGroupId() ) )
-                    {
-                        log.debug( "artifactId: " + artifact.getArtifactId() + " " + project.getArtifactId() );
-                        if ( artifact.getArtifactId().equals( project.getArtifactId() ) )
-                        {
-                            StringBuilder buf = new StringBuilder( getErrorMessage() );
-                            buf.append( "\n  " ).append( artifact.getGroupId() ).append( ":" ).append( artifact.getArtifactId() ).append( "\n " );
-                            throw new EnforcerRuleException( buf.toString() );
-                        }
-                    }
-                }
+            Set<SimpleArtifact> projectArtifacts = new HashSet<SimpleArtifact>();
+            for (Object subproject : project.getCollectedProjects()) {
+              if (subproject instanceof MavenProject) {
+                MavenProject mavenSubproject = (MavenProject)subproject;
+                projectArtifacts.add(new SimpleArtifact(mavenSubproject.getGroupId(), mavenSubproject.getArtifactId()));
+              }
             }
+            // Iterate through the sub-projects this project builds
+            for (Object subproject : project.getCollectedProjects()) {
+              if (subproject instanceof MavenProject) {
+                MavenProject mavenSubproject = (MavenProject)subproject;
+                Set<SimpleArtifact> dependencyArtifacts = getDependenciesToCheck( mavenSubproject, log, projectArtifacts );
+                for ( SimpleArtifact artifact : dependencyArtifacts )
+                {
+                  log.debug("Artifact " + artifact.getGroupId() + " : " + artifact.getArtifactId());
+                  if (projectArtifacts.contains(artifact))
+                  {
+                    StringBuilder buf = new StringBuilder( getErrorMessage() );
+                    buf.append( "\n  " )
+                    .append( artifact.getGroupId() )
+                    .append( ":" )
+                    .append( artifact.getArtifactId() )
+                    .append( " found in transitive dependencies of " )
+                    .append( mavenSubproject.getGroupId() )
+                    .append( ":" )
+                    .append( mavenSubproject.getArtifactId() )
+                    .append( "\n " );
+                    throw new EnforcerRuleException( buf.toString() );
+                  }
+                }
+              }
+            }
+
+
         }
         catch ( ExpressionEvaluationException e )
         {
@@ -128,32 +144,46 @@ public class BanCircularDependencies
         }
     }
 
-    protected Set<Artifact> getDependenciesToCheck( MavenProject project )
+    protected Set<SimpleArtifact> getDependenciesToCheck( MavenProject project, Log log, Set<SimpleArtifact> topLevelArtifactsToIgnore )
     {
         Set<Artifact> dependencies = null;
         try
         {
             DependencyNode node = graphBuilder.buildDependencyGraph( project, null );
-            dependencies  = getAllDescendants( node );
+            dependencies  = getAllDescendants( node, topLevelArtifactsToIgnore );
         }
         catch ( DependencyGraphBuilderException e )
         {
             // otherwise we need to change the signature of this protected method
             throw new RuntimeException( e );
         }
-        return dependencies;
+        Set<SimpleArtifact> simpleDependencies = new HashSet<SimpleArtifact>();
+        if (dependencies != null)
+        {
+          for (Artifact artifact : dependencies) {
+            simpleDependencies.add(new SimpleArtifact(artifact.getGroupId(), artifact.getArtifactId()));
+          }
+        }
+
+        return simpleDependencies;
     }
 
-    private Set<Artifact> getAllDescendants( DependencyNode node )
+    private Set<Artifact> getAllDescendants( DependencyNode node, Set<SimpleArtifact> topLevelArtifactsToIgnore )
     {
         Set<Artifact> children = null;
         if( node.getChildren() != null )
         {
-            children = new HashSet<>();
+            children = new HashSet<Artifact>();
             for( DependencyNode depNode : node.getChildren() )
             {
+                if (topLevelArtifactsToIgnore != null) {
+                  SimpleArtifact childArtifact = new SimpleArtifact(depNode.getArtifact().getGroupId(), depNode.getArtifact().getArtifactId());
+                  if (topLevelArtifactsToIgnore.contains(childArtifact)) {
+                    continue; // skip modules in the project
+                  }
+                }
                 children.add( depNode.getArtifact() );
-                Set<Artifact> subNodes = getAllDescendants( depNode );
+                Set<Artifact> subNodes = getAllDescendants( depNode, null ); // only skip modules where they are direct descendants
                 if( subNodes != null )
                 {
                     children.addAll( subNodes );
@@ -167,8 +197,8 @@ public class BanCircularDependencies
     private String getErrorMessage()
     {
         if ( message == null )
-            return "Circular Dependency found. Your project's groupId:artifactId combination "
-                + "must not exist in the list of direct or transitive dependencies.";
+            return "Circular Project Dependency found. No modules groupId:artifactId combination in your project "
+                + "must exist in the list of transitive dependencies for any module in the project.";
         return message;
     }
 
@@ -197,5 +227,49 @@ public class BanCircularDependencies
     public String getCacheId()
     {
         return "Does not matter as not cacheable";
+    }
+
+
+    private static class SimpleArtifact {
+
+      private final String groupId;
+      private final String artifactId;
+
+      SimpleArtifact(String groupId, String artifactId) {
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+      }
+
+      public String getGroupId() {
+        return groupId;
+      }
+
+      public String getArtifactId() {
+        return artifactId;
+      }
+
+      @Override
+      public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (artifactId == null ? 0 : artifactId.hashCode());
+        result = prime * result + (groupId == null ? 0 : groupId.hashCode());
+        return result;
+      }
+
+      @Override
+      public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        SimpleArtifact other = (SimpleArtifact) obj;
+        if (artifactId == null) {
+          if (other.artifactId != null) return false;
+        } else if (!artifactId.equals(other.artifactId)) return false;
+        if (groupId == null) {
+          if (other.groupId != null) return false;
+        } else if (!groupId.equals(other.groupId)) return false;
+        return true;
+      }
     }
 }
