@@ -42,9 +42,9 @@ Extra Enforcer Rules
 
   * {{{./requireContributorRoles.html}requireContributorRoles}} - verifies that certain roles are repesented by at least one contributor.
   
-  * {{{./enforceBytecodeVersion.html}enforceBytecodeVersion}} - verifies that there are no class in dependecies having bytecode version higher than specified.
+  * {{{./enforceBytecodeVersion.html}enforceBytecodeVersion}} - verifies that there are no classes in dependencies having bytecode versions higher than specified.
   
-  * {{{./banCircularDependencies.html}banCircularDependencies}} - verifies that there are no circular dependecies in the project.
+  * {{{./banCircularDependencies.html}banCircularDependencies}} - verifies that there are no circular dependencies in the project.
   
   * {{{./requireEncoding.html}requireEncoding}} - verifies that source files have a required encoding.
 
