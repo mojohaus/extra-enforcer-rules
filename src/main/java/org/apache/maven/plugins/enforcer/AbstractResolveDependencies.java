@@ -31,15 +31,15 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 public abstract class AbstractResolveDependencies implements EnforcerRule
 {
 
-    private transient DependencyTreeBuilder treeBuilder;
+    private DependencyTreeBuilder treeBuilder;
     
-    private transient ArtifactResolver resolver;
+    private ArtifactResolver resolver;
     
-    private transient ArtifactRepository localRepository;
+    private ArtifactRepository localRepository;
     
-    private transient List<ArtifactRepository> remoteRepositories;
+    private List<ArtifactRepository> remoteRepositories;
     
-    private transient EnforcerRuleHelper helper;
+    private EnforcerRuleHelper helper;
     public void execute( EnforcerRuleHelper helper )
         throws EnforcerRuleException
     {

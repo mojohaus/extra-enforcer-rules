@@ -45,7 +45,7 @@ public class BanCircularDependencies
     implements EnforcerRule
 {
     
-    private transient DependencyGraphBuilder graphBuilder;
+    private DependencyGraphBuilder graphBuilder;
     
     private String message;
     
