@@ -34,7 +34,9 @@ import java.util.regex.PatternSyntaxException;
  * 
  * @since 1.0-beta-4
  */
-public class RequireProjectUrl implements EnforcerRule {
+public class RequireProjectUrl
+        extends AbstractMojoHausEnforcerRule
+{
     /**
      * The regex that the url must match. Default is a non-empty URL
      */

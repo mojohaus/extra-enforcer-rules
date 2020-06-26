@@ -28,7 +28,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * @author Robert Scholte
  *
  */
-public abstract class AbstractResolveDependencies implements EnforcerRule
+public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforcerRule
 {
 
     private transient DependencyTreeBuilder treeBuilder;
