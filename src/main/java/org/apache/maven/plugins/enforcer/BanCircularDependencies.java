@@ -42,7 +42,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * @since 1.0-alpha-4
  */
 public class BanCircularDependencies
-    implements EnforcerRule
+        extends AbstractMojoHausEnforcerRule
 {
     
     private transient DependencyGraphBuilder graphBuilder;

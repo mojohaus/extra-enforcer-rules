@@ -41,7 +41,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
  */
-abstract class AbstractRequireRoles<T extends Contributor> implements EnforcerRule
+abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoHausEnforcerRule
 {
     /**
      * Specify the required roles as comma separated list.

@@ -79,7 +79,18 @@
   </developers>
 
   <properties>
-    <enforcerApiVersion>1.0</enforcerApiVersion>
+    <enforcerApiVersion>1.4.1</enforcerApiVersion>
+    <!--
+        Danger ahead: increasing this to the next patch-level 1.4.1 will
+        fail the following ITs:
+        *  banduplicate-classes-fail-when-not-identical/pom.xml
+        *  enforce-bytecode-version-multirelease/pom.xml
+        *  mojo-1731/pom.xml
+        *  mojo-1744/pom.xml
+        *  mojo-1769/pom.xml
+        *  smokes/pom.xml
+        See https://travis-ci.org/github/mojohaus/extra-enforcer-rules/jobs/702384586
+    -->
     <enforcerPluginVersion>1.4</enforcerPluginVersion>
     <maven.version>2.0.9</maven.version>
     <mojo.java.target>1.6</mojo.java.target>

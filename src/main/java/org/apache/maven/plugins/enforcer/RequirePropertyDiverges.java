@@ -47,7 +47,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
  */
-public class RequirePropertyDiverges implements EnforcerRule
+public class RequirePropertyDiverges
+        extends AbstractMojoHausEnforcerRule
 {
     private String message;
     
