@@ -349,9 +349,13 @@ public class EnforceBytecodeVersion
                         
                         if ( matcher.matches() )
                         {
-                            int expectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( matcher.group( 1 ) );
+                            Integer expectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( matcher.group( 1 ) );
                             
-                            if ( major != expectedMajor )
+                            if (expectedMajor == null) {
+                                getLog().warn( "Unknown bytecodeVersion for " + a + " : "
+                                                + entry.getName() + ": got " + expectedMajor + " class-file-version" ); 
+                            }
+                            else if ( major != expectedMajor )
                             {
                                 getLog().warn( "Invalid bytecodeVersion for " + a + " : "
                                         + entry.getName() + ": expected " + expectedMajor + ", but was " + major );
