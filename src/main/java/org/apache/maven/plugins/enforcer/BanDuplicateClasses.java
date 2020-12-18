@@ -89,7 +89,7 @@ public class BanDuplicateClasses
     @Override
     protected void handleArtifacts( Set<Artifact> artifacts ) throws EnforcerRuleException
     {
-        List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
+        List<IgnorableDependency> ignorableDependencies = new ArrayList<>();
 
         IgnorableDependency ignoreableClasses = new IgnorableDependency();
         ignoreableClasses.applyIgnoreClasses( DEFAULT_CLASSES_IGNORES, false );
@@ -126,8 +126,8 @@ public class BanDuplicateClasses
             }
         }
 
-        Map<String, ClassesWithSameName> classesSeen = new HashMap<String, ClassesWithSameName>();
-        Set<String> duplicateClassNames = new HashSet<String>();
+        Map<String, ClassesWithSameName> classesSeen = new HashMap<>();
+        Set<String> duplicateClassNames = new HashSet<>();
         for ( Artifact o : artifacts )
         {
             if( scopes != null && !scopes.contains( o.getScope() ) )
@@ -195,7 +195,7 @@ public class BanDuplicateClasses
         }
         if ( !duplicateClassNames.isEmpty() )
         {
-            Map<Set<Artifact>, List<String>> inverted = new HashMap<Set<Artifact>, List<String>>();
+            Map<Set<Artifact>, List<String>> inverted = new HashMap<>();
             for ( String className : duplicateClassNames )
             {
                 ClassesWithSameName classesWithSameName = classesSeen.get( className );
@@ -204,7 +204,7 @@ public class BanDuplicateClasses
                 List<String> s = inverted.get( artifactsOfDuplicateClass );
                 if ( s == null )
                 {
-                    s = new ArrayList<String>();
+                    s = new ArrayList<>();
                 }
                 s.add( classesWithSameName.toOutputString( ignoreWhenIdentical ) );
                 inverted.put( artifactsOfDuplicateClass, s );

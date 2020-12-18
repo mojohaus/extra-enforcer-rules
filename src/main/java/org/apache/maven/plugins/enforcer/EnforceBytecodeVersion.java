@@ -56,7 +56,7 @@ import org.codehaus.plexus.util.IOUtil;
 public class EnforceBytecodeVersion
     extends AbstractResolveDependencies
 {
-    private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new LinkedHashMap<String, Integer>();
+    private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new LinkedHashMap<>();
     /**
      * Default ignores when validating against jdk < 9 because <code>module-info.class</code> will always have level 1.9.
      */
@@ -175,7 +175,7 @@ public class EnforceBytecodeVersion
      */
     private boolean ignoreOptionals = false;
 
-    private List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
+    private List<IgnorableDependency> ignorableDependencies = new ArrayList<>();
 
     @Override
     protected void handleArtifacts( Set<Artifact> artifacts )
@@ -441,7 +441,7 @@ public class EnforceBytecodeVersion
             filter.add( new StrictPatternExcludesArtifactFilter( excludes ) );
         }
 
-        Set<Artifact> result = new HashSet<Artifact>();
+        Set<Artifact> result = new HashSet<>();
         for ( Artifact artifact : dependencies )
         {
             if ( ignoredScopes != null && Arrays.asList( ignoredScopes ).contains( artifact.getScope() ) )

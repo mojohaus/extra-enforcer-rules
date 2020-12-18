@@ -97,7 +97,7 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
             }
             else if ( node.getChildren() != null )
             {
-                dependencies = new HashSet<Artifact>();
+                dependencies = new HashSet<>();
                 for( DependencyNode depNode : node.getChildren() )
                 {
                     dependencies.add( depNode.getArtifact() );
@@ -117,7 +117,7 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
         Set<Artifact> children = null; 
         if( node.getChildren() != null )
         {
-            children = new HashSet<Artifact>();
+            children = new HashSet<>();
             for( DependencyNode depNode : node.getChildren() )
             {
                 try
@@ -233,7 +233,7 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
         public Pattern artifactId;
         public Pattern classifier;
         public Pattern type;
-        public List<Pattern> ignores = new ArrayList<Pattern>();
+        public List<Pattern> ignores = new ArrayList<>();
 
         public IgnorableDependency applyIgnoreClasses( String[] ignores, boolean indent )
         {

@@ -254,7 +254,7 @@ public class RequirePropertyDiverges
     {
         if ( plugins.containsKey( MAVEN_ENFORCER_PLUGIN ) )
         {
-            final List<Xpp3Dom> ruleConfigurations = new ArrayList<Xpp3Dom>();
+            final List<Xpp3Dom> ruleConfigurations = new ArrayList<>();
 
             final Plugin enforcer = plugins.get( MAVEN_ENFORCER_PLUGIN );
             final Xpp3Dom configuration = ( Xpp3Dom ) enforcer.getConfiguration();
@@ -272,7 +272,7 @@ public class RequirePropertyDiverges
         }
         else
         {
-            return new ArrayList();
+            return new ArrayList<>();
         }
     }
 
@@ -308,11 +308,11 @@ public class RequirePropertyDiverges
      */
     private List<Xpp3Dom> createRuleListWithNameSortedChildren( final List<Xpp3Dom> originalListFromPom )
     {
-        final List<Xpp3Dom> listWithSortedEntries = new ArrayList<Xpp3Dom>( originalListFromPom.size() );
+        final List<Xpp3Dom> listWithSortedEntries = new ArrayList<>(originalListFromPom.size());
         for ( Xpp3Dom unsortedXpp3Dom : originalListFromPom )
         {
             final Xpp3Dom sortedXpp3Dom = new Xpp3Dom( getRuleName() );
-            final SortedMap<String, Xpp3Dom> childrenMap = new TreeMap<String, Xpp3Dom>();
+            final SortedMap<String, Xpp3Dom> childrenMap = new TreeMap<>();
             final Xpp3Dom[] children = unsortedXpp3Dom.getChildren();
             for ( Xpp3Dom child : children )
             {
@@ -447,7 +447,7 @@ public class RequirePropertyDiverges
     {
 
         private final Xpp3Dom ruleDom;
-        private final SortedMap<String, Xpp3Dom> map = new TreeMap<String, Xpp3Dom>();
+        private final SortedMap<String, Xpp3Dom> map = new TreeMap<>();
 
         /** Real work is done in the constructor */
         public CreateInvokingRuleDom( RequirePropertyDiverges rule )

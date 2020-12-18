@@ -53,7 +53,7 @@ public class BanDuplicateClassesLogParser
     public Map<Set<String>, Set<String>> parse( )
         throws IOException
     {
-        Map<Set<String>, Set<String>> duplicates = new HashMap<Set<String>, Set<String>>();
+        Map<Set<String>, Set<String>> duplicates = new HashMap<>();
 
         BufferedReader reader = null;
         try {
@@ -92,7 +92,7 @@ public class BanDuplicateClassesLogParser
     private static Set<String> readFoundInJars( BufferedReader reader )
         throws IOException
     {
-        Set<String> jars = new HashSet<String>();
+        Set<String> jars = new HashSet<>();
         for ( String line = reader.readLine(); line != null && !"  Duplicate classes:".equals( line ); line =
             reader.readLine() )
         {
@@ -104,7 +104,7 @@ public class BanDuplicateClassesLogParser
     private static Set<String> readDuplicateClasses( BufferedReader reader )
         throws IOException
     {
-        Set<String> classes = new HashSet<String>();
+        Set<String> classes = new HashSet<>();
         for ( String line = reader.readLine(); line != null && line.length() > 0; line = reader.readLine() )
         {
             classes.add( line.trim() );
