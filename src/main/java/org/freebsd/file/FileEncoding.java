@@ -342,12 +342,12 @@ public class FileEncoding
         return false;
     }
 
-    private int looks_ucs16( byte buf[], int nbytes )
+    private int looks_ucs16( byte[] buf, int nbytes )
     {
         int bigend;
         int i;
 
-        char ubuf[] = new char[ nbytes ];
+        char[] ubuf = new char[ nbytes ];
 
         if ( nbytes < 2 )
         {

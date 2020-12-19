@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -147,7 +146,7 @@ public class EnforceBytecodeVersion
      * This parameter is here for potentially advanced use cases, but it seems like it is actually always 0.
      * 
      * @see #maxJavaMajorVersionNumber
-     * @see http://en.wikipedia.org/wiki/Java_class_file#General_layout
+     * @see <a href="https://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
      */
     int maxJavaMinorVersionNumber = 0;
 
@@ -192,7 +191,7 @@ public class EnforceBytecodeVersion
             StringBuilder buf = new StringBuilder();
             if ( message != null )
             {
-                buf.append( message + "\n" );
+                buf.append(message).append("\n");
             }
             for ( Artifact artifact : foundExcludes )
             {
