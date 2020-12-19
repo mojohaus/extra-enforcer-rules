@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -56,7 +55,7 @@ import org.codehaus.plexus.util.IOUtil;
 public class EnforceBytecodeVersion
     extends AbstractResolveDependencies
 {
-    private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new LinkedHashMap<String, Integer>();
+    private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new LinkedHashMap<>();
     /**
      * Default ignores when validating against jdk < 9 because <code>module-info.class</code> will always have level 1.9.
      */
@@ -151,7 +150,7 @@ public class EnforceBytecodeVersion
      * This parameter is here for potentially advanced use cases, but it seems like it is actually always 0.
      * 
      * @see #maxJavaMajorVersionNumber
-     * @see http://en.wikipedia.org/wiki/Java_class_file#General_layout
+     * @see <a href="https://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
      */
     int maxJavaMinorVersionNumber = 0;
 
@@ -179,7 +178,7 @@ public class EnforceBytecodeVersion
      */
     private boolean ignoreOptionals = false;
 
-    private List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
+    private List<IgnorableDependency> ignorableDependencies = new ArrayList<>();
 
     @Override
     protected void handleArtifacts( Set<Artifact> artifacts )
@@ -196,7 +195,7 @@ public class EnforceBytecodeVersion
             StringBuilder buf = new StringBuilder();
             if ( message != null )
             {
-                buf.append( message + "\n" );
+                buf.append(message).append("\n");
             }
             for ( Artifact artifact : foundExcludes )
             {
@@ -264,10 +263,9 @@ public class EnforceBytecodeVersion
         throws EnforcerRuleException
     {
         long beforeCheck = System.currentTimeMillis();
-        Set<Artifact> problematic = new LinkedHashSet<Artifact>();
-        for ( Iterator<Artifact> it = dependencies.iterator(); it.hasNext(); )
+        Set<Artifact> problematic = new LinkedHashSet<>();
+        for ( Artifact artifact : dependencies )
         {
-            Artifact artifact = it.next();
             getLog().debug( "Analyzing artifact " + artifact );
             String problem = isBadArtifact( artifact );
             if ( problem != null )
@@ -449,7 +447,7 @@ public class EnforceBytecodeVersion
             filter.add( new StrictPatternExcludesArtifactFilter( excludes ) );
         }
 
-        Set<Artifact> result = new HashSet<Artifact>();
+        Set<Artifact> result = new HashSet<>();
         for ( Artifact artifact : dependencies )
         {
             if ( ignoredScopes != null && Arrays.asList( ignoredScopes ).contains( artifact.getScope() ) )
