@@ -55,9 +55,8 @@ public class BanDuplicateClassesLogParser
     {
         Map<Set<String>, Set<String>> duplicates = new HashMap<>();
 
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader( new FileReader( logFile ) );
+        try ( BufferedReader reader = new BufferedReader( new FileReader( logFile ) ) )
+        {
             String line;
             while ( ( line = reader.readLine() ) != null )
             {
@@ -78,12 +77,6 @@ public class BanDuplicateClassesLogParser
                     Set<String> classes = readDuplicateClasses( reader );
                     duplicates.put( jars, classes );
                 }
-            }
-        }
-        finally {
-            if ( reader != null )
-            {
-                reader.close();
             }
         }
         return duplicates;

@@ -165,24 +165,12 @@ public class BanDuplicateClasses
                 try
                 {
                     //@todo use UnArchiver as defined per type
-                    JarFile jar = new JarFile( file );
-                    try
+                    try ( JarFile jar = new JarFile( file ) )
                     {
                         for ( JarEntry entry : Collections.<JarEntry>list( jar.entries() ) )
                         {
                             String fileName = entry.getName();
                             checkAndAddName( o, fileName, classesSeen, duplicateClassNames, ignorableDependencies );
-                        }
-                    }
-                    finally
-                    {
-                        try
-                        {
-                            jar.close();
-                        }
-                        catch ( IOException e )
-                        {
-                            // ignore
                         }
                     }
                 }
