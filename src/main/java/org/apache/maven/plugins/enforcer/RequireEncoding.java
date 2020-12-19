@@ -84,11 +84,11 @@ public class RequireEncoding
             ds.setBasedir( basedir );
             if ( StringUtils.isNotBlank( includes ) )
             {
-                ds.setIncludes( includes.split( "[,\\|]" ) );
+                ds.setIncludes( includes.split( "[,|]" ) );
             }
             if ( StringUtils.isNotBlank( excludes ) )
             {
-                ds.setExcludes( excludes.split( "[,\\|]" ) );
+                ds.setExcludes( excludes.split( "[,|]" ) );
             }
             if ( useDefaultExcludes )
             {
