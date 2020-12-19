@@ -138,11 +138,7 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
                         }
                     }
                 }
-                catch ( ArtifactResolutionException e )
-                {
-                    getLog().warn( e.getMessage() );
-                }
-                catch ( ArtifactNotFoundException e )
+                catch ( ArtifactResolutionException | ArtifactNotFoundException e )
                 {
                     getLog().warn( e.getMessage() );
                 }
