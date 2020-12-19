@@ -167,7 +167,7 @@ public class BanDuplicateClasses
                     //@todo use UnArchiver as defined per type
                     try ( JarFile jar = new JarFile( file ) )
                     {
-                        for ( JarEntry entry : Collections.<JarEntry>list( jar.entries() ) )
+                        for ( JarEntry entry : Collections.list( jar.entries() ) )
                         {
                             String fileName = entry.getName();
                             checkAndAddName( o, fileName, classesSeen, duplicateClassNames, ignorableDependencies );

@@ -260,10 +260,9 @@ public class EnforceBytecodeVersion
         throws EnforcerRuleException
     {
         long beforeCheck = System.currentTimeMillis();
-        Set<Artifact> problematic = new LinkedHashSet<Artifact>();
-        for ( Iterator<Artifact> it = dependencies.iterator(); it.hasNext(); )
+        Set<Artifact> problematic = new LinkedHashSet<>();
+        for ( Artifact artifact : dependencies )
         {
-            Artifact artifact = it.next();
             getLog().debug( "Analyzing artifact " + artifact );
             String problem = isBadArtifact( artifact );
             if ( problem != null )
