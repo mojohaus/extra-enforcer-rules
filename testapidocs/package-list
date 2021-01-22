@@ -1,2 +1,3 @@
 org.apache.maven.plugins.enforcer
 org.codehaus.mojo.extraenforcerrules.it
+org.freebsd.file

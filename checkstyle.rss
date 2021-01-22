@@ -23,11 +23,11 @@ under the License.
     <link>http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules</link>
     <description>Extra Enforcer Rules - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2011 - 2019 MojoHaus</copyright>
+    <copyright>&#169;2011 - 2021 MojoHaus</copyright>
     <item>
-      <title>File: 15,
-             Errors: 100,
-             Warnings: 32,
+      <title>File: 17,
+             Errors: 138,
+             Warnings: 35,
              Infos: 5
       </title>
             <link>http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html</link>
@@ -46,6 +46,20 @@ under the License.
           <tbody>
                           <tr>
                 <td>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireProjectUrl.java">org/apache/maven/plugins/enforcer/RequireProjectUrl.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  36
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequirePropertyDiverges.java">org/apache/maven/plugins/enforcer/RequirePropertyDiverges.java</a>
                 </td>
                 <td>
@@ -60,16 +74,16 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.RequireProjectUrl.java">org/apache/maven/plugins/enforcer/RequireProjectUrl.java</a>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.freebsd.file.FileEncoding.java">org/freebsd/file/FileEncoding.java</a>
                 </td>
                 <td>
                   0
                 </td>
                 <td>
-                  1
+                  5
                 </td>
                 <td>
-                  37
+                  25
                 </td>
               </tr>
                           <tr>
@@ -83,7 +97,7 @@ under the License.
                   4
                 </td>
                 <td>
-                  28
+                  36
                 </td>
               </tr>
                           <tr>
@@ -172,6 +186,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.apache.maven.plugins.enforcer.AbstractMojoHausEnforcerRule.java">org/apache/maven/plugins/enforcer/AbstractMojoHausEnforcerRule.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.mojohaus.org/extra-enforcer-rules/extra-enforcer-rules/checkstyle.html#org.codehaus.mojo.enforcer.Dependency.java">org/codehaus/mojo/enforcer/Dependency.java</a>
                 </td>
                 <td>
@@ -195,7 +223,7 @@ under the License.
                   14
                 </td>
                 <td>
-                  1
+                  7
                 </td>
               </tr>
                           <tr>
@@ -248,7 +276,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  2
+                  0
                 </td>
                 <td>
                   6
