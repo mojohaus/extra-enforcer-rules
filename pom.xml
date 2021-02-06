@@ -95,6 +95,7 @@
     <maven.version>2.0.9</maven.version>
     <mojo.java.target>1.6</mojo.java.target>
     <scmpublish.content>target/staging/${project.artifactId}</scmpublish.content>
+    <project.build.outputTimestamp>2021-02-06T08:02:09Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
