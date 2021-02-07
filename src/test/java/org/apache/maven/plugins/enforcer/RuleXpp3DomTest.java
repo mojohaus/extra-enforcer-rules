@@ -20,8 +20,9 @@ package org.apache.maven.plugins.enforcer;
  */
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import org.junit.Test;
 
 /**
@@ -84,13 +85,13 @@ public class RuleXpp3DomTest
     {
         Xpp3Dom ruleDom1 = sut1.createInvokingRuleDom();
         Xpp3Dom ruleDom2 = sut2.createInvokingRuleDom();
-        assertTrue( ruleDom1.equals( ruleDom2 ) );
+        assertEquals(ruleDom1, ruleDom2);
     }
 
     void checkDiverges()
     {
         Xpp3Dom ruleDom1 = sut1.createInvokingRuleDom();
         Xpp3Dom ruleDom2 = sut2.createInvokingRuleDom();
-        assertFalse( ruleDom1.equals( ruleDom2 ) );
+        assertNotEquals(ruleDom1, ruleDom2);
     }
 }

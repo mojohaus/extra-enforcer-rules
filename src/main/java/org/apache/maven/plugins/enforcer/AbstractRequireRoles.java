@@ -75,7 +75,7 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoH
     private void checkRequiredRoles( final Set<String> requiredRolesSet, final Set<String> rolesFromProject )
         throws EnforcerRuleException
     {
-        final Set<String> copyOfRequiredRolesSet = new LinkedHashSet<String>( requiredRolesSet );
+        final Set<String> copyOfRequiredRolesSet = new LinkedHashSet<>(requiredRolesSet);
         copyOfRequiredRolesSet.removeAll( rolesFromProject );
         if ( copyOfRequiredRolesSet.size() > 0 )
         {
@@ -88,7 +88,7 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoH
     private void checkValidRoles( final Set<String> requiredRolesSet, final Set<String> rolesFromProject )
         throws EnforcerRuleException
     {
-        final Set<String> copyOfRolesFromProject = new LinkedHashSet<String>(rolesFromProject); 
+        final Set<String> copyOfRolesFromProject = new LinkedHashSet<>(rolesFromProject);
         final Set<String> allowedRoles = getRolesFromString( validRoles );
         if ( !allowedRoles.contains( "*" ) )
         {
@@ -113,14 +113,11 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoH
     @SuppressWarnings( "unchecked" )
     final Set<String> getRolesFromProject( MavenProject mavenProject )
     {
-        final Set<String> result = new HashSet<String>();
+        final Set<String> result = new HashSet<>();
         for ( final T roleFromPom : getRoles( mavenProject ) )
         {
             List<String> roles = roleFromPom.getRoles();
-            for ( String role : roles )
-            {
-                result.add( role );
-            }
+            result.addAll(roles);
         }
         return result;
     }
@@ -150,7 +147,7 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoH
     Set<String> getRolesFromString( final String toSet )
     {
         final List<String> asList = Arrays.asList( StringUtils.split( toSet, "," ) );
-        final Set<String> result = new HashSet<String>();
+        final Set<String> result = new HashSet<>();
         for ( String role : asList )
         {
             result.add( role.trim() );

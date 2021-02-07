@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,7 +68,7 @@ public class RequireEncoding
             }
             Log log = helper.getLog();
 
-            Set< String > acceptedEncodings = new HashSet< String >( Arrays.asList( encoding ) );
+            Set< String > acceptedEncodings = new HashSet<>(Collections.singletonList(encoding));
             if ( encoding.equals( StandardCharsets.US_ASCII.name() ) )
             {
                 log.warn( "Encoding US-ASCII is hard to detect. Use UTF-8 or ISO-8859-1" );
@@ -84,11 +84,11 @@ public class RequireEncoding
             ds.setBasedir( basedir );
             if ( StringUtils.isNotBlank( includes ) )
             {
-                ds.setIncludes( includes.split( "[,\\|]" ) );
+                ds.setIncludes( includes.split( "[,|]" ) );
             }
             if ( StringUtils.isNotBlank( excludes ) )
             {
-                ds.setExcludes( excludes.split( "[,\\|]" ) );
+                ds.setExcludes( excludes.split( "[,|]" ) );
             }
             if ( useDefaultExcludes )
             {
