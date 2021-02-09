@@ -43,6 +43,8 @@ Enforce Bytecode Version
 
    * ignoreOptionals - a boolean, if <<<true>>> all dependencies which have <<<<optional>true</optional>>>> are ignored.
 
+   * ignoreModuleInfo - a boolean, default <<<true>>>, indicate if ignore <<<module-info.class>>> for jdk < 9
+
    []
 
 Note 

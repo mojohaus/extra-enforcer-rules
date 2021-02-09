@@ -175,6 +175,12 @@ public class EnforceBytecodeVersion
      */
     private boolean ignoreOptionals = false;
 
+    /**
+     * indicate if ignore {@code module-info.class} for jdk &lt; 9
+     * @since 1.4
+     */
+    private boolean ignoreModuleInfo = true;
+
     private List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
 
     @Override
@@ -237,7 +243,7 @@ public class EnforceBytecodeVersion
                         "\"1.7\", \"8\", \"11\", \"12\", \"13\", \"14\", \"15\", \"16\"" );
             }
             maxJavaMajorVersionNumber = needle;
-            if ( needle < 53 )
+            if ( needle < 53 && ignoreModuleInfo )
             {
                 IgnorableDependency ignoreModuleInfoDependency = new IgnorableDependency();
                 ignoreModuleInfoDependency.applyIgnoreClasses(DEFAULT_CLASSES_IGNORE_BEFORE_JDK_9, false );
