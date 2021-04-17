@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
@@ -69,15 +70,10 @@ public class ClassFileHelper
         File tempDirectory = createTempDirectory( uniqueIdStr );
         File tempJarFile = new File( tempDirectory, jarFileName );
 
-        JarOutputStream outStream = new JarOutputStream( new FileOutputStream( tempJarFile ) );
-        try
+        try ( JarOutputStream outStream = new JarOutputStream( new FileOutputStream( tempJarFile ) ) )
         {
             outStream.putNextEntry( new JarEntry( pathToClassFile ) );
-            outStream.write( fileContents.getBytes( "UTF-8" ) );
-        }
-        finally
-        {
-            outStream.close();
+            outStream.write( fileContents.getBytes( StandardCharsets.UTF_8 ) );
         }
 
         Artifact artifact = ArtifactBuilder.newBuilder()
@@ -113,14 +109,9 @@ public class ClassFileHelper
 
         file.createNewFile();
 
-        FileWriter writer = new FileWriter( file );
-        try
+        try ( FileWriter writer = new FileWriter( file ) )
         {
             writer.write( fileContents );
-        }
-        finally
-        {
-            writer.close();
         }
     }
 }

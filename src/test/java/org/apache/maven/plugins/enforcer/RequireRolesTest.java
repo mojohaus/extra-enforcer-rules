@@ -19,6 +19,7 @@ package org.apache.maven.plugins.enforcer;
  * under the License.
  */
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -96,7 +97,7 @@ public class RequireRolesTest
     @Test
     public void testGetRolesFromString()
     {
-        HashSet<String> expResult = new HashSet<String>( Arrays.asList( "architect", "codemonkey", "business engineer" ) );
+        HashSet<String> expResult = new HashSet<>(Arrays.asList("architect", "codemonkey", "business engineer"));
         final RequireContributorRoles sut = new RequireContributorRoles();
         Set<String> result = sut.getRolesFromString( " architect,  business engineer   , codemonkey " );
         assertEquals( expResult, result );
@@ -108,22 +109,19 @@ public class RequireRolesTest
     @Test
     public void testGetRolesFromMaven()
     {
-        HashSet<String> expResult = new HashSet<String>( Arrays.asList( 
-                "quality manager", "product owner", "business engineer" ) );
+        HashSet<String> expResult = new HashSet<>(Arrays.asList(
+                "quality manager", "product owner", "business engineer"));
         final Contributor singleHero = new Contributor();
         singleHero.addRole( "quality manager" );
         singleHero.addRole( "business engineer" );
         singleHero.addRole( "product owner" );
-        List<Contributor> listFromMaven = Arrays.asList( singleHero );
-        final HashSet<String> result = new HashSet<String>();
+        List<Contributor> listFromMaven = Collections.singletonList(singleHero);
+        final HashSet<String> result = new HashSet<>();
         for ( final Contributor contributor : listFromMaven )
         {
             @SuppressWarnings( "unchecked" )
             List<String> roles = contributor.getRoles();
-            for ( String role : roles )
-            {
-                result.add( role );
-            }
+            result.addAll(roles);
         }
         assertEquals( expResult, result );
     }
