@@ -20,6 +20,7 @@ package org.apache.maven.plugins.enforcer;
  */
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -48,7 +49,7 @@ public class BanCircularDependencies
     private transient DependencyGraphBuilder graphBuilder;
     
     private String message;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -79,8 +80,9 @@ public class BanCircularDependencies
         try
         {
             MavenProject project = (MavenProject) helper.evaluate( "${project}" );
-            
-            Set<Artifact> artifacts = getDependenciesToCheck( project );
+            List<MavenProject> reactorProjects = (List<MavenProject>) helper.evaluate( "${reactorProjects}" );
+
+            Set<Artifact> artifacts = getDependenciesToCheck( project, reactorProjects );
 
             if ( artifacts != null )
             {
@@ -129,12 +131,12 @@ public class BanCircularDependencies
         }
     }
     
-    protected Set<Artifact> getDependenciesToCheck( MavenProject project )
+    protected Set<Artifact> getDependenciesToCheck( MavenProject project, final List<MavenProject> reactorProjects )
     {
         Set<Artifact> dependencies = null;
         try
         {
-            DependencyNode node = graphBuilder.buildDependencyGraph( project, null );
+            DependencyNode node = graphBuilder.buildDependencyGraph( project, null, reactorProjects );
             dependencies  = getAllDescendants( node );
         }
         catch ( DependencyGraphBuilderException e )
