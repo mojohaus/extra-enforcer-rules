@@ -111,6 +111,10 @@ public class EnforceBytecodeVersion
         // Java 16
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "16", 60 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.16", 60 );
+
+        // Java 17
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "17", 61 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.17", 61 );
     }
 
     static String renderVersion( int major, int minor )
@@ -234,7 +238,7 @@ public class EnforceBytecodeVersion
             if ( needle == null )
             {
                 throw new IllegalArgumentException( "Unknown JDK version given. Should be something like " +
-                        "\"1.7\", \"8\", \"11\", \"12\", \"13\", \"14\", \"15\", \"16\"" );
+                        "\"1.7\", \"8\", \"11\", \"12\", \"13\", \"14\", \"15\", \"16\", \"17\"" );
             }
             maxJavaMajorVersionNumber = needle;
             if ( needle < 53 )
