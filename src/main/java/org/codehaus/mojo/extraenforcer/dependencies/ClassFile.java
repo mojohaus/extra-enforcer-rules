@@ -66,7 +66,7 @@ public class ClassFile {
 
     private String computeHash(InputStreamSupplier inputStreamSupplier) throws IOException {
         try (InputStream inputStream = inputStreamSupplier.get()) {
-            return DigestUtils.md5Hex(inputStream);
+            return DigestUtils.sha256Hex(inputStream);
         }
     }
 
