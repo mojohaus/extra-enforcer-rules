@@ -19,7 +19,7 @@ public class ClassFileTest {
     public void getHashComputesHashOfFile() throws Exception {
         ClassFile classFile = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "the content of the file");
 
-        assertEquals("7e47820975c51a762e63caa95cc76e45", classFile.getHash());
+        assertEquals("7b7f48e1c0e847133d8881d5743d253756bf44e490e2252556ad4816a0a77b67", classFile.getHash());
     }
 
     @Test
@@ -29,7 +29,7 @@ public class ClassFileTest {
         String hash1 = classFile.getHash();
         String hash2 = classFile.getHash();
 
-        assertEquals("d10b4c3ff123b26dc068d43a8bef2d23", hash1);
+        assertEquals("e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c", hash1);
         assertEquals(hash1, hash2);
     }
 }
