@@ -29,7 +29,7 @@ Enforce Bytecode Version
 
    The following parameters are supported by this rule:
 
-   * maxJdkVersion - the maximum target jdk version in the 1.x form (e.g. 1.6, 1.7, 1.8, 1.9 or 6, 7, 8, 9...) 
+   * maxJdkVersion - the maximum target jdk version in the 1.x form (e.g. 1.6, 1.7, 1.8, 1.9 or 6, 7, 8, 9, 10, 11...)
 
    * maxJavaMajorVersionNumber - an integer indicating the maximum bytecode major version number (cannot be specified if maxJdkVersion is present)
 
@@ -40,6 +40,8 @@ Enforce Bytecode Version
    * ignoreClasses - a list of classes to ignore bytecode version problems. Wildcards can be specified using the * character.
 
    * ignoredScopes - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
+
+   * ignoreOptionals - a boolean, if <<<true>>> all dependencies which have <<<<optional>true</optional>>>> are ignored.
 
    []
 

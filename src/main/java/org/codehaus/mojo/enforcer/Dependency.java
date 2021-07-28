@@ -144,7 +144,7 @@ public class Dependency
     @Override
     public String toString()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append( groupId ).append( ':' ).append( artifactId ).append( ':' ).append( type );
         if ( classifier != null )
         {

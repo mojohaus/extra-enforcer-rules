@@ -4,11 +4,11 @@
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
-    <version>40</version>
+    <version>60</version>
   </parent>
 
   <artifactId>extra-enforcer-rules</artifactId>
-  <version>1.0-beta-10-SNAPSHOT</version>
+  <version>1.4-SNAPSHOT</version>
 
   <name>Extra Enforcer Rules</name>
 
@@ -55,7 +55,7 @@
         <checksumPolicy>fail</checksumPolicy>
         <enabled>true</enabled>
       </snapshots>
-      <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </repository>
   </repositories>
 
@@ -79,11 +79,22 @@
   </developers>
 
   <properties>
-    <enforcerApiVersion>1.0</enforcerApiVersion>
+    <enforcerApiVersion>1.4.1</enforcerApiVersion>
+    <!--
+        Danger ahead: increasing this to the next patch-level 1.4.1 will
+        fail the following ITs:
+        *  banduplicate-classes-fail-when-not-identical/pom.xml
+        *  enforce-bytecode-version-multirelease/pom.xml
+        *  mojo-1731/pom.xml
+        *  mojo-1744/pom.xml
+        *  mojo-1769/pom.xml
+        *  smokes/pom.xml
+        See https://travis-ci.org/github/mojohaus/extra-enforcer-rules/jobs/702384586
+    -->
     <enforcerPluginVersion>1.4</enforcerPluginVersion>
     <maven.version>2.0.9</maven.version>
-    <mojo.java.target>1.5</mojo.java.target>
     <scmpublish.content>target/staging/${project.artifactId}</scmpublish.content>
+    <project.build.outputTimestamp>2021-02-06T08:02:09Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
@@ -125,12 +136,13 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>1.9.0</version>
+      <artifactId>mockito-core</artifactId>
+      <version>2.28.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -138,15 +150,29 @@
       <artifactId>maven-common-artifact-filters</artifactId>
       <version>3.0.1</version>
     </dependency>
-    <dependency>
-    	<groupId>com.ibm.icu</groupId>
-    	<artifactId>icu4j</artifactId>
-    	<version>56.1</version>
-    </dependency>
-    
   </dependencies>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.9.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-invoker-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -175,17 +201,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>descriptor</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
         <configuration>
           <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
@@ -195,6 +210,10 @@
           <preBuildHookScript>setup</preBuildHookScript>
           <postBuildHookScript>verify</postBuildHookScript>
           <addTestClassPath>true</addTestClassPath>
+          <properties>
+            <!-- e.g. ensure that Java7 picks up TLSv1.2 when connecting with Central -->
+            <https.protocols>TLSv1.2</https.protocols>
+          </properties>
           <filterProperties>
             <enforcerPluginVersion>${enforcerPluginVersion}</enforcerPluginVersion>
           </filterProperties>
@@ -220,8 +239,20 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-invoker-plugin</artifactId>
-          <version>1.10</version>
         </plugin>
       </plugins>
   </reporting>
+  <profiles>
+    <profile>
+      <id>java12</id>
+      <activation>
+        <jdk>[12,)</jdk>
+      </activation>
+      <properties>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.release>7</maven.compiler.release>
+      </properties>
+    </profile>
+  </profiles>
 </project>

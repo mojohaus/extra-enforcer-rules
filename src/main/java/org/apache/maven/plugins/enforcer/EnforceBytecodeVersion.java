@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -56,10 +55,13 @@ import org.codehaus.plexus.util.IOUtil;
 public class EnforceBytecodeVersion
     extends AbstractResolveDependencies
 {
-    private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new LinkedHashMap<String, Integer>();
-    
+    private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new LinkedHashMap<>();
+    /**
+     * Default ignores when validating against jdk < 9 because <code>module-info.class</code> will always have level 1.9.
+     */
+    private static final String[] DEFAULT_CLASSES_IGNORE_BEFORE_JDK_9 = {"module-info"};
+
     private final Pattern MULTIRELEASE = Pattern.compile( "META-INF/versions/(\\d+)/.*" );
-    private final String MODULE_INFO_CLASS = "module-info.class";
 
     static
     {
@@ -75,15 +77,43 @@ public class EnforceBytecodeVersion
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.7", 51 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "7", 51 );
         // Java8
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.8", 52 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "8", 52 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.8", 52 );
         // Java9
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.9", 53 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "9", 53 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.9", 53 );
 
         // Java10
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.10", 54 );
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "10", 54 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.10", 54 );
+
+        // Java11
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "11", 55 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.11", 55 );
+
+        // Java 12
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "12", 56 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.12", 56 );
+
+        // Java 13
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "13", 57 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.13", 57 );
+
+        // Java 14
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "14", 58 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.14", 58 );
+
+        // Java 15
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "15", 59 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.15", 59 );
+
+        // Java 16
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "16", 60 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.16", 60 );
+
+        // Java 17
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "17", 61 );
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put( "1.17", 61 );
     }
 
     static String renderVersion( int major, int minor )
@@ -120,7 +150,7 @@ public class EnforceBytecodeVersion
      * This parameter is here for potentially advanced use cases, but it seems like it is actually always 0.
      * 
      * @see #maxJavaMajorVersionNumber
-     * @see http://en.wikipedia.org/wiki/Java_class_file#General_layout
+     * @see <a href="https://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
      */
     int maxJavaMinorVersionNumber = 0;
 
@@ -142,7 +172,13 @@ public class EnforceBytecodeVersion
      */
     private String[] ignoredScopes;
 
-    private List<IgnorableDependency> ignorableDependencies = new ArrayList<IgnorableDependency>();
+    /**
+     * Ignore all dependencies which have {@code &lt;optional&gt;true&lt;/optional&gt;}.
+     * @since 1.2
+     */
+    private boolean ignoreOptionals = false;
+
+    private List<IgnorableDependency> ignorableDependencies = new ArrayList<>();
 
     @Override
     protected void handleArtifacts( Set<Artifact> artifacts )
@@ -159,7 +195,7 @@ public class EnforceBytecodeVersion
             StringBuilder buf = new StringBuilder();
             if ( message != null )
             {
-                buf.append( message + "\n" );
+                buf.append(message).append("\n");
             }
             for ( Artifact artifact : foundExcludes )
             {
@@ -200,9 +236,16 @@ public class EnforceBytecodeVersion
             Integer needle = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( maxJdkVersion );
             if ( needle == null )
             {
-                throw new IllegalArgumentException( "Unknown JDK version given. Should be something like \"1.7\"" );
+                throw new IllegalArgumentException( "Unknown JDK version given. Should be something like " +
+                        "\"1.7\", \"8\", \"11\", \"12\", \"13\", \"14\", \"15\", \"16\", \"17\"" );
             }
             maxJavaMajorVersionNumber = needle;
+            if ( needle < 53 )
+            {
+                IgnorableDependency ignoreModuleInfoDependency = new IgnorableDependency();
+                ignoreModuleInfoDependency.applyIgnoreClasses(DEFAULT_CLASSES_IGNORE_BEFORE_JDK_9, false );
+                ignorableDependencies.add( ignoreModuleInfoDependency );
+            }
         }
         if ( maxJavaMajorVersionNumber == -1 )
         {
@@ -220,10 +263,9 @@ public class EnforceBytecodeVersion
         throws EnforcerRuleException
     {
         long beforeCheck = System.currentTimeMillis();
-        Set<Artifact> problematic = new LinkedHashSet<Artifact>();
-        for ( Iterator<Artifact> it = dependencies.iterator(); it.hasNext(); )
+        Set<Artifact> problematic = new LinkedHashSet<>();
+        for ( Artifact artifact : dependencies )
         {
-            Artifact artifact = it.next();
             getLog().debug( "Analyzing artifact " + artifact );
             String problem = isBadArtifact( artifact );
             if ( problem != null )
@@ -307,18 +349,18 @@ public class EnforceBytecodeVersion
                         
                         Matcher matcher = MULTIRELEASE.matcher( entry.getName() );
                         
-                        if ( MODULE_INFO_CLASS.equals( entry.getName() ) ) {
-                            getLog().warn( "Invalid bytecodeVersion for " + entry.getName() + ": expected "
-                                            + maxJavaMajorVersionNumber + ", but was " + major);
-                        }
-                        else if ( matcher.matches() )
+                        if ( matcher.matches() )
                         {
-                            int expectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( matcher.group( 1 ) );
+                            Integer expectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( matcher.group( 1 ) );
                             
-                            if ( major != expectedMajor )
+                            if (expectedMajor == null) {
+                                getLog().warn( "Unknown bytecodeVersion for " + a + " : "
+                                                + entry.getName() + ": got " + expectedMajor + " class-file-version" ); 
+                            }
+                            else if ( major != expectedMajor )
                             {
-                                getLog().warn( "Invalid bytecodeVersion for " + entry.getName() + ": expected "
-                                                + expectedMajor + ", but was " + major );
+                                getLog().warn( "Invalid bytecodeVersion for " + a + " : "
+                                        + entry.getName() + ": expected " + expectedMajor + ", but was " + major );
                             }
                         }
                         else
@@ -390,7 +432,7 @@ public class EnforceBytecodeVersion
      */
     private Set<Artifact> filterArtifacts( Set<Artifact> dependencies )
     {
-        if ( includes == null && excludes == null && ignoredScopes == null )
+        if ( includes == null && excludes == null && ignoredScopes == null && ignoreOptionals == false )
         {
             return dependencies;
         }
@@ -405,10 +447,14 @@ public class EnforceBytecodeVersion
             filter.add( new StrictPatternExcludesArtifactFilter( excludes ) );
         }
 
-        Set<Artifact> result = new HashSet<Artifact>();
+        Set<Artifact> result = new HashSet<>();
         for ( Artifact artifact : dependencies )
         {
             if ( ignoredScopes != null && Arrays.asList( ignoredScopes ).contains( artifact.getScope() ) )
+            {
+                continue;
+            }
+            if ( ignoreOptionals && artifact.isOptional() )
             {
                 continue;
             }

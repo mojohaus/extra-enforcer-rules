@@ -28,7 +28,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * @author Robert Scholte
  *
  */
-public abstract class AbstractResolveDependencies implements EnforcerRule
+public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforcerRule
 {
 
     private transient DependencyGraphBuilder graphBuilder;
@@ -50,7 +50,7 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
         {
             resolver = (ArtifactResolver) helper.getComponent( ArtifactResolver.class );
             
-            graphBuilder = (DependencyGraphBuilder) helper.getComponent(DependencyGraphBuilder.class );
+            graphBuilder = (DependencyGraphBuilder) helper.getComponent( DependencyGraphBuilder.class );
         }
         catch ( ComponentLookupException e )
         {
@@ -72,7 +72,7 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
             throw new EnforcerRuleException( "Unable to lookup an expression " + e.getLocalizedMessage(), e );
         }
         
-        Set<Artifact> artifacts = getDependenciesToCheck( project);
+        Set<Artifact> artifacts = getDependenciesToCheck( project );
         
         handleArtifacts( artifacts ); 
     }
@@ -89,7 +89,7 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
         Set<Artifact> dependencies = null;
         try
         {
-            DependencyNode node = graphBuilder.buildDependencyGraph( project ,null);
+            DependencyNode node = graphBuilder.buildDependencyGraph( project, null );
             
             if( isSearchTransitive() )
             {
@@ -97,7 +97,7 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
             }
             else if ( node.getChildren() != null )
             {
-                dependencies = new HashSet<Artifact>();
+                dependencies = new HashSet<>();
                 for( DependencyNode depNode : node.getChildren() )
                 {
                     dependencies.add( depNode.getArtifact() );
@@ -117,7 +117,7 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
         Set<Artifact> children = null; 
         if( node.getChildren() != null )
         {
-            children = new HashSet<Artifact>();
+            children = new HashSet<>();
             for( DependencyNode depNode : node.getChildren() )
             {
                 try
@@ -132,14 +132,10 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
 
                     if( subNodes != null )
                     {
-                        children.addAll(subNodes);
+                        children.addAll( subNodes );
                     }
                 }
-                catch ( ArtifactResolutionException e )
-                {
-                    getLog().warn( e.getMessage() );
-                }
-                catch ( ArtifactNotFoundException e )
+                catch ( ArtifactResolutionException | ArtifactNotFoundException e )
                 {
                     getLog().warn( e.getMessage() );
                 }
@@ -230,7 +226,7 @@ public abstract class AbstractResolveDependencies implements EnforcerRule
         public Pattern artifactId;
         public Pattern classifier;
         public Pattern type;
-        public List<Pattern> ignores = new ArrayList<Pattern>();
+        public List<Pattern> ignores = new ArrayList<>();
 
         public IgnorableDependency applyIgnoreClasses( String[] ignores, boolean indent )
         {

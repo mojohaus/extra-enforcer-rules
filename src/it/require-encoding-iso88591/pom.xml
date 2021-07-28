@@ -26,6 +26,7 @@
 							<encoding>ISO-8859-1</encoding>
 							<includes>src/main/resources/ascii.txt,src/main/resources/iso88591.txt</includes>
 							<excludes>pom.xml</excludes>
+							<acceptAsciiSubset>true</acceptAsciiSubset>
 						</requireEncoding>
 					</rules>
 				</configuration>
@@ -45,7 +46,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

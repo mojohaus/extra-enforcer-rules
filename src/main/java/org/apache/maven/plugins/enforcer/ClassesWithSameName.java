@@ -49,7 +49,7 @@ public class ClassesWithSameName
     private final Log log;
     /** the path to the .class file. Example: org/apache/maven/Stuff.class */
     private final String classFilePath;
-    private final List<ClassFile> list = new ArrayList<ClassFile>();
+    private final List<ClassFile> list = new ArrayList<>();
 
     /**
      * @param log (required) the logger
@@ -107,7 +107,7 @@ public class ClassesWithSameName
      */
     public Set<Artifact> getAllArtifactsThisClassWasFoundIn()
     {
-        Set<Artifact> result = new HashSet<Artifact>();
+        Set<Artifact> result = new HashSet<>();
 
         for ( ClassFile classFile : list )
         {
@@ -229,14 +229,14 @@ public class ClassesWithSameName
 
     private Map<String, Set<Artifact>> groupArtifactsWhoseClassesAreExactMatch()
     {
-        Map<String, Set<Artifact>> groupedArtifacts = new LinkedHashMap<String, Set<Artifact>>();
+        Map<String, Set<Artifact>> groupedArtifacts = new LinkedHashMap<>();
 
         for ( ClassFile classFile : list )
         {
             Set<Artifact> artifacts = groupedArtifacts.get( classFile.getHash() );
             if ( artifacts == null )
             {
-                artifacts = new LinkedHashSet<Artifact>();
+                artifacts = new LinkedHashSet<>();
             }
             artifacts.add( classFile.getArtifactThisClassWasFoundIn() );
 

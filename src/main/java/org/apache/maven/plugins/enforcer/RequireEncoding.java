@@ -1,10 +1,12 @@
 package org.apache.maven.plugins.enforcer;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
@@ -12,11 +14,8 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-
-import com.ibm.icu.text.CharsetDetector;
-import com.ibm.icu.text.CharsetMatch;
+import org.freebsd.file.FileEncoding;
 
 /**
  * Checks file encodings to see if they match the project.build.sourceEncoding If file encoding can not be determined it
@@ -26,7 +25,7 @@ import com.ibm.icu.text.CharsetMatch;
  * @see <a href="https://github.com/ericbn/encoding-enforcer">ericbn/encoding-enforcer</a>
  */
 public class RequireEncoding
-    implements EnforcerRule
+        extends AbstractMojoHausEnforcerRule
 {
     /**
      * Validate files match this encoding. If not specified then default to ${project.build.sourceEncoding}.
@@ -53,6 +52,11 @@ public class RequireEncoding
      */
     private boolean failFast = true;
 
+    /**
+     * Should the rule accept US-ASCII as an subset of UTF-8 and ISO-8859-1.
+     */
+    private boolean acceptAsciiSubset = false;
+
     public void execute( EnforcerRuleHelper helper )
         throws EnforcerRuleException
     {
@@ -63,20 +67,28 @@ public class RequireEncoding
                 encoding = (String) helper.evaluate( "${project.build.sourceEncoding}" );
             }
             Log log = helper.getLog();
+
+            Set< String > acceptedEncodings = new HashSet<>(Collections.singletonList(encoding));
             if ( encoding.equals( StandardCharsets.US_ASCII.name() ) )
             {
                 log.warn( "Encoding US-ASCII is hard to detect. Use UTF-8 or ISO-8859-1" );
             }
+
+            if ( acceptAsciiSubset && ( encoding.equals( StandardCharsets.ISO_8859_1.name() ) || encoding.equals( StandardCharsets.UTF_8.name() ) ) )
+            {
+                acceptedEncodings.add( StandardCharsets.US_ASCII.name() );
+            }
+
             String basedir = (String) helper.evaluate( "${basedir}" );
             DirectoryScanner ds = new DirectoryScanner();
             ds.setBasedir( basedir );
             if ( StringUtils.isNotBlank( includes ) )
             {
-                ds.setIncludes( includes.split( "[,\\|]" ) );
+                ds.setIncludes( includes.split( "[,|]" ) );
             }
             if ( StringUtils.isNotBlank( excludes ) )
             {
-                ds.setExcludes( excludes.split( "[,\\|]" ) );
+                ds.setExcludes( excludes.split( "[,|]" ) );
             }
             if ( useDefaultExcludes )
             {
@@ -91,7 +103,7 @@ public class RequireEncoding
                 {
                     log.debug( file + "==>" + fileEncoding );
                 }
-                if ( fileEncoding != null && !fileEncoding.equals( encoding ) )
+                if ( fileEncoding != null && !acceptedEncodings.contains( fileEncoding ) )
                 {
                     filesInMsg.append( file );
                     filesInMsg.append( "==>" );
@@ -121,27 +133,18 @@ public class RequireEncoding
     protected String getEncoding( String requiredEncoding, File file, Log log )
         throws IOException
     {
-        FileInputStream fis = null;
-        try
+        FileEncoding fileEncoding = new FileEncoding();
+        if ( !fileEncoding.guessFileEncoding( Files.readAllBytes( file.toPath() ) ) )
         {
-            fis = new FileInputStream( file );
-            CharsetDetector detector = new CharsetDetector();
-            detector.setDeclaredEncoding( requiredEncoding );
-            detector.setText( new BufferedInputStream( fis ) );
-            CharsetMatch[] charsets = detector.detectAll();
-            if ( charsets == null )
-            {
-                return null;
-            }
-            else
-            {
-                return charsets[0].getName();
-            }
+            return null;
         }
-        finally
+
+        if ( log.isDebugEnabled() )
         {
-            IOUtil.close( fis );
+            log.debug( String.format( "%s: (%s) %s; charset=%s", file, fileEncoding.getCode(), fileEncoding.getType(), fileEncoding.getCodeMime() ) );
         }
+
+        return fileEncoding.getCodeMime().toUpperCase();
     }
 
     /**
