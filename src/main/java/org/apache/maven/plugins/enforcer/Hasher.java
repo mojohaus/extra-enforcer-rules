@@ -19,16 +19,15 @@ package org.apache.maven.plugins.enforcer;
  * under the License.
  */
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.jar.JarFile;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.maven.artifact.Artifact;
 
+import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 import static org.apache.maven.plugins.enforcer.JarUtils.isJarFile;
 
 /**
@@ -83,57 +82,19 @@ public class Hasher
 
     private String hashForFileInDirectory( File artifactFile ) throws IOException
     {
-        File classFile = new File( artifactFile, classFilePath );
-        InputStream inputStream = new FileInputStream( classFile );
-        try
+        try ( InputStream inputStream = new FileInputStream( new File( artifactFile, classFilePath ) ) )
         {
-            return DigestUtils.md5Hex( inputStream );
-        }
-        finally
-        {
-            closeAll( inputStream );
+            return sha256Hex( inputStream );
         }
       }
 
     private String hashForFileInJar( File artifactFile ) throws IOException
     {
-        JarFile jar = new JarFile( artifactFile );
-        InputStream inputStream = jar.getInputStream( jar.getEntry( classFilePath ) );
-        try
+        try( JarFile jar = new JarFile( artifactFile );
+        InputStream inputStream = jar.getInputStream( jar.getEntry( classFilePath )))
         {
-            return DigestUtils.md5Hex( inputStream );
-        }
-        finally
-        {
-            closeAll( inputStream, jar );
+            return sha256Hex( inputStream );
         }
     }
 
-    private void closeAll( Closeable... closeables ) throws IOException
-    {
-        IOException firstException = null;
-
-        for ( Closeable closeable : closeables )
-        {
-            if ( closeable != null )
-            {
-                try
-                {
-                    closeable.close();
-                }
-                catch ( IOException exception )
-                {
-                    if ( firstException == null )
-                    {
-                        firstException = exception;
-                    }
-                }
-            }
-        }
-
-        if ( firstException != null )
-        {
-            throw firstException;
-        }
-    }
 }

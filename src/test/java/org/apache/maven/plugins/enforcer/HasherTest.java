@@ -36,7 +36,7 @@ public class HasherTest
 
         String hash = hasher.generateHash( artifact );
 
-        assertEquals( "ae23844bc5db9bfad3fbbe5426d89dd3", hash );
+        assertEquals( "5b82cd379f4d1da618997ba295bdc8f1b01b542341635369e2416af278d1b7ea", hash );
     }
 
     @Test
@@ -48,6 +48,6 @@ public class HasherTest
 
         String hash = hasher.generateHash( artifact );
 
-        assertEquals( "ae23844bc5db9bfad3fbbe5426d89dd3", hash );
+        assertEquals( "5b82cd379f4d1da618997ba295bdc8f1b01b542341635369e2416af278d1b7ea", hash );
     }
 }
