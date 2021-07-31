@@ -146,7 +146,7 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoH
      */
     Set<String> getRolesFromString( final String toSet )
     {
-        final List<String> asList = Arrays.asList( StringUtils.split( toSet, "," ) );
+        final String[] asList = StringUtils.split( toSet, "," );
         final Set<String> result = new HashSet<>();
         for ( String role : asList )
         {

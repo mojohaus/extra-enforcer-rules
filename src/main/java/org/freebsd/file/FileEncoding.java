@@ -387,7 +387,7 @@ public class FileEncoding
             {
                 return 0;
             }
-            if ( ubuf[ ulen - 1 ] < 128 && text_chars[ (int) ubuf[ ulen - 1 ] ] != T )
+            if ( ubuf[ ulen - 1 ] < 128 && text_chars[ubuf[ ulen - 1 ]] != T )
             {
                 return 0;
             }

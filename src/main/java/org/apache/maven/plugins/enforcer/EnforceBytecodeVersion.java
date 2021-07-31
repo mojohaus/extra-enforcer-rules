@@ -201,7 +201,7 @@ public class EnforceBytecodeVersion
             {
                 buf.append( getErrorMessage( artifact ) );
             }
-            message = buf.toString() + "Use 'mvn dependency:tree' to locate the source of the banned dependencies.";
+            message = buf + "Use 'mvn dependency:tree' to locate the source of the banned dependencies.";
 
             throw new EnforcerRuleException( message );
         }
@@ -432,7 +432,7 @@ public class EnforceBytecodeVersion
      */
     private Set<Artifact> filterArtifacts( Set<Artifact> dependencies )
     {
-        if ( includes == null && excludes == null && ignoredScopes == null && ignoreOptionals == false )
+        if ( includes == null && excludes == null && ignoredScopes == null && !ignoreOptionals )
         {
             return dependencies;
         }

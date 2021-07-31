@@ -93,6 +93,7 @@
     -->
     <enforcerPluginVersion>1.4</enforcerPluginVersion>
     <maven.version>2.0.9</maven.version>
+    <mojo.java.target>1.8</mojo.java.target>
     <scmpublish.content>target/staging/${project.artifactId}</scmpublish.content>
     <project.build.outputTimestamp>2021-02-06T08:02:09Z</project.build.outputTimestamp>
   </properties>
@@ -210,10 +211,6 @@
           <preBuildHookScript>setup</preBuildHookScript>
           <postBuildHookScript>verify</postBuildHookScript>
           <addTestClassPath>true</addTestClassPath>
-          <properties>
-            <!-- e.g. ensure that Java7 picks up TLSv1.2 when connecting with Central -->
-            <https.protocols>TLSv1.2</https.protocols>
-          </properties>
           <filterProperties>
             <enforcerPluginVersion>${enforcerPluginVersion}</enforcerPluginVersion>
           </filterProperties>
@@ -249,9 +246,9 @@
         <jdk>[12,)</jdk>
       </activation>
       <properties>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <maven.compiler.release>7</maven.compiler.release>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.release>8</maven.compiler.release>
       </properties>
     </profile>
   </profiles>
