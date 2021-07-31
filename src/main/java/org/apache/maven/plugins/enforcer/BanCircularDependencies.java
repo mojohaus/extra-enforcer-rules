@@ -20,6 +20,7 @@ package org.apache.maven.plugins.enforcer;
  */
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -28,6 +29,8 @@ import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.execution.RuntimeInformation;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
@@ -48,6 +51,12 @@ public class BanCircularDependencies
     private transient DependencyGraphBuilder graphBuilder;
     
     private String message;
+
+    /**
+     * If {@code false} then the rule will only check the dependency hierarchy.
+     * If {@code true} then the rule will also verify there are no exclusions used to get around the rule.
+     */
+    private boolean checkExclusions;    
     
     /**
      * {@inheritDoc}
@@ -94,6 +103,24 @@ public class BanCircularDependencies
                         {
                             throw new EnforcerRuleException( getErrorMessage() + "\n  " + artifact.getGroupId()
                                     + ":" + artifact.getArtifactId() + "\n " );
+                        }
+                    }
+                }
+            }
+            if( checkExclusions ) 
+            {
+                List<Dependency> dependencies = project.getDependencies();
+                for( Dependency dependency : dependencies ) 
+                {
+                    List<Exclusion> exclusions = dependency.getExclusions();
+                    for(Exclusion exclusion: exclusions) 
+                    {
+                        if(exclusion.getGroupId().equals(project.getGroupId()) &&
+                                exclusion.getArtifactId().equals(project.getArtifactId())) 
+                        {
+                            StringBuilder buf = new StringBuilder("You are not allowed to break the circular dependency by excluding yourself.  Self exclusion found under dependency "); 
+                            buf.append( "\n  " ).append( dependency.getGroupId() ).append( ":" ).append( dependency.getArtifactId() ).append( "\n " );
+                            throw new EnforcerRuleException( buf.toString() );
                         }
                     }
                 }
