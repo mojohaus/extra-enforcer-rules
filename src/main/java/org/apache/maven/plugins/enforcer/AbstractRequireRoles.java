@@ -141,16 +141,21 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoH
     /**
      * Returns the set of required roles from the property.
      *
-     * @param toSet
+     * @param csRoles comma-separated roles to be split
      * @return
      */
-    Set<String> getRolesFromString( final String toSet )
+    Set<String> getRolesFromString( final String csRoles )
     {
-        final String[] asList = StringUtils.split( toSet, "," );
+        return splitCsvToSet( csRoles );
+    }
+
+    static Set<String> splitCsvToSet( final String csv )
+    {
+        final String [] splitValues = StringUtils.split( csv, "," );
         final Set<String> result = new HashSet<>();
-        for ( String role : asList )
+        for ( String value : splitValues )
         {
-            result.add( role.trim() );
+            result.add( value.trim() );
         }
         return result;
     }
