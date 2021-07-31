@@ -92,9 +92,8 @@ public class BanCircularDependencies
                         log.debug( "artifactId: " + artifact.getArtifactId() + " " + project.getArtifactId() );
                         if ( artifact.getArtifactId().equals( project.getArtifactId() ) )
                         {
-                            StringBuilder buf = new StringBuilder( getErrorMessage() );
-                            buf.append( "\n  " ).append( artifact.getGroupId() ).append( ":" ).append( artifact.getArtifactId() ).append( "\n " );
-                            throw new EnforcerRuleException( buf.toString() );
+                            throw new EnforcerRuleException( getErrorMessage() + "\n  " + artifact.getGroupId()
+                                    + ":" + artifact.getArtifactId() + "\n " );
                         }
                     }
                 }

@@ -134,7 +134,7 @@ public class BanDuplicateClasses
             {
                 if( getLog().isDebugEnabled() )
                 {
-                    getLog().debug( "Skipping " + o.toString() + " due to scope" );
+                    getLog().debug( "Skipping " + o + " due to scope" );
                 }
                 continue;
             }
@@ -157,7 +157,7 @@ public class BanDuplicateClasses
                 catch ( IOException e )
                 {
                     throw new EnforcerRuleException(
-                        "Unable to process dependency " + o.toString() + " due to " + e.getLocalizedMessage(), e );
+                        "Unable to process dependency " + o + " due to " + e.getLocalizedMessage(), e );
                 }
             }
             else if ( isJarFile( o ) )
@@ -177,7 +177,7 @@ public class BanDuplicateClasses
                 catch ( IOException e )
                 {
                     throw new EnforcerRuleException(
-                        "Unable to process dependency " + o.toString() + " due to " + e.getLocalizedMessage(), e );
+                        "Unable to process dependency " + o + " due to " + e.getLocalizedMessage(), e );
                 }
             }
         }
@@ -267,19 +267,18 @@ public class BanDuplicateClasses
         {
             Artifact previousArtifact = classesWithSameName.previous().getArtifactThisClassWasFoundIn();
 
-            StringBuilder buf = new StringBuilder( message == null ? "Duplicate class found:" : message );
-            buf.append( '\n' );
-            buf.append( "\n  Found in:" );
-            buf.append( "\n    " );
-            buf.append( previousArtifact );
-            buf.append( "\n    " );
-            buf.append( artifact );
-            buf.append( "\n  Duplicate classes:" );
-            buf.append( "\n    " );
-            buf.append( pathToClassFile );
-            buf.append( '\n' );
-            buf.append( "There may be others but <findAllDuplicates> was set to false, so failing fast" );
-            throw new EnforcerRuleException( buf.toString() );
+            String buf = ( message == null ? "Duplicate class found:" : message ) + '\n'
+                    + "\n  Found in:"
+                    + "\n    "
+                    + previousArtifact
+                    + "\n    "
+                    + artifact
+                    + "\n  Duplicate classes:"
+                    + "\n    "
+                    + pathToClassFile
+                    + '\n'
+                    + "There may be others but <findAllDuplicates> was set to false, so failing fast";
+            throw new EnforcerRuleException( buf );
         }
     }
 }

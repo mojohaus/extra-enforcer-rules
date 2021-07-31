@@ -1,5 +1,6 @@
 package org.apache.maven.plugins.enforcer;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -9,13 +10,9 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class RequireEncodingTest {
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   private EnforcerRuleHelper helper;
   private RequireEncoding rule;
@@ -35,7 +32,6 @@ public class RequireEncodingTest {
     
     rule.setIncludes("ascii.txt");
 
-    exception.expect(EnforcerRuleException.class);
-    rule.execute(helper);
+    assertThrows(EnforcerRuleException.class, () -> rule.execute(helper) );
   }
 }
