@@ -14,8 +14,11 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
@@ -34,9 +37,9 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
     private transient DependencyGraphBuilder graphBuilder;
     
     private transient ArtifactResolver resolver;
-    
+
     private transient ArtifactRepository localRepository;
-    
+
     private transient List<ArtifactRepository> remoteRepositories;
     
     private transient EnforcerRuleHelper helper;
@@ -48,33 +51,33 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
         // Get components
         try
         {
-            resolver = (ArtifactResolver) helper.getComponent( ArtifactResolver.class );
-            
-            graphBuilder = (DependencyGraphBuilder) helper.getComponent( DependencyGraphBuilder.class );
+            resolver = helper.getComponent( ArtifactResolver.class );
+            graphBuilder = helper.getComponent( DependencyGraphBuilder.class );
         }
         catch ( ComponentLookupException e )
         {
                 throw new EnforcerRuleException( "Unable to lookup DependencyTreeBuilder: ", e );
         }
-        
+
         // Resolve expressions
         MavenProject project;
+        MavenSession session;
         try
         {
             project = (MavenProject) helper.evaluate( "${project}" );
-            
+            session = (MavenSession) helper.evaluate( "${session}" );
             localRepository = (ArtifactRepository) helper.evaluate( "${localRepository}" );
-            
             remoteRepositories = (List<ArtifactRepository>) helper.evaluate( "${project.remoteArtifactRepositories}" );
         }
         catch ( ExpressionEvaluationException e )
         {
             throw new EnforcerRuleException( "Unable to lookup an expression " + e.getLocalizedMessage(), e );
         }
-        
-        Set<Artifact> artifacts = getDependenciesToCheck( project );
-        
-        handleArtifacts( artifacts ); 
+        ProjectBuildingRequest buildingRequest =
+                new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
+        buildingRequest.setProject( project );
+
+        handleArtifacts( getDependenciesToCheck( buildingRequest ) );
     }
 
     protected abstract void handleArtifacts( Set<Artifact> artifacts ) throws EnforcerRuleException;
@@ -84,12 +87,12 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
         return true;
     }
         
-    private Set<Artifact> getDependenciesToCheck( MavenProject project )
+    private Set<Artifact> getDependenciesToCheck( ProjectBuildingRequest buildingRequest )
     {
         Set<Artifact> dependencies = null;
         try
         {
-            DependencyNode node = graphBuilder.buildDependencyGraph( project ,null );
+            DependencyNode node = graphBuilder.buildDependencyGraph( buildingRequest ,null );
             
             if( isSearchTransitive() )
             {
@@ -114,7 +117,7 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
 
     private Set<Artifact> getAllDescendants( DependencyNode node )
     {
-        Set<Artifact> children = null; 
+        Set<Artifact> children = null;
         if( node.getChildren() != null )
         {
             children = new HashSet<>();
