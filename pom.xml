@@ -154,7 +154,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-invoker-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.2.2</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -195,9 +195,21 @@
           <preBuildHookScript>setup</preBuildHookScript>
           <postBuildHookScript>verify</postBuildHookScript>
           <addTestClassPath>true</addTestClassPath>
+          <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+          <mavenOpts>-Djava.io.tmpdir=${project.build.directory}</mavenOpts>
+          <properties>
+            <maven.compiler.source>${maven.compiler.source}</maven.compiler.source>
+            <maven.compiler.target>${maven.compiler.target}</maven.compiler.target>
+            <https.protocols>${https.protocols}</https.protocols>
+            <jdk.tls.client.protocols>${https.protocols}</jdk.tls.client.protocols>
+          </properties>
           <filterProperties>
             <enforcerPluginVersion>${enforcerPluginVersion}</enforcerPluginVersion>
           </filterProperties>
+          <goals>
+            <goal>clean</goal>
+            <goal>initialize</goal>
+          </goals>
         </configuration>
         <executions>
           <execution>

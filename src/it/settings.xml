@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
+  <mirrors>
+    <mirror>
+      <id>httpsCentral</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
   <!--<profiles>-->
     <!--<profile>-->
       <!--<id>it-repo</id>-->
