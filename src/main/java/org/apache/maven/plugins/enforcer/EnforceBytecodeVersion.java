@@ -351,16 +351,16 @@ public class EnforceBytecodeVersion
                         
                         if ( matcher.matches() )
                         {
-                            Integer expectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( matcher.group( 1 ) );
+                            Integer maxExpectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( matcher.group( 1 ) );
                             
-                            if (expectedMajor == null) {
+                            if (maxExpectedMajor == null) {
                                 getLog().warn( "Unknown bytecodeVersion for " + a + " : "
-                                                + entry.getName() + ": got " + expectedMajor + " class-file-version" ); 
+                                                + entry.getName() + ": got " + maxExpectedMajor + " class-file-version" );
                             }
-                            else if ( major != expectedMajor )
+                            else if ( major > maxExpectedMajor )
                             {
                                 getLog().warn( "Invalid bytecodeVersion for " + a + " : "
-                                        + entry.getName() + ": expected " + expectedMajor + ", but was " + major );
+                                        + entry.getName() + ": expected lower or equal to " + maxExpectedMajor + ", but was " + major );
                             }
                         }
                         else
