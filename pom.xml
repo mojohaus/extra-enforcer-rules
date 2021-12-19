@@ -81,7 +81,7 @@
   <properties>
     <enforcerApiVersion>3.0.0</enforcerApiVersion>
     <enforcerPluginVersion>3.0.0</enforcerPluginVersion>
-    <maven.version>3.1.1</maven.version>
+    <maven.version>3.2.5</maven.version>
     <mojo.java.target>1.8</mojo.java.target>
     <scmpublish.content>target/staging/${project.artifactId}</scmpublish.content>
     <project.build.outputTimestamp>2021-12-15T17:24:42Z</project.build.outputTimestamp>
@@ -92,7 +92,7 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
-        <version>3.1.1</version>
+        <version>3.2.5</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -205,8 +205,6 @@
           <properties>
             <maven.compiler.source>${maven.compiler.source}</maven.compiler.source>
             <maven.compiler.target>${maven.compiler.target}</maven.compiler.target>
-            <https.protocols>${https.protocols}</https.protocols>
-            <jdk.tls.client.protocols>${https.protocols}</jdk.tls.client.protocols>
           </properties>
           <filterProperties>
             <enforcerPluginVersion>${enforcerPluginVersion}</enforcerPluginVersion>
