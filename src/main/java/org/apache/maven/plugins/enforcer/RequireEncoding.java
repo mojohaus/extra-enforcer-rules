@@ -27,6 +27,8 @@ import org.freebsd.file.FileEncoding;
 public class RequireEncoding
         extends AbstractMojoHausEnforcerRule
 {
+    private static final String ISO_8859_15 = "ISO-8859-15";
+    
     /**
      * Validate files match this encoding. If not specified then default to ${project.build.sourceEncoding}.
      */
@@ -53,9 +55,14 @@ public class RequireEncoding
     private boolean failFast = true;
 
     /**
-     * Should the rule accept US-ASCII as an subset of UTF-8 and ISO-8859-1.
+     * Should the rule accept US-ASCII as an subset of UTF-8 and ISO-8859-1/-15.
      */
     private boolean acceptAsciiSubset = false;
+
+    /**
+     * Should the rule accept ISO-8859-1 as a subset of ISO-8859-15.
+     */
+    private boolean acceptIso8859Subset = false;
 
     public void execute( EnforcerRuleHelper helper )
         throws EnforcerRuleException
@@ -74,9 +81,13 @@ public class RequireEncoding
                 log.warn( "Encoding US-ASCII is hard to detect. Use UTF-8 or ISO-8859-1" );
             }
 
-            if ( acceptAsciiSubset && ( encoding.equals( StandardCharsets.ISO_8859_1.name() ) || encoding.equals( StandardCharsets.UTF_8.name() ) ) )
+            if ( acceptAsciiSubset && ( encoding.equals( StandardCharsets.ISO_8859_1.name() ) || encoding.equals(ISO_8859_15) || encoding.equals( StandardCharsets.UTF_8.name() ) ) )
             {
                 acceptedEncodings.add( StandardCharsets.US_ASCII.name() );
+            }
+            if ( acceptIso8859Subset && encoding.equals(ISO_8859_15) )
+            {
+                acceptedEncodings.add( "ISO-8859-1" );
             }
 
             String basedir = (String) helper.evaluate( "${basedir}" );
