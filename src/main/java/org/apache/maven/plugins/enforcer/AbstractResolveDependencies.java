@@ -67,6 +67,7 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
             project = (MavenProject) helper.evaluate( "${project}" );
             session = (MavenSession) helper.evaluate( "${session}" );
             localRepository = (ArtifactRepository) helper.evaluate( "${localRepository}" );
+            //noinspection unchecked
             remoteRepositories = (List<ArtifactRepository>) helper.evaluate( "${project.remoteArtifactRepositories}" );
         }
         catch ( ExpressionEvaluationException e )

@@ -230,13 +230,11 @@ public class RequirePropertyDiverges
      */
     final List<Xpp3Dom> getRuleConfigurations( final Build build )
     {
-        @SuppressWarnings( "unchecked" )
         final Map<String, Plugin> plugins = build.getPluginsAsMap();
         final List<Xpp3Dom> ruleConfigurationsForPlugins = getRuleConfigurations( plugins );
         final PluginManagement pluginManagement = build.getPluginManagement();
         if ( pluginManagement != null )
         {
-            @SuppressWarnings( "unchecked" )
             final Map<String, Plugin> pluginsFromManagementAsMap = pluginManagement.getPluginsAsMap();
             List<Xpp3Dom> ruleConfigurationsFromManagement = getRuleConfigurations( pluginsFromManagementAsMap );
             ruleConfigurationsForPlugins.addAll( ruleConfigurationsFromManagement );
@@ -263,9 +261,9 @@ public class RequirePropertyDiverges
             addRules( configuration, ruleConfigurations );
 
             // add rules from all plugin execution configurations
-            for ( Object execution : enforcer.getExecutions() )
+            for ( PluginExecution execution : enforcer.getExecutions() )
             {
-                addRules( ( Xpp3Dom ) ( ( PluginExecution ) execution ).getConfiguration(), ruleConfigurations );
+                addRules( ( Xpp3Dom ) execution.getConfiguration(), ruleConfigurations );
             }
 
             return ruleConfigurations;

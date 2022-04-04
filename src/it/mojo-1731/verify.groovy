@@ -21,4 +21,4 @@ assert log.exists()
 def ruleLines = ( log.readLines().findResults { line ->
   line.startsWith( "[DEBUG] Searching for duplicate classes in" ) ? line.find( ~/[a-z0-9.\-]+$/ ) : null
 } as Set )
-assert ruleLines == ( [ "spring-beans-2.5.6.pom", "commons-logging-1.1.1.jar" , "spring-core-2.5.6.jar" ] as Set )
+assert ruleLines == ( [ "spring-beans-5.3.18.pom", "spring-jcl-5.3.18.jar" , "spring-core-5.3.18.jar" ] as Set )
