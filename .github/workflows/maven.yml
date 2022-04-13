@@ -58,7 +58,7 @@ jobs:
 
     strategy:
       matrix:
-        maven: [ '3.2.5', '3.3.9', '3.6.3', '3.8.4' ]
+        maven: [ '3.2.5', '3.3.9', '3.6.3', '3.8.5' ]
         os: [ ubuntu-latest, windows-latest, macOS-latest ]
         java:
           # Hotspot VM, the "default" VM
