@@ -48,7 +48,7 @@ import org.codehaus.plexus.util.IOUtil;
 
 /**
  * Enforcer rule that will check the bytecode version of each class of each dependency.
- * 
+ *
  * @see <a href="http://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
  * @since 1.0-alpha-4
  */
@@ -148,7 +148,7 @@ public class EnforceBytecodeVersion
 
     /**
      * This parameter is here for potentially advanced use cases, but it seems like it is actually always 0.
-     * 
+     *
      * @see #maxJavaMajorVersionNumber
      * @see <a href="https://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
      */
@@ -166,6 +166,11 @@ public class EnforceBytecodeVersion
      * List of classes to ignore. Wildcard at the end accepted
      */
     private String[] ignoreClasses;
+
+    /**
+     * Process module-info and Multi-Release JAR classes if true
+     */
+    private boolean strict = false;
 
     /**
      * Optional list of dependency scopes to ignore. {@code test} and {@code provided} make sense here.
@@ -240,7 +245,7 @@ public class EnforceBytecodeVersion
                         "\"1.7\", \"8\", \"11\", \"12\", \"13\", \"14\", \"15\", \"16\", \"17\"" );
             }
             maxJavaMajorVersionNumber = needle;
-            if ( needle < 53 )
+            if ( !strict && needle < 53 )
             {
                 IgnorableDependency ignoreModuleInfoDependency = new IgnorableDependency();
                 ignoreModuleInfoDependency.applyIgnoreClasses(DEFAULT_CLASSES_IGNORE_BEFORE_JDK_9, false );
@@ -342,17 +347,17 @@ public class EnforceBytecodeVersion
                     int major = ( magicAndClassFileVersion[6] << 8 ) + magicAndClassFileVersion[7];
 
                     // Assuming regex match is more expensive, verify bytecode versions first
-                    
+
                     if ( ( major > maxJavaMajorVersionNumber )
                         || ( major == maxJavaMajorVersionNumber && minor > maxJavaMinorVersionNumber ) )
                     {
-                        
+
                         Matcher matcher = MULTIRELEASE.matcher( entry.getName() );
-                        
-                        if ( matcher.matches() )
+
+                        if ( !strict && matcher.matches() )
                         {
                             Integer maxExpectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get( matcher.group( 1 ) );
-                            
+
                             if (maxExpectedMajor == null) {
                                 getLog().warn( "Unknown bytecodeVersion for " + a + " : "
                                                 + entry.getName() + ": got " + maxExpectedMajor + " class-file-version" );
@@ -421,6 +426,15 @@ public class EnforceBytecodeVersion
     public void setSearchTransitive( boolean theSearchTransitive )
     {
         this.searchTransitive = theSearchTransitive;
+    }
+
+    /**
+     * Process module-info and Multi-Release JAR classes if true
+     * @param strict the strictness to set
+     */
+    public void setStrict( boolean strict )
+    {
+        this.strict = strict;
     }
 
     // copied from RequireReleaseDeps

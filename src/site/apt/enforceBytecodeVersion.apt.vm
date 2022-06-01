@@ -43,9 +43,11 @@ Enforce Bytecode Version
 
    * ignoreOptionals - a boolean, if <<<true>>> all dependencies which have <<<<optional>true</optional>>>> are ignored.
 
+   * strict - a boolean, if <<<true>>> process module-info and Multi-Release JAR classes
+
    []
 
-Note 
+Note
   Sample Plugin Configuration:
 
 +---+
