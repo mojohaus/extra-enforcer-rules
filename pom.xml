@@ -81,7 +81,7 @@
   <properties>
     <enforcerApiVersion>3.0.0</enforcerApiVersion>
     <enforcerPluginVersion>3.0.0</enforcerPluginVersion>
-    <maven.version>3.2.5</maven.version>
+    <maven.version>3.8.6</maven.version>
     <scmpublish.content>target/staging/${project.artifactId}</scmpublish.content>
     <project.build.outputTimestamp>2021-12-15T17:24:42Z</project.build.outputTimestamp>
   </properties>
