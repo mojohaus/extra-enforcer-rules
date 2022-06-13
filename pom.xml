@@ -79,7 +79,7 @@
   </developers>
 
   <properties>
-    <enforcerApiVersion>3.0.0</enforcerApiVersion>
+    <enforcerApiVersion>3.1.0</enforcerApiVersion>
     <enforcerPluginVersion>3.0.0</enforcerPluginVersion>
     <maven.version>3.2.5</maven.version>
     <scmpublish.content>target/staging/${project.artifactId}</scmpublish.content>
