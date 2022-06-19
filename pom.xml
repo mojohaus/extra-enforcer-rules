@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
-    <version>67</version>
+    <version>68</version>
   </parent>
 
   <artifactId>extra-enforcer-rules</artifactId>
@@ -15,49 +15,24 @@
   <description>
     Extra Enforcer Rules. These are extra rules for Apache Maven's Enforcer Plugin.
   </description>
+  <url>https://www.mojohaus.org/extra-enforcer-rules/</url>
 
   <inceptionYear>2011</inceptionYear>
 
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
 
-  <issueManagement>
-    <system>GitHub</system>
-    <url>https://github.com/mojohaus/extra-enforcer-rules/issues</url>
-  </issueManagement>
-
   <scm>
     <connection>scm:git:https://github.com/mojohaus/extra-enforcer-rules.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mojohaus/extra-enforcer-rules.git</developerConnection>
-    <url>https://github.com/mojohaus/extra-enforcer-rules</url>
+    <url>https://github.com/mojohaus/extra-enforcer-rules/tree/master</url>
     <tag>HEAD</tag>
   </scm>
-
-  <ciManagement>
-    <system>Travis</system>
-    <url>https://travis-ci.org/mojohaus/extra-enforcer-rules</url>
-  </ciManagement>
-
-  <repositories>
-    <repository>
-      <id>ossrh-snapshots</id>
-      <layout>default</layout>
-      <name>ossrh-snapshots</name>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <checksumPolicy>fail</checksumPolicy>
-        <enabled>true</enabled>
-      </snapshots>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </repository>
-  </repositories>
 
   <developers>
     <developer>
@@ -79,10 +54,9 @@
   </developers>
 
   <properties>
-    <enforcerApiVersion>3.1.0</enforcerApiVersion>
-    <enforcerPluginVersion>3.0.0</enforcerPluginVersion>
+    <!-- override from parent pom, here we need more control -->
+    <maven-enforcer-plugin.version>3.1.0</maven-enforcer-plugin.version>
     <maven.version>3.2.5</maven.version>
-    <scmpublish.content>target/staging/${project.artifactId}</scmpublish.content>
     <project.build.outputTimestamp>2021-12-15T17:24:42Z</project.build.outputTimestamp>
   </properties>
 
@@ -100,7 +74,7 @@
     <dependency>
       <groupId>org.apache.maven.enforcer</groupId>
       <artifactId>enforcer-api</artifactId>
-      <version>${enforcerApiVersion}</version>
+      <version>${maven-enforcer-plugin.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -146,7 +120,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>${enforcerPluginVersion}</version>
         <executions>
           <execution>
             <id>enforce-banned-dependencies</id>
@@ -174,7 +147,6 @@
         <configuration>
           <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
           <showErrors>true</showErrors>
-          <streamLogs>true</streamLogs>
           <settingsFile>src/it/settings.xml</settingsFile>
           <preBuildHookScript>setup</preBuildHookScript>
           <postBuildHookScript>verify</postBuildHookScript>
@@ -186,7 +158,7 @@
             <maven.compiler.target>${maven.compiler.target}</maven.compiler.target>
           </properties>
           <filterProperties>
-            <enforcerPluginVersion>${enforcerPluginVersion}</enforcerPluginVersion>
+            <enforcerPluginVersion>${maven-enforcer-plugin.version}</enforcerPluginVersion>
           </filterProperties>
           <goals>
             <goal>clean</goal>

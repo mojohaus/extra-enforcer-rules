@@ -4,4 +4,4 @@
 
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/mojohaus/extra-enforcer-rules.svg?label=License)](http://www.apache.org/licenses/)
 [![Maven Central](https://img.shields.io/maven-central/v/org.codehaus.mojo/extra-enforcer-rules.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.codehaus.mojo/extra-enforcer-rules)
-![Build Status](https://github.com/mojohaus/extra-enforcer-rules/actions/workflows/maven.yml/badge.svg)
+[![GitHub CI](https://github.com/mojohaus/extra-enforcer-rules/actions/workflows/maven.yml/badge.svg)](https://github.com/mojohaus/extra-enforcer-rules/actions/workflows/maven.yml)
