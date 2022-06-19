@@ -34,7 +34,7 @@ import java.util.Set;
 public class BanDuplicateClassesLogParser
 {
     private static final String DUPLICATE_START_LINE =
-        "[WARNING] Rule 0: org.apache.maven.plugins.enforcer.BanDuplicateClasses failed with message:";
+        "[ERROR] Rule 0: org.apache.maven.plugins.enforcer.BanDuplicateClasses failed with message:";
     
     private final File logFile;
     

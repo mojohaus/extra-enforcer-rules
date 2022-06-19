@@ -55,7 +55,7 @@ Require Contributor Roles
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>${enforcerApiVersion}</version> <!-- find the latest version at http://maven.apache.org/plugins/maven-enforcer-plugin/ -->
+        <version>${maven-enforcer-plugin.version}</version> <!-- find the latest version at http://maven.apache.org/plugins/maven-enforcer-plugin/ -->
         <executions>
           <execution>
             <id>enforce-require-roles</id>
