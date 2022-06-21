@@ -20,7 +20,7 @@ under the License.
 <faqs id="FAQ" title="Frequently Asked Questions">
  <part id="General">
    <faq id="mojo_project_with_org_apache_maven_package">
-     <question>Why does this Mojo project uses the <code>org.apache.maven</code>package ?</question>
+     <question>Why does this Mojo project use the <code>org.apache.maven</code>package?</question>
      <answer>
        <p>This way the rules get simple names, otherwise these rules are pretty complex to add.</p>
      </answer>
