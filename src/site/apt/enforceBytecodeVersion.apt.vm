@@ -58,7 +58,7 @@ Note
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>${maven-enforcer-plugin.version}</version> <!-- find the latest version at http://maven.apache.org/plugins/maven-enforcer-plugin/ -->
+        <version>${enforcerPluginVersion}</version> <!-- find the latest version at http://maven.apache.org/plugins/maven-enforcer-plugin/ -->
         <executions>
           <execution>
             <id>enforce-bytecode-version</id>
