@@ -20,12 +20,9 @@ package org.apache.maven.plugins.enforcer;
  */
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
+import java.nio.file.Files;
 
 import org.apache.maven.artifact.Artifact;
 import org.junit.rules.TemporaryFolder;
@@ -58,31 +55,8 @@ public class ClassFileHelper
             .withType( "some type that isn't 'jar' so our code assumes it's a directory" )
             .build();
 
-        return new ClassFile( pathToClassFile, artifact );
-    }
-
-    public ClassFile createJarWithContent( String jarFileName, String pathToClassFile, String fileContents )
-        throws IOException
-    {
-        uniqueId++;
-        String uniqueIdStr = Integer.toString( uniqueId );
-
-        File tempDirectory = createTempDirectory( uniqueIdStr );
-        File tempJarFile = new File( tempDirectory, jarFileName );
-
-        try ( JarOutputStream outStream = new JarOutputStream( new FileOutputStream( tempJarFile ) ) )
-        {
-            outStream.putNextEntry( new JarEntry( pathToClassFile ) );
-            outStream.write( fileContents.getBytes( StandardCharsets.UTF_8 ) );
-        }
-
-        Artifact artifact = ArtifactBuilder.newBuilder()
-            .withFileOrDirectory( tempJarFile )
-            .withVersion( uniqueIdStr )
-            .withType( "jar" )
-            .build();
-
-        return new ClassFile( pathToClassFile, artifact );
+        return new ClassFile( pathToClassFile, artifact,
+                              () -> Files.newInputStream( tempDirectory.toPath().resolve( pathToClassFile ) ) );
     }
 
     private File createTempDirectory( String uniqueIdStr )

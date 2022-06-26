@@ -21,6 +21,7 @@ package org.apache.maven.plugins.enforcer;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -151,7 +152,8 @@ public class BanDuplicateClasses
                     for ( String name : FileUtils.getFileNames( file, null, null, false ) )
                     {
                         getLog().debug( "  " + name );
-                        checkAndAddName( o, name, classesSeen, duplicateClassNames, ignorableDependencies );
+                        checkAndAddName( o, name, () -> Files.newInputStream( file.toPath().resolve( name ) ),
+                                         classesSeen, duplicateClassNames, ignorableDependencies );
                     }
                 }
                 catch ( IOException e )
@@ -170,7 +172,9 @@ public class BanDuplicateClasses
                         for ( JarEntry entry : Collections.list( jar.entries() ) )
                         {
                             String fileName = entry.getName();
-                            checkAndAddName( o, fileName, classesSeen, duplicateClassNames, ignorableDependencies );
+
+                            checkAndAddName( o, fileName, () -> jar.getInputStream( entry ),
+                                             classesSeen, duplicateClassNames, ignorableDependencies );
                         }
                     }
                 }
@@ -220,10 +224,10 @@ public class BanDuplicateClasses
 
     }
 
-    private void checkAndAddName( Artifact artifact, String pathToClassFile, Map<String,
+    private void checkAndAddName( Artifact artifact, String pathToClassFile, InputStreamSupplier inputStreamSupplier, Map<String,
                                   ClassesWithSameName> classesSeen, Set<String> duplicateClasses,
                                   Collection<IgnorableDependency> ignores )
-        throws EnforcerRuleException
+        throws EnforcerRuleException, IOException
     {
         if ( !pathToClassFile.endsWith( ".class" ) )
         {
@@ -244,7 +248,8 @@ public class BanDuplicateClasses
 
         ClassesWithSameName classesWithSameName = classesSeen.get( pathToClassFile );
         boolean isFirstTimeSeeingThisClass = ( classesWithSameName == null );
-        ClassFile classFile = new ClassFile( pathToClassFile, artifact );
+
+        ClassFile classFile = new ClassFile( pathToClassFile, artifact, inputStreamSupplier );
 
         if ( isFirstTimeSeeingThisClass )
         {
