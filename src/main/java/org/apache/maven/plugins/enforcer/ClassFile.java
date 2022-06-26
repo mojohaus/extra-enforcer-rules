@@ -19,6 +19,10 @@ package org.apache.maven.plugins.enforcer;
  * under the License.
  */
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.maven.artifact.Artifact;
 
 /**
@@ -44,19 +48,28 @@ public class ClassFile
     /** the path to the .class file. Example: org/apache/maven/Stuff.class */
     private final String classFilePath;
     private final Artifact artifactThisClassWasFoundIn;
-    private final Hasher hasher;
-    private String lazilyComputedHash;
+    private String hash;
 
     /**
      * Constructor.
      * @param classFilePath path to the class file. Example: org/apache/maven/Stuff.class
      * @param artifactThisClassWasFoundIn the maven artifact the class appeared in (example: a jar file)
+     * @param inputStreamSupplier a supplier for class content input stream
      */
-    public ClassFile( String classFilePath, Artifact artifactThisClassWasFoundIn )
+    public ClassFile( String classFilePath, Artifact artifactThisClassWasFoundIn, InputStreamSupplier inputStreamSupplier )
+        throws IOException
     {
         this.classFilePath = classFilePath;
         this.artifactThisClassWasFoundIn = artifactThisClassWasFoundIn;
-        this.hasher = new Hasher( classFilePath );
+        this.hash = computeHash(inputStreamSupplier);
+    }
+
+    private String computeHash( InputStreamSupplier inputStreamSupplier ) throws IOException
+    {
+        try (InputStream inputStream = inputStreamSupplier.get())
+        {
+            return DigestUtils.md5Hex( inputStream );
+        }
     }
 
     /**
@@ -81,12 +94,7 @@ public class ClassFile
      */
     public String getHash()
     {
-        if ( lazilyComputedHash == null )
-        {
-            lazilyComputedHash = hasher.generateHash( artifactThisClassWasFoundIn );
-        }
-
-        return lazilyComputedHash;
+        return hash;
     }
 
 }
