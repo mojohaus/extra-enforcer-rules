@@ -73,31 +73,49 @@
   </dependencyManagement>
 
   <dependencies>
+    <!-- enforcer API -->
     <dependency>
       <groupId>org.apache.maven.enforcer</groupId>
       <artifactId>enforcer-api</artifactId>
       <version>${maven-enforcer-plugin.version}</version>
+      <scope>provided</scope>
     </dependency>
+
+    <!-- Maven core -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>${maven.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
+      <!-- used by AbstractResolveDependencies -->
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-compat</artifactId>
       <version>${maven.version}</version>
+      <scope>provided</scope>
     </dependency>
+
+    <!-- Maven shared -->
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-dependency-tree</artifactId>
       <version>3.1.1</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-common-artifact-filters</artifactId>
+      <version>3.3.0</version>
+    </dependency>
+
+    <!-- other commons -->
+    <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
       <version>1.15</version>
     </dependency>
+
+    <!-- testing support -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -109,11 +127,6 @@
       <artifactId>mockito-core</artifactId>
       <version>4.6.1</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-common-artifact-filters</artifactId>
-      <version>3.3.0</version>
     </dependency>
   </dependencies>
 
