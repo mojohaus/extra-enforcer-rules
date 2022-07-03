@@ -51,6 +51,11 @@
       </roles>
       <timezone>Europe/Paris</timezone>
     </developer>
+    <developer>
+      <name>Slawomir Jaranowski</name>
+      <email>sjaranowski@apache.org</email>
+      <timezone>Europe/Warsaw</timezone>
+    </developer>
   </developers>
 
   <properties>
