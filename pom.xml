@@ -93,13 +93,6 @@
       <version>${maven.version}</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <!-- used by AbstractResolveDependencies -->
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-compat</artifactId>
-      <version>${maven.version}</version>
-      <scope>provided</scope>
-    </dependency>
 
     <!-- Maven shared -->
     <dependency>

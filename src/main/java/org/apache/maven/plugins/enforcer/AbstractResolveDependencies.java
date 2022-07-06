@@ -7,18 +7,18 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
@@ -34,15 +34,14 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforcerRule
 {
 
-    private transient DependencyGraphBuilder graphBuilder;
-    
-    private transient ArtifactResolver resolver;
+    private DependencyGraphBuilder graphBuilder;
 
-    private transient ArtifactRepository localRepository;
+    private MavenSession session;
+    private RepositorySystem repositorySystem;
+    private ResolutionErrorHandler resolutionErrorHandler;
 
-    private transient List<ArtifactRepository> remoteRepositories;
-    
-    private transient EnforcerRuleHelper helper;
+    private EnforcerRuleHelper helper;
+
     public void execute( EnforcerRuleHelper helper )
         throws EnforcerRuleException
     {
@@ -51,7 +50,8 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
         // Get components
         try
         {
-            resolver = helper.getComponent( ArtifactResolver.class );
+            repositorySystem = helper.getComponent( RepositorySystem.class );
+            resolutionErrorHandler = helper.getComponent( ResolutionErrorHandler.class );
             graphBuilder = helper.getComponent( DependencyGraphBuilder.class );
         }
         catch ( ComponentLookupException e )
@@ -60,23 +60,18 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
         }
 
         // Resolve expressions
-        MavenProject project;
-        MavenSession session;
         try
         {
-            project = (MavenProject) helper.evaluate( "${project}" );
             session = (MavenSession) helper.evaluate( "${session}" );
-            localRepository = (ArtifactRepository) helper.evaluate( "${localRepository}" );
-            //noinspection unchecked
-            remoteRepositories = (List<ArtifactRepository>) helper.evaluate( "${project.remoteArtifactRepositories}" );
         }
         catch ( ExpressionEvaluationException e )
         {
             throw new EnforcerRuleException( "Unable to lookup an expression " + e.getLocalizedMessage(), e );
         }
+
         ProjectBuildingRequest buildingRequest =
                 new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
-        buildingRequest.setProject( project );
+        buildingRequest.setProject( session.getCurrentProject() );
 
         handleArtifacts( getDependenciesToCheck( buildingRequest ) );
     }
@@ -88,7 +83,7 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
         return true;
     }
         
-    private Set<Artifact> getDependenciesToCheck( ProjectBuildingRequest buildingRequest )
+    private Set<Artifact> getDependenciesToCheck( ProjectBuildingRequest buildingRequest ) throws EnforcerRuleException
     {
         Set<Artifact> dependencies = null;
         try
@@ -110,8 +105,7 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
         }
         catch ( DependencyGraphBuilderException e )
         {
-            // otherwise we need to change the signature of this protected method
-            throw new RuntimeException( e );
+            throw new EnforcerRuleException( e.getMessage(), e );
         }
         return dependencies;
     }
@@ -127,9 +121,7 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
                 try
                 {
                     Artifact artifact = depNode.getArtifact();
-
-                    resolver.resolve( artifact, remoteRepositories, localRepository );
-
+                    resolveArtifact( artifact );
                     children.add( artifact );
 
                     Set<Artifact> subNodes = getAllDescendants( depNode );
@@ -139,13 +131,27 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
                         children.addAll( subNodes );
                     }
                 }
-                catch ( ArtifactResolutionException | ArtifactNotFoundException e )
+                catch ( ArtifactResolutionException e )
                 {
                     getLog().warn( e.getMessage() );
                 }
             }
         }
         return children;
+    }
+
+    private void resolveArtifact( Artifact artifact ) throws ArtifactResolutionException
+    {
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( artifact )
+            .setLocalRepository( session.getLocalRepository() )
+            .setRemoteRepositories( session.getRequest().getRemoteRepositories() )
+            .setOffline( session.isOffline() )
+            .setForceUpdate( session.getRequest().isUpdateSnapshots() );
+
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
+
+        resolutionErrorHandler.throwErrors( request, result );
     }
 
     protected Log getLog()
