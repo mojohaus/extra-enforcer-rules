@@ -1,96 +1,13 @@
 name: GitHub CI
 
 on:
-  workflow_dispatch: {}
   push:
-    branches:
-      - '*'
   pull_request:
-    branches:
-      - 'main'
-      - 'master'
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Prepare maven build
-        shell: bash
-        # cannot go offline, the system dependency is being looked up on Central.
-        # blocked by MDEP-568
-        run: mvn --show-version --errors --batch-mode validate 
-
-      - name: Build with Maven
-        shell: bash
-        run: mvn --show-version --errors --batch-mode "-Dinvoker.streamLogsOnFailures=true" clean verify
-
-  site:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Build with Maven
-        shell: bash
-        run: mvn --show-version --errors --batch-mode clean site site:stage
-
-  build-all:
-
-    needs: build 
-
-    strategy:
-      matrix:
-        maven: [ '3.2.5', '3.3.9', '3.6.3', '3.8.5' ]
-        os: [ ubuntu-latest, windows-latest, macOS-latest ]
-        java:
-          # Hotspot VM, the "default" VM
-          - version: 8
-            dist: temurin
-          - version: 11
-            dist: temurin
-          - version: 17
-            dist: temurin
-      fail-fast: false
-
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: ${{ matrix.java.version }}
-          distribution: ${{ matrix.java.dist }}
-          cache: 'maven'
-
-      - name: Set up Maven
-        shell: bash
-        run: mvn -N "io.takari:maven:0.7.7:wrapper" "-Dmaven=${{ matrix.maven }}"
-
-      - name: Prepare maven build
-        shell: bash
-        run: ./mvnw --show-version --errors --batch-mode validate
-
-      - name: Build with Maven
-        shell: bash
-        run: ./mvnw --show-version --errors --batch-mode "-Dinvoker.streamLogsOnFailures=true" clean verify
+    name: Verify
+    uses: apache/maven-gh-actions-shared/.github/workflows/maven-verify.yml@v3
+    with:
+      ff-maven: "3.8.6"
+      maven-matrix: '[ "3.2.5", "3.8.6" ]'
