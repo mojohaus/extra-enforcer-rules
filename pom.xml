@@ -63,7 +63,7 @@
     <maven-enforcer-plugin.version>3.1.0</maven-enforcer-plugin.version>
     <!-- we need dot less properties for .vm -->
     <enforcerPluginVersion>${maven-enforcer-plugin.version}</enforcerPluginVersion>
-    <maven.version>3.2.5</maven.version>
+    <maven.version>3.8.6</maven.version>
     <project.build.outputTimestamp>2021-12-15T17:24:42Z</project.build.outputTimestamp>
   </properties>
 
