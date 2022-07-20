@@ -145,7 +145,7 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( artifact )
             .setLocalRepository( session.getLocalRepository() )
-            .setRemoteRepositories( session.getRequest().getRemoteRepositories() )
+            .setRemoteRepositories( session.getRequest().getProjectBuildingRequest().getRemoteRepositories() )
             .setOffline( session.isOffline() )
             .setForceUpdate( session.getRequest().isUpdateSnapshots() );
 
