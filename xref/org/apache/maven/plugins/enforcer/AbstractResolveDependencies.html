@@ -153,7 +153,7 @@
 <a class="jxr_linenumber" name="L145" href="#L145">145</a>         ArtifactResolutionRequest request = <strong class="jxr_keyword">new</strong> ArtifactResolutionRequest()
 <a class="jxr_linenumber" name="L146" href="#L146">146</a>             .setArtifact( artifact )
 <a class="jxr_linenumber" name="L147" href="#L147">147</a>             .setLocalRepository( session.getLocalRepository() )
-<a class="jxr_linenumber" name="L148" href="#L148">148</a>             .setRemoteRepositories( session.getRequest().getRemoteRepositories() )
+<a class="jxr_linenumber" name="L148" href="#L148">148</a>             .setRemoteRepositories( session.getRequest().getProjectBuildingRequest().getRemoteRepositories() )
 <a class="jxr_linenumber" name="L149" href="#L149">149</a>             .setOffline( session.isOffline() )
 <a class="jxr_linenumber" name="L150" href="#L150">150</a>             .setForceUpdate( session.getRequest().isUpdateSnapshots() );
 <a class="jxr_linenumber" name="L151" href="#L151">151</a> 
