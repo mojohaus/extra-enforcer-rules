@@ -6,11 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
@@ -18,12 +15,15 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
 
 /**
  * Abstract rule for when the content of the artifacts matters.
@@ -38,7 +38,6 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
 
     private MavenSession session;
     private RepositorySystem repositorySystem;
-    private ResolutionErrorHandler resolutionErrorHandler;
 
     private EnforcerRuleHelper helper;
 
@@ -51,7 +50,6 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
         try
         {
             repositorySystem = helper.getComponent( RepositorySystem.class );
-            resolutionErrorHandler = helper.getComponent( ResolutionErrorHandler.class );
             graphBuilder = helper.getComponent( DependencyGraphBuilder.class );
         }
         catch ( ComponentLookupException e )
@@ -142,16 +140,15 @@ public abstract class AbstractResolveDependencies extends AbstractMojoHausEnforc
 
     private void resolveArtifact( Artifact artifact ) throws ArtifactResolutionException
     {
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( artifact )
-            .setLocalRepository( session.getLocalRepository() )
-            .setRemoteRepositories( session.getRequest().getProjectBuildingRequest().getRemoteRepositories() )
-            .setOffline( session.isOffline() )
-            .setForceUpdate( session.getRequest().isUpdateSnapshots() );
+        ArtifactRequest request = new ArtifactRequest();
+        request.setRepositories( session.getCurrentProject().getRemoteProjectRepositories() );
+        request.setArtifact( RepositoryUtils.toArtifact( artifact ) );
 
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
+        ArtifactResult artifactResult = repositorySystem.resolveArtifact( session.getRepositorySession(), request );
 
-        resolutionErrorHandler.throwErrors( request, result );
+        artifact.setFile( artifactResult.getArtifact().getFile() );
+        artifact.setVersion( artifactResult.getArtifact().getVersion() );
+        artifact.setResolved( true );
     }
 
     protected Log getLog()
