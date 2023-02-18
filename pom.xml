@@ -59,6 +59,9 @@
   </developers>
 
   <properties>
+    <!-- some of plugins requires JDK 11 -->
+    <recommendedJavaBuildVersion>11</recommendedJavaBuildVersion>
+
     <!-- override from parent pom, here we need more control -->
     <maven-enforcer-plugin.version>3.2.1</maven-enforcer-plugin.version>
     <!-- we need dot less properties for .vm -->
@@ -206,6 +209,30 @@
                 </configuration>
               </execution>
             </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>java11+</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+
+      <build>
+        <!--- newer versions of plugins requires JDK 11 -->
+        <plugins>
+          <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <configuration>
+              <configLocation>${checkstyle.spotless.config}</configLocation>
+            </configuration>
           </plugin>
         </plugins>
       </build>
