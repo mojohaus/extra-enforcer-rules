@@ -43,10 +43,10 @@ import org.apache.maven.artifact.Artifact;
  * of the directory/jar is not included in the class file path. Rather,
  * it's included in the Artifact. See {@link Artifact#getFile()}
  */
-public class ClassFile
-{
+public class ClassFile {
     /** the path to the .class file. Example: org/apache/maven/Stuff.class */
     private final String classFilePath;
+
     private final Artifact artifactThisClassWasFoundIn;
     private String hash;
 
@@ -56,35 +56,31 @@ public class ClassFile
      * @param artifactThisClassWasFoundIn the maven artifact the class appeared in (example: a jar file)
      * @param inputStreamSupplier a supplier for class content input stream
      */
-    public ClassFile( String classFilePath, Artifact artifactThisClassWasFoundIn, InputStreamSupplier inputStreamSupplier )
-        throws IOException
-    {
+    public ClassFile(
+            String classFilePath, Artifact artifactThisClassWasFoundIn, InputStreamSupplier inputStreamSupplier)
+            throws IOException {
         this.classFilePath = classFilePath;
         this.artifactThisClassWasFoundIn = artifactThisClassWasFoundIn;
         this.hash = computeHash(inputStreamSupplier);
     }
 
-    private String computeHash( InputStreamSupplier inputStreamSupplier ) throws IOException
-    {
-        try (InputStream inputStream = inputStreamSupplier.get())
-        {
-            return DigestUtils.md5Hex( inputStream );
+    private String computeHash(InputStreamSupplier inputStreamSupplier) throws IOException {
+        try (InputStream inputStream = inputStreamSupplier.get()) {
+            return DigestUtils.md5Hex(inputStream);
         }
     }
 
     /**
      * @return the path to the .class file. Example: org/apache/maven/Stuff.class
      */
-    public String getClassFilePath()
-    {
+    public String getClassFilePath() {
         return classFilePath;
     }
 
     /**
      * @return the maven artifact the class appeared in (example: a jar file)
      */
-    public Artifact getArtifactThisClassWasFoundIn()
-    {
+    public Artifact getArtifactThisClassWasFoundIn() {
         return artifactThisClassWasFoundIn;
     }
 
@@ -92,9 +88,7 @@ public class ClassFile
      * @return a hash or checksum of the binary file. If two files have the same hash
      * then they are the same binary file.
      */
-    public String getHash()
-    {
+    public String getHash() {
         return hash;
     }
-
 }

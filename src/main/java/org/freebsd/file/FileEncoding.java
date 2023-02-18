@@ -4,28 +4,26 @@ import java.util.Arrays;
 
 /**
  * Tries to guess the encoding of the byte sequence.
- *
  * Orignial code taken from https://github.com/file/file/blob/master/src/encoding.c
  */
-public class FileEncoding
-{
+@SuppressWarnings("checkstyle:MemberName")
+public class FileEncoding {
 
     private String type = "text/plain";
-    private String code = "unknown";
-    private String code_mime = "binary";
 
-    public String getCodeMime()
-    {
-        return code_mime;
+    private String code = "unknown";
+
+    private String codeMime = "binary";
+
+    public String getCodeMime() {
+        return codeMime;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public String getCode()
-    {
+    public String getCode() {
         return code;
     }
 
@@ -35,73 +33,50 @@ public class FileEncoding
      *
      * @return true if it could guess an encoding.
      */
-    public boolean guessFileEncoding( byte[] buf )
-    {
+    @SuppressWarnings("checkstyle:InnerAssignment")
+    public boolean guessFileEncoding(byte[] buf) {
         int nbytes = buf.length;
-        int ucs_type;
+        int ucsType;
 
-        if ( looks_ascii( buf, nbytes ) )
-        {
-            if ( looks_utf7( buf, nbytes ) )
-            {
+        if (looksAscii(buf, nbytes)) {
+            if (looksUtf7(buf, nbytes)) {
                 code = "UTF-7 Unicode";
-                code_mime = "utf-7";
-            }
-            else
-            {
+                codeMime = "utf-7";
+            } else {
                 code = "ASCII";
-                code_mime = "us-ascii";
+                codeMime = "us-ascii";
             }
-        }
-        else if ( looks_utf8_with_BOM( buf, nbytes ) )
-        {
+        } else if (looksUtf8WithBOM(buf, nbytes)) {
             code = "UTF-8 Unicode (with BOM)";
-            code_mime = "utf-8";
-        }
-        else if ( looks_utf8( buf, nbytes ) > 1 )
-        {
+            codeMime = "utf-8";
+        } else if (looksUtf8(buf, nbytes) > 1) {
             code = "UTF-8 Unicode";
-            code_mime = "utf-8";
-        }
-        else if ( ( ucs_type = looks_ucs16( buf, nbytes ) ) != 0 )
-        {
-            if ( ucs_type == 1 )
-            {
+            codeMime = "utf-8";
+        } else if ((ucsType = looksUcs16(buf, nbytes)) != 0) {
+            if (ucsType == 1) {
                 code = "Little-endian UTF-16 Unicode";
-                code_mime = "utf-16le";
-            }
-            else
-            {
+                codeMime = "utf-16le";
+            } else {
                 code = "Big-endian UTF-16 Unicode";
-                code_mime = "utf-16be";
+                codeMime = "utf-16be";
             }
-        }
-        else if ( looks_latin1( buf, nbytes ) )
-        {
+        } else if (looksLatin1(buf, nbytes)) {
             code = "ISO-8859";
-            code_mime = "iso-8859-1";
-        }
-        else if ( looks_extended( buf, nbytes ) )
-        {
+            codeMime = "iso-8859-1";
+        } else if (looksExtended(buf, nbytes)) {
             code = "Non-ISO extended-ASCII";
-            code_mime = "unknown-8bit";
-        }
-        else
-        {
-            byte[] nbuf = from_ebcdic( buf, nbytes );
+            codeMime = "unknown-8bit";
+        } else {
+            byte[] nbuf = fromEbcdic(buf, nbytes);
 
-            if ( looks_ascii( nbuf, nbytes ) )
-            {
+            if (looksAscii(nbuf, nbytes)) {
                 code = "EBCDIC";
-                code_mime = "ebcdic";
-            }
-            else if ( looks_latin1( nbuf, nbytes ) )
-            {
+                codeMime = "ebcdic";
+            } else if (looksLatin1(nbuf, nbytes)) {
                 code = "International EBCDIC";
-                code_mime = "ebcdic";
-            }
-            else
-            { /* Doesn't look like text at all */
+                codeMime = "ebcdic";
+            } else {
+                /* Doesn't look like text at all */
                 type = "binary";
                 return false;
             }
@@ -162,14 +137,17 @@ public class FileEncoding
      * consider to be printing characters.
      */
     private static final byte F = 0; /* character never appears in text */
+
     private static final byte T = 1; /* character appears in plain ASCII text */
+
     private static final byte I = 2; /* character appears in ISO-8859 text */
+
     private static final byte X = 3; /* character appears in non-ISO extended ASCII (Mac, IBM PC) */
 
     private byte[] text_chars = {
-            /*                  BEL BS HT LF VT FF CR    */
+        /*                  BEL BS HT LF VT FF CR    */
         F, F, F, F, F, F, F, T, T, T, T, T, T, T, F, F, /* 0x0X */
-            /*                              ESC          */
+        /*                              ESC          */
         F, F, F, F, F, F, F, F, F, F, F, T, F, F, F, F, /* 0x1X */
         T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, /* 0x2X */
         T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, /* 0x3X */
@@ -177,7 +155,7 @@ public class FileEncoding
         T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, /* 0x5X */
         T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, /* 0x6X */
         T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, F, /* 0x7X */
-            /*            NEL                            */
+        /*            NEL                            */
         X, X, X, X, X, T, X, X, X, X, X, X, X, X, X, X, /* 0x8X */
         X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, /* 0x9X */
         I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, /* 0xaX */
@@ -188,26 +166,20 @@ public class FileEncoding
         I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I /* 0xfX */
     };
 
-    private boolean looks_ascii( byte[] buf, int nbytes )
-    {
-        for ( int i = 0; i < nbytes; i++ )
-        {
-            if ( text_chars[ unsignedByte( buf[ i ] ) ] != T )
-            {
+    private boolean looksAscii(byte[] buf, int nbytes) {
+        for (int i = 0; i < nbytes; i++) {
+            if (text_chars[unsignedByte(buf[i])] != T) {
                 return false;
             }
         }
         return true;
     }
 
-    private boolean looks_latin1( byte[] buf, int nbytes )
-    {
-        for ( int i = 0; i < nbytes; i++ )
-        {
-            int t = text_chars[ unsignedByte( buf[ i ] ) ];
+    private boolean looksLatin1(byte[] buf, int nbytes) {
+        for (int i = 0; i < nbytes; i++) {
+            int t = text_chars[unsignedByte(buf[i])];
 
-            if ( t != T && t != I )
-            {
+            if (t != T && t != I) {
                 return false;
             }
         }
@@ -215,13 +187,10 @@ public class FileEncoding
         return true;
     }
 
-    private boolean looks_extended( byte[] buf, int nbytes )
-    {
-        for ( int i = 0; i < nbytes; i++ )
-        {
-            int t = text_chars[ unsignedByte( buf[ i ] ) ];
-            if ( t != T && t != I && t != X )
-            {
+    private boolean looksExtended(byte[] buf, int nbytes) {
+        for (int i = 0; i < nbytes; i++) {
+            int t = text_chars[unsignedByte(buf[i])];
+            if (t != T && t != I && t != X) {
                 return false;
             }
         }
@@ -236,69 +205,54 @@ public class FileEncoding
      *      1: 7-bit text
      *      2: definitely UTF-8 text (valid high-bit set bytes)
      */
-    protected int looks_utf8( byte[] buf, int nbytes )
-    {
+    protected int looksUtf8(byte[] buf, int nbytes) {
         boolean gotone = false;
 
-        for ( int i = 0; i < nbytes; i++ )
-        {
-            if ( ( unsignedByte( buf[ i ] ) & 0x80 ) == 0 )
-            { /* 0xxxxxxx is plain ASCII */
+        for (int i = 0; i < nbytes; i++) {
+            if ((unsignedByte(buf[i]) & 0x80) == 0) {
+                /* 0xxxxxxx is plain ASCII */
                 /*
-                * Even if the whole file is valid UTF-8 sequences,
-                * still reject it if it uses weird control characters.
-                */
+                 * Even if the whole file is valid UTF-8 sequences,
+                 * still reject it if it uses weird control characters.
+                 */
 
-                if ( text_chars[ unsignedByte( buf[ i ] ) ] != T )
-                {
+                if (text_chars[unsignedByte(buf[i])] != T) {
                     return 0;
                 }
-            }
-            else
-            {
-                if ( ( unsignedByte( buf[ i ] ) & 0x40 ) == 0 )
-                { /* 10xxxxxx never 1st byte */
+            } else {
+                if ((unsignedByte(buf[i]) & 0x40) == 0) {
+                    /* 10xxxxxx never 1st byte */
                     return -1;
-                }
-                else
-                {   /* 11xxxxxx begins UTF-8 */
+                } else {
+                    /* 11xxxxxx begins UTF-8 */
                     int following;
 
-                    if ( ( unsignedByte( buf[ i ] ) & 0x20 ) == 0 )
-                    { /* 110xxxxx */
+                    if ((unsignedByte(buf[i]) & 0x20) == 0) {
+                        /* 110xxxxx */
                         following = 1;
-                    }
-                    else if ( ( unsignedByte( buf[ i ] ) & 0x10 ) == 0 )
-                    { /* 1110xxxx */
+                    } else if ((unsignedByte(buf[i]) & 0x10) == 0) {
+                        /* 1110xxxx */
                         following = 2;
-                    }
-                    else if ( ( unsignedByte( buf[ i ] ) & 0x08 ) == 0 )
-                    { /* 11110xxx */
+                    } else if ((unsignedByte(buf[i]) & 0x08) == 0) {
+                        /* 11110xxx */
                         following = 3;
-                    }
-                    else if ( ( unsignedByte( buf[ i ] ) & 0x04 ) == 0 )
-                    { /* 111110xx */
+                    } else if ((unsignedByte(buf[i]) & 0x04) == 0) {
+                        /* 111110xx */
                         following = 4;
-                    }
-                    else if ( ( unsignedByte( buf[ i ] ) & 0x02 ) == 0 )
-                    { /* 1111110x */
+                    } else if ((unsignedByte(buf[i]) & 0x02) == 0) {
+                        /* 1111110x */
                         following = 5;
-                    }
-                    else
-                    {
+                    } else {
                         return -1;
                     }
 
-                    for ( int n = 0; n < following; n++ )
-                    {
+                    for (int n = 0; n < following; n++) {
                         i++;
-                        if ( i >= nbytes )
-                        {
+                        if (i >= nbytes) {
                             return gotone ? 2 : 1;
                         }
 
-                        if ( ( unsignedByte( buf[ i ] ) & 0x80 ) == 0 || ( unsignedByte( buf[ i ] ) & 0x40 ) > 0 )
-                        {
+                        if ((unsignedByte(buf[i]) & 0x80) == 0 || (unsignedByte(buf[i]) & 0x40) > 0) {
                             return -1;
                         }
                     }
@@ -315,21 +269,19 @@ public class FileEncoding
      * BOM, return -1; otherwise return the result of looks_utf8 on the
      * rest of the text.
      */
-    private boolean looks_utf8_with_BOM( byte[] buf, int nbytes )
-    {
-        if ( nbytes > 3 && unsignedByte( buf[ 0 ] ) == 0xef && unsignedByte( buf[ 1 ] ) == 0xbb && unsignedByte( buf[ 2 ] ) == 0xbf )
-        {
-            return looks_utf8( Arrays.copyOfRange( buf, 3, nbytes ), nbytes - 3 ) > 0;
+    private boolean looksUtf8WithBOM(byte[] buf, int nbytes) {
+        if (nbytes > 3
+                && unsignedByte(buf[0]) == 0xef
+                && unsignedByte(buf[1]) == 0xbb
+                && unsignedByte(buf[2]) == 0xbf) {
+            return looksUtf8(Arrays.copyOfRange(buf, 3, nbytes), nbytes - 3) > 0;
         }
         return false;
     }
 
-    private boolean looks_utf7( byte[] buf, int nbytes )
-    {
-        if ( nbytes > 4 && buf[ 0 ] == '+' && buf[ 1 ] == '/' && buf[ 2 ] == 'v' )
-        {
-            switch ( buf[ 3 ] )
-            {
+    private boolean looksUtf7(byte[] buf, int nbytes) {
+        if (nbytes > 4 && buf[0] == '+' && buf[1] == '/' && buf[2] == 'v') {
+            switch (buf[3]) {
                 case '8':
                 case '9':
                 case '+':
@@ -342,53 +294,39 @@ public class FileEncoding
         return false;
     }
 
-    private int looks_ucs16( byte[] buf, int nbytes )
-    {
+    private int looksUcs16(byte[] buf, int nbytes) {
         int bigend;
         int i;
 
-        char[] ubuf = new char[ nbytes ];
+        char[] ubuf = new char[nbytes];
 
-        if ( nbytes < 2 )
-        {
+        if (nbytes < 2) {
             return 0;
         }
 
-        if ( unsignedByte( buf[ 0 ] ) == 0xff && unsignedByte( buf[ 1 ] ) == 0xfe )
-        {
+        if (unsignedByte(buf[0]) == 0xff && unsignedByte(buf[1]) == 0xfe) {
             bigend = 0;
-        }
-        else
-        {
-            if ( unsignedByte( buf[ 0 ] ) == 0xfe && unsignedByte( buf[ 1 ] ) == 0xff )
-            {
+        } else {
+            if (unsignedByte(buf[0]) == 0xfe && unsignedByte(buf[1]) == 0xff) {
                 bigend = 1;
-            }
-            else
-            {
+            } else {
                 return 0;
             }
         }
 
         int ulen = 0;
 
-        for ( i = 2; i + 1 < nbytes; i += 2 )
-        {
-            if ( bigend == 1 )
-            {
-                ubuf[ ( ulen )++ ] = (char) ( unsignedByte( buf[ i + 1 ] ) + 256 * buf[ i ] );
-            }
-            else
-            {
-                ubuf[ ( ulen )++ ] = (char) ( unsignedByte( buf[ i ] ) + 256 * buf[ i + 1 ] );
+        for (i = 2; i + 1 < nbytes; i += 2) {
+            if (bigend == 1) {
+                ubuf[(ulen)++] = (char) (unsignedByte(buf[i + 1]) + 256 * buf[i]);
+            } else {
+                ubuf[(ulen)++] = (char) (unsignedByte(buf[i]) + 256 * buf[i + 1]);
             }
 
-            if ( ubuf[ ulen - 1 ] == 0xfffe )
-            {
+            if (ubuf[ulen - 1] == 0xfffe) {
                 return 0;
             }
-            if ( ubuf[ ulen - 1 ] < 128 && text_chars[ubuf[ ulen - 1 ]] != T )
-            {
+            if (ubuf[ulen - 1] < 128 && text_chars[ubuf[ulen - 1]] != T) {
                 return 0;
             }
         }
@@ -417,7 +355,7 @@ public class FileEncoding
      * This is sufficient to allow us to identify EBCDIC text and to distinguish
      * between old-style and internationalized examples of text.
      */
-    private static final char[] ebcdic_to_ascii = { //
+    private static final char[] EBCDIC_TO_ASCII = { //
         0, 1, 2, 3, 156, 9, 134, 127, 151, 141, 142, 11, 12, 13, 14, 15, //
         16, 17, 18, 19, 157, 133, 8, 135, 24, 25, 146, 143, 28, 29, 30, 31, //
         128, 129, 130, 131, 132, 10, 23, 27, 136, 137, 138, 139, 140, 5, 6, 7, //
@@ -449,7 +387,7 @@ public class FileEncoding
      * If this table is used instead of the above one, some of the special
      * cases for the NEL character can be taken out of the code.
      */
-    private static final char[] ebcdic_1047_to_8859 = { //
+    private static final char[] EBCDIC_1047_TO_8859 = { //
         0x00, 0x01, 0x02, 0x03, 0x9C, 0x09, 0x86, 0x7F, 0x97, 0x8D, 0x8E, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, //
         0x10, 0x11, 0x12, 0x13, 0x9D, 0x0A, 0x08, 0x87, 0x18, 0x19, 0x92, 0x8F, 0x1C, 0x1D, 0x1E, 0x1F, //
         0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x17, 0x1B, 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x05, 0x06, 0x07, //
@@ -471,18 +409,15 @@ public class FileEncoding
     /*
      * Copy buf[0 ... nbytes-1] into out[], translating EBCDIC to ASCII.
      */
-    private byte[] from_ebcdic( byte[] buf, int nbytes )
-    {
-        byte[] out = new byte[ nbytes ];
-        for ( int i = 0; i < nbytes; i++ )
-        {
-            out[ i ] = (byte) ebcdic_to_ascii[ unsignedByte( buf[ i ] ) ];
+    private byte[] fromEbcdic(byte[] buf, int nbytes) {
+        byte[] out = new byte[nbytes];
+        for (int i = 0; i < nbytes; i++) {
+            out[i] = (byte) EBCDIC_TO_ASCII[unsignedByte(buf[i])];
         }
         return out;
     }
 
-    private int unsignedByte( byte value )
-    {
+    private int unsignedByte(byte value) {
         return value & 0xFF;
     }
 }

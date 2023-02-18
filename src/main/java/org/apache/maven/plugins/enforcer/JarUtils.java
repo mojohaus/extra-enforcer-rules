@@ -24,15 +24,12 @@ import org.apache.maven.artifact.Artifact;
 /**
  * Utility methods for working with Java jar files.
  */
-public class JarUtils
-{
+public class JarUtils {
     /**
      * @param artifact the artifact to check (could be a jar file, directory, etc.)
      * @return true if the artifact is a jar file, false if it's something else (like a directory)
      */
-    public static boolean isJarFile( Artifact artifact )
-    {
-        return artifact.getFile().isFile() && "jar".equals( artifact.getType() );
+    public static boolean isJarFile(Artifact artifact) {
+        return artifact.getFile().isFile() && "jar".equals(artifact.getType());
     }
-
 }

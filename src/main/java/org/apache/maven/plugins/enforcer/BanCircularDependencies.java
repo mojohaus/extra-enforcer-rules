@@ -39,133 +39,107 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 /**
  * Bans circular dependencies on the classpath.
- * 
+ *
  * @since 1.0-alpha-4
  */
-public class BanCircularDependencies
-        extends AbstractMojoHausEnforcerRule
-{
-    
+public class BanCircularDependencies extends AbstractMojoHausEnforcerRule {
+
     private transient DependencyGraphBuilder graphBuilder;
-    
+
     private String message;
-    
+
     /**
      * {@inheritDoc}
      */
-    public void execute( EnforcerRuleHelper helper )
-        throws EnforcerRuleException
-    {
+    public void execute(EnforcerRuleHelper helper) throws EnforcerRuleException {
         Log log = helper.getLog();
 
-        try
-        {
-            graphBuilder = helper.getComponent( DependencyGraphBuilder.class );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new EnforcerRuleException( "Unable to lookup DependencyGraphBuilder: ", e );
+        try {
+            graphBuilder = helper.getComponent(DependencyGraphBuilder.class);
+        } catch (ComponentLookupException e) {
+            throw new EnforcerRuleException("Unable to lookup DependencyGraphBuilder: ", e);
         }
 
-        try
-        {
-            MavenProject project = (MavenProject) helper.evaluate( "${project}" );
-            MavenSession session = (MavenSession) helper.evaluate( "${session}" );
+        try {
+            MavenProject project = (MavenProject) helper.evaluate("${project}");
+            MavenSession session = (MavenSession) helper.evaluate("${session}");
 
             ProjectBuildingRequest buildingRequest =
-                    new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
-            buildingRequest.setProject( project );
+                    new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+            buildingRequest.setProject(project);
 
-            Set<Artifact> artifacts = getDependenciesToCheck( buildingRequest );
-            if ( artifacts != null )
-            {
-                for ( Artifact artifact : artifacts )
-                {
-                    log.debug( "groupId: " + artifact.getGroupId() + project.getGroupId() );
-                    if ( artifact.getGroupId().equals( project.getGroupId() ) )
-                    {
-                        log.debug( "artifactId: " + artifact.getArtifactId() + " " + project.getArtifactId() );
-                        if ( artifact.getArtifactId().equals( project.getArtifactId() ) )
-                        {
-                            throw new EnforcerRuleException( getErrorMessage() + "\n  " + artifact.getGroupId()
-                                    + ":" + artifact.getArtifactId() + "\n " );
+            Set<Artifact> artifacts = getDependenciesToCheck(buildingRequest);
+            if (artifacts != null) {
+                for (Artifact artifact : artifacts) {
+                    log.debug("groupId: " + artifact.getGroupId() + project.getGroupId());
+                    if (artifact.getGroupId().equals(project.getGroupId())) {
+                        log.debug("artifactId: " + artifact.getArtifactId() + " " + project.getArtifactId());
+                        if (artifact.getArtifactId().equals(project.getArtifactId())) {
+                            throw new EnforcerRuleException(getErrorMessage() + "\n  " + artifact.getGroupId() + ":"
+                                    + artifact.getArtifactId() + "\n ");
                         }
                     }
                 }
             }
-        }
-        catch ( ExpressionEvaluationException e )
-        {
-            log.error( "Error checking for circular dependencies", e );
+        } catch (ExpressionEvaluationException e) {
+            log.error("Error checking for circular dependencies", e);
             e.printStackTrace();
         }
     }
 
-    protected Set<Artifact> getDependenciesToCheck( ProjectBuildingRequest buildingRequest )
-    {
+    protected Set<Artifact> getDependenciesToCheck(ProjectBuildingRequest buildingRequest) {
         Set<Artifact> dependencies;
-        try
-        {
-            DependencyNode node = graphBuilder.buildDependencyGraph( buildingRequest, null );
-            dependencies = getAllDescendants( node );
-        }
-        catch ( DependencyGraphBuilderException e )
-        {
+        try {
+            DependencyNode node = graphBuilder.buildDependencyGraph(buildingRequest, null);
+            dependencies = getAllDescendants(node);
+        } catch (DependencyGraphBuilderException e) {
             // otherwise we need to change the signature of this protected method
-            throw new RuntimeException( e );
+            throw new RuntimeException(e);
         }
         return dependencies;
     }
 
-    private Set<Artifact> getAllDescendants( DependencyNode node )
-    {
+    private Set<Artifact> getAllDescendants(DependencyNode node) {
         Set<Artifact> children = null;
-        if ( node.getChildren() != null )
-        {
+        if (node.getChildren() != null) {
             children = new HashSet<>();
-            for ( DependencyNode depNode : node.getChildren() )
-            {
-                children.add( depNode.getArtifact() );
-                Set<Artifact> subNodes = getAllDescendants( depNode );
-                if ( subNodes != null )
-                {
-                    children.addAll( subNodes );
+            for (DependencyNode depNode : node.getChildren()) {
+                children.add(depNode.getArtifact());
+                Set<Artifact> subNodes = getAllDescendants(depNode);
+                if (subNodes != null) {
+                    children.addAll(subNodes);
                 }
             }
         }
         return children;
     }
-    
 
-    private String getErrorMessage()
-    {
-        if ( message == null )
+    private String getErrorMessage() {
+        if (message == null) {
             return "Circular Dependency found. Your project's groupId:artifactId combination "
-                + "must not exist in the list of direct or transitive dependencies.";
+                    + "must not exist in the list of direct or transitive dependencies.";
+        }
         return message;
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean isCacheable()
-    {
+    public boolean isCacheable() {
         return false;
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean isResultValid( EnforcerRule enforcerRule )
-    {
+    public boolean isResultValid(EnforcerRule enforcerRule) {
         return false;
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getCacheId()
-    {
+    public String getCacheId() {
         return "Does not matter as not cacheable";
     }
 }

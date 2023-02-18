@@ -30,69 +30,57 @@ import org.apache.maven.artifact.versioning.VersionRange;
 /**
  * Test helper for working with {@link Artifact}s.
  */
-public class ArtifactBuilder
-{
+public class ArtifactBuilder {
     private String groupId = "groupId";
     private String artifactId = "artifactId";
-    private VersionRange versionRange = VersionRange.createFromVersion( "1.0" );
+    private VersionRange versionRange = VersionRange.createFromVersion("1.0");
     private String scope = "scope";
     private String type = "type";
     private String classifier = "classifier";
     private File fileOrDirectory = getAnyFile();
 
-    public static ArtifactBuilder newBuilder()
-    {
+    public static ArtifactBuilder newBuilder() {
         return new ArtifactBuilder();
     }
 
-    public ArtifactBuilder withVersion( String version )
-    {
-        versionRange = VersionRange.createFromVersion( version );
+    public ArtifactBuilder withVersion(String version) {
+        versionRange = VersionRange.createFromVersion(version);
         return this;
     }
 
-    public ArtifactBuilder withType( String type )
-    {
+    public ArtifactBuilder withType(String type) {
         this.type = type;
         return this;
     }
 
-    public ArtifactBuilder withAnyDirectory()
-    {
+    public ArtifactBuilder withAnyDirectory() {
         fileOrDirectory = getAnyDirectory();
         return this;
     }
 
-    public ArtifactBuilder withFileOrDirectory( File directory )
-    {
+    public ArtifactBuilder withFileOrDirectory(File directory) {
         fileOrDirectory = directory;
         return this;
     }
 
-    public Artifact build()
-    {
-        Artifact artifact = new DefaultArtifact( groupId, artifactId, versionRange, scope, type, classifier, null );
-        artifact.setFile( fileOrDirectory );
+    public Artifact build() {
+        Artifact artifact = new DefaultArtifact(groupId, artifactId, versionRange, scope, type, classifier, null);
+        artifact.setFile(fileOrDirectory);
 
         return artifact;
     }
 
-    private static File getAnyFile()
-    {
+    private static File getAnyFile() {
         // the actual file isn't important, just so long as it exists
-        URL url = ArtifactBuilder.class.getResource( "/utf8.txt" );
-        try
-        {
-            return new File( url.toURI() );
-        }
-        catch ( URISyntaxException exception )
-        {
-            throw new RuntimeException( exception );
+        URL url = ArtifactBuilder.class.getResource("/utf8.txt");
+        try {
+            return new File(url.toURI());
+        } catch (URISyntaxException exception) {
+            throw new RuntimeException(exception);
         }
     }
 
-    private File getAnyDirectory()
-    {
+    private File getAnyDirectory() {
         return getAnyFile().getParentFile();
     }
 }

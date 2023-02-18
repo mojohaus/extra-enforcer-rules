@@ -19,24 +19,22 @@ package org.apache.maven.plugins.enforcer;
  * under the License.
  */
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 /**
  * This rule enforces the presence of an URL and optionally matches the URL against a regex
- * 
+ *
  * @since 1.0-beta-4
  */
-public class RequireProjectUrl
-        extends AbstractMojoHausEnforcerRule
-{
+public class RequireProjectUrl extends AbstractMojoHausEnforcerRule {
     /**
      * The regex that the url must match. Default is a non-empty URL
      */
@@ -59,7 +57,6 @@ public class RequireProjectUrl
         } catch (PatternSyntaxException e) {
             throw new EnforcerRuleException("Invalid regex \"" + regex + "\": " + e.getLocalizedMessage(), e);
         }
-
     }
 
     /**
@@ -82,5 +79,4 @@ public class RequireProjectUrl
     public String getCacheId() {
         return "Does not matter as not cacheable";
     }
-
 }

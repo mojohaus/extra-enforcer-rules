@@ -47,11 +47,9 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
  */
-public class RequirePropertyDiverges
-        extends AbstractMojoHausEnforcerRule
-{
+public class RequirePropertyDiverges extends AbstractMojoHausEnforcerRule {
     private String message;
-    
+
     static final String MAVEN_ENFORCER_PLUGIN = "org.apache.maven.plugins:maven-enforcer-plugin";
     /**
      * Specify the required property. Must be given.
@@ -61,7 +59,8 @@ public class RequirePropertyDiverges
      * Match the property value to a given regular expression. Defaults to value of defining project.
      */
     private String regex = null;
-    private final String ruleName = StringUtils.lowercaseFirstLetter( getClass().getSimpleName() );
+
+    private final String ruleName = StringUtils.lowercaseFirstLetter(getClass().getSimpleName());
 
     /**
      * Execute the rule.
@@ -69,38 +68,30 @@ public class RequirePropertyDiverges
      * @param helper the helper
      * @throws EnforcerRuleException the enforcer rule exception
      */
-    public void execute( EnforcerRuleHelper helper ) throws EnforcerRuleException
-    {
+    public void execute(EnforcerRuleHelper helper) throws EnforcerRuleException {
         final Log log = helper.getLog();
 
-        Object propValue = getPropertyValue( helper );
-        checkPropValueNotBlank( propValue );
+        Object propValue = getPropertyValue(helper);
+        checkPropValueNotBlank(propValue);
 
-        final MavenProject project = getMavenProject( helper );
-        log.debug( getRuleName() + ": checking property '" + property + "' for project " + project );
+        final MavenProject project = getMavenProject(helper);
+        log.debug(getRuleName() + ": checking property '" + property + "' for project " + project);
 
-        final MavenProject parent = findDefiningParent( project );
+        final MavenProject parent = findDefiningParent(project);
 
         // fail fast if the defining parent could not be found due to a bug in the rule
-        if ( parent == null )
-        {
-            throw new IllegalStateException( "Failed to find parent POM which defines the current rule" );
+        if (parent == null) {
+            throw new IllegalStateException("Failed to find parent POM which defines the current rule");
         }
 
-        if ( project.equals( parent ) )
-        {
-            log.debug( getRuleName() + ": skip for property '" + property + "' as " + project + " defines rule." );
-        }
-        else
-        {
-            log.debug( "Check configuration defined in " + parent );
-            if ( regex == null )
-            {
-                checkAgainstParentValue( project, parent, helper, propValue );
-            }
-            else
-            {
-                checkAgainstRegex( propValue );
+        if (project.equals(parent)) {
+            log.debug(getRuleName() + ": skip for property '" + property + "' as " + project + " defines rule.");
+        } else {
+            log.debug("Check configuration defined in " + parent);
+            if (regex == null) {
+                checkAgainstParentValue(project, parent, helper, propValue);
+            } else {
+                checkAgainstRegex(propValue);
             }
         }
     }
@@ -114,24 +105,22 @@ public class RequirePropertyDiverges
      * @param propValue
      * @throws EnforcerRuleException
      */
-    void checkAgainstParentValue( final MavenProject project, final MavenProject parent, EnforcerRuleHelper helper,
-            Object propValue ) throws EnforcerRuleException
-    {
-        final StringBuilder parentHierarchy = new StringBuilder( "project." );
+    void checkAgainstParentValue(
+            final MavenProject project, final MavenProject parent, EnforcerRuleHelper helper, Object propValue)
+            throws EnforcerRuleException {
+        final StringBuilder parentHierarchy = new StringBuilder("project.");
         MavenProject needle = project;
-        while ( !needle.equals( parent ) )
-        {
-            parentHierarchy.append( "parent." );
+        while (!needle.equals(parent)) {
+            parentHierarchy.append("parent.");
             needle = needle.getParent();
         }
-        final String propertyNameInParent = property.replace( "project.", parentHierarchy.toString() );
-        Object parentValue = getPropertyValue( helper, propertyNameInParent );
-        if ( propValue.equals( parentValue ) )
-        {
-            final String errorMessage = createResultingErrorMessage( String.format(
+        final String propertyNameInParent = property.replace("project.", parentHierarchy.toString());
+        Object parentValue = getPropertyValue(helper, propertyNameInParent);
+        if (propValue.equals(parentValue)) {
+            final String errorMessage = createResultingErrorMessage(String.format(
                     "Property '%s' evaluates to '%s'. This does match '%s' from parent %s",
-                    property, propValue, parentValue, parent ) );
-            throw new EnforcerRuleException( errorMessage );
+                    property, propValue, parentValue, parent));
+            throw new EnforcerRuleException(errorMessage);
         }
     }
 
@@ -142,16 +131,13 @@ public class RequirePropertyDiverges
      * @param propValue
      * @throws EnforcerRuleException
      */
-    void checkAgainstRegex( Object propValue ) throws EnforcerRuleException
-    {
+    void checkAgainstRegex(Object propValue) throws EnforcerRuleException {
         // Check that the property does not match the regex.
-        if ( propValue.toString().matches( regex ) )
-        {
-            final String errorMessage = createResultingErrorMessage(
-                    String.format(
+        if (propValue.toString().matches(regex)) {
+            final String errorMessage = createResultingErrorMessage(String.format(
                     "Property '%s' evaluates to '%s'. This does match the regular expression '%s'",
-                    property, propValue, regex ) );
-            throw new EnforcerRuleException( errorMessage );
+                    property, propValue, regex));
+            throw new EnforcerRuleException(errorMessage);
         }
     }
 
@@ -161,19 +147,15 @@ public class RequirePropertyDiverges
      * @param project to inspect
      * @return the defining ancestor project.
      */
-    final MavenProject findDefiningParent( final MavenProject project )
-    {
+    final MavenProject findDefiningParent(final MavenProject project) {
         final Xpp3Dom invokingRule = createInvokingRuleDom();
         MavenProject parent = project;
-        while ( parent != null )
-        {
+        while (parent != null) {
             final Model model = parent.getOriginalModel();
             final Build build = model.getBuild();
-            if ( build != null )
-            {
-                final List<Xpp3Dom> rules = getRuleConfigurations( build );
-                if ( isDefiningProject( rules, invokingRule ) )
-                {
+            if (build != null) {
+                final List<Xpp3Dom> rules = getRuleConfigurations(build);
+                if (isDefiningProject(rules, invokingRule)) {
                     break;
                 }
             }
@@ -187,9 +169,8 @@ public class RequirePropertyDiverges
      *
      * @return dom of the invoker.
      */
-    Xpp3Dom createInvokingRuleDom()
-    {
-        return new CreateInvokingRuleDom( this ).getRuleDom();
+    Xpp3Dom createInvokingRuleDom() {
+        return new CreateInvokingRuleDom(this).getRuleDom();
     }
 
     /**
@@ -199,12 +180,9 @@ public class RequirePropertyDiverges
      * @param invokingRule
      * @return true when the rules contain the invoking rule.
      */
-    final boolean isDefiningProject( final List<Xpp3Dom> rulesFromModel, final Xpp3Dom invokingRule )
-    {
-        for ( final Xpp3Dom rule : rulesFromModel )
-        {
-            if ( rule.equals( invokingRule ) )
-            {
+    final boolean isDefiningProject(final List<Xpp3Dom> rulesFromModel, final Xpp3Dom invokingRule) {
+        for (final Xpp3Dom rule : rulesFromModel) {
+            if (rule.equals(invokingRule)) {
                 return true;
             }
         }
@@ -216,8 +194,7 @@ public class RequirePropertyDiverges
      *
      * @return configuration name.
      */
-    final String getRuleName()
-    {
+    final String getRuleName() {
         return ruleName;
     }
 
@@ -228,16 +205,14 @@ public class RequirePropertyDiverges
      * @param build the build to inspect.
      * @return configuration of the rules, may be an empty list.
      */
-    final List<Xpp3Dom> getRuleConfigurations( final Build build )
-    {
+    final List<Xpp3Dom> getRuleConfigurations(final Build build) {
         final Map<String, Plugin> plugins = build.getPluginsAsMap();
-        final List<Xpp3Dom> ruleConfigurationsForPlugins = getRuleConfigurations( plugins );
+        final List<Xpp3Dom> ruleConfigurationsForPlugins = getRuleConfigurations(plugins);
         final PluginManagement pluginManagement = build.getPluginManagement();
-        if ( pluginManagement != null )
-        {
+        if (pluginManagement != null) {
             final Map<String, Plugin> pluginsFromManagementAsMap = pluginManagement.getPluginsAsMap();
-            List<Xpp3Dom> ruleConfigurationsFromManagement = getRuleConfigurations( pluginsFromManagementAsMap );
-            ruleConfigurationsForPlugins.addAll( ruleConfigurationsFromManagement );
+            List<Xpp3Dom> ruleConfigurationsFromManagement = getRuleConfigurations(pluginsFromManagementAsMap);
+            ruleConfigurationsForPlugins.addAll(ruleConfigurationsFromManagement);
         }
         return ruleConfigurationsForPlugins;
     }
@@ -248,28 +223,23 @@ public class RequirePropertyDiverges
      * @param plugins
      * @return list of requirePropertyDiverges configurations.
      */
-    List<Xpp3Dom> getRuleConfigurations( final Map<String, Plugin> plugins )
-    {
-        if ( plugins.containsKey( MAVEN_ENFORCER_PLUGIN ) )
-        {
+    List<Xpp3Dom> getRuleConfigurations(final Map<String, Plugin> plugins) {
+        if (plugins.containsKey(MAVEN_ENFORCER_PLUGIN)) {
             final List<Xpp3Dom> ruleConfigurations = new ArrayList<>();
 
-            final Plugin enforcer = plugins.get( MAVEN_ENFORCER_PLUGIN );
-            final Xpp3Dom configuration = ( Xpp3Dom ) enforcer.getConfiguration();
+            final Plugin enforcer = plugins.get(MAVEN_ENFORCER_PLUGIN);
+            final Xpp3Dom configuration = (Xpp3Dom) enforcer.getConfiguration();
 
             // add rules from plugin configuration
-            addRules( configuration, ruleConfigurations );
+            addRules(configuration, ruleConfigurations);
 
             // add rules from all plugin execution configurations
-            for ( PluginExecution execution : enforcer.getExecutions() )
-            {
-                addRules( ( Xpp3Dom ) execution.getConfiguration(), ruleConfigurations );
+            for (PluginExecution execution : enforcer.getExecutions()) {
+                addRules((Xpp3Dom) execution.getConfiguration(), ruleConfigurations);
             }
 
             return ruleConfigurations;
-        }
-        else
-        {
+        } else {
             return new ArrayList<>();
         }
     }
@@ -282,17 +252,14 @@ public class RequirePropertyDiverges
      * @param ruleConfigurations
      *            List to which the rules will be added.
      */
-    private void addRules( final Xpp3Dom configuration, final List<Xpp3Dom> ruleConfigurations )
-    {
+    private void addRules(final Xpp3Dom configuration, final List<Xpp3Dom> ruleConfigurations) {
         // may be null when rules are defined in pluginManagement during invocation
         // for plugin section and vice versa.
-        if ( configuration != null )
-        {
-            final Xpp3Dom rules = configuration.getChild( "rules" );
-            if ( rules != null )
-            {
-                final List<Xpp3Dom> originalListFromPom = Arrays.asList( rules.getChildren( getRuleName() ) );
-                ruleConfigurations.addAll( createRuleListWithNameSortedChildren( originalListFromPom ) );
+        if (configuration != null) {
+            final Xpp3Dom rules = configuration.getChild("rules");
+            if (rules != null) {
+                final List<Xpp3Dom> originalListFromPom = Arrays.asList(rules.getChildren(getRuleName()));
+                ruleConfigurations.addAll(createRuleListWithNameSortedChildren(originalListFromPom));
             }
         }
     }
@@ -304,23 +271,19 @@ public class RequirePropertyDiverges
      * @param originalListFromPom order not specified
      * @return a list where children's member are alphabetically sorted.
      */
-    private List<Xpp3Dom> createRuleListWithNameSortedChildren( final List<Xpp3Dom> originalListFromPom )
-    {
+    private List<Xpp3Dom> createRuleListWithNameSortedChildren(final List<Xpp3Dom> originalListFromPom) {
         final List<Xpp3Dom> listWithSortedEntries = new ArrayList<>(originalListFromPom.size());
-        for ( Xpp3Dom unsortedXpp3Dom : originalListFromPom )
-        {
-            final Xpp3Dom sortedXpp3Dom = new Xpp3Dom( getRuleName() );
+        for (Xpp3Dom unsortedXpp3Dom : originalListFromPom) {
+            final Xpp3Dom sortedXpp3Dom = new Xpp3Dom(getRuleName());
             final SortedMap<String, Xpp3Dom> childrenMap = new TreeMap<>();
             final Xpp3Dom[] children = unsortedXpp3Dom.getChildren();
-            for ( Xpp3Dom child : children )
-            {
-                childrenMap.put( child.getName(), child );
+            for (Xpp3Dom child : children) {
+                childrenMap.put(child.getName(), child);
             }
-            for ( Xpp3Dom entry : childrenMap.values() )
-            {
-                sortedXpp3Dom.addChild( entry );
+            for (Xpp3Dom entry : childrenMap.values()) {
+                sortedXpp3Dom.addChild(entry);
             }
-            listWithSortedEntries.add( sortedXpp3Dom );
+            listWithSortedEntries.add(sortedXpp3Dom);
         }
         return listWithSortedEntries;
     }
@@ -333,9 +296,8 @@ public class RequirePropertyDiverges
      *
      * @throws EnforcerRuleException
      */
-    Object getPropertyValue( EnforcerRuleHelper helper ) throws EnforcerRuleException
-    {
-        return getPropertyValue( helper, property );
+    Object getPropertyValue(EnforcerRuleHelper helper) throws EnforcerRuleException {
+        return getPropertyValue(helper, property);
     }
 
     /**
@@ -346,15 +308,11 @@ public class RequirePropertyDiverges
      * @return the value of the property.
      * @throws EnforcerRuleException
      */
-    Object getPropertyValue( EnforcerRuleHelper helper, final String propertyName ) throws EnforcerRuleException
-    {
-        try
-        {
-            return helper.evaluate( "${" + propertyName + "}" );
-        }
-        catch ( ExpressionEvaluationException eee )
-        {
-            throw new EnforcerRuleException( "Unable to evaluate property: " + propertyName, eee );
+    Object getPropertyValue(EnforcerRuleHelper helper, final String propertyName) throws EnforcerRuleException {
+        try {
+            return helper.evaluate("${" + propertyName + "}");
+        } catch (ExpressionEvaluationException eee) {
+            throw new EnforcerRuleException("Unable to evaluate property: " + propertyName, eee);
         }
     }
 
@@ -366,15 +324,11 @@ public class RequirePropertyDiverges
      *
      * @throws EnforcerRuleException
      */
-    MavenProject getMavenProject( EnforcerRuleHelper helper ) throws EnforcerRuleException
-    {
-        try
-        {
-            return ( MavenProject ) helper.evaluate( "${project}" );
-        }
-        catch ( ExpressionEvaluationException eee )
-        {
-            throw new EnforcerRuleException( "Unable to get project.", eee );
+    MavenProject getMavenProject(EnforcerRuleHelper helper) throws EnforcerRuleException {
+        try {
+            return (MavenProject) helper.evaluate("${project}");
+        } catch (ExpressionEvaluationException eee) {
+            throw new EnforcerRuleException("Unable to get project.", eee);
         }
     }
 
@@ -384,13 +338,11 @@ public class RequirePropertyDiverges
      * @param propValue value of the property from the project.
      * @throws EnforcerRuleException
      */
-    void checkPropValueNotBlank( Object propValue ) throws EnforcerRuleException
-    {
+    void checkPropValueNotBlank(Object propValue) throws EnforcerRuleException {
 
-        if ( propValue == null || StringUtils.isBlank( propValue.toString() ) )
-        {
-            throw new EnforcerRuleException( String.format(
-                    "Property '%s' is required for this build and not defined in hierarchy at all.", property ) );
+        if (propValue == null || StringUtils.isBlank(propValue.toString())) {
+            throw new EnforcerRuleException(String.format(
+                    "Property '%s' is required for this build and not defined in hierarchy at all.", property));
         }
     }
 
@@ -401,14 +353,10 @@ public class RequirePropertyDiverges
      * @param errorMessage
      * @return
      */
-    String createResultingErrorMessage( String errorMessage )
-    {
-        if ( StringUtils.isNotEmpty( message ) )
-        {
+    String createResultingErrorMessage(String errorMessage) {
+        if (StringUtils.isNotEmpty(message)) {
             return "Property '" + property + "' must be overridden:\n" + message;
-        }
-        else
-        {
+        } else {
             return errorMessage;
         }
     }
@@ -417,43 +365,38 @@ public class RequirePropertyDiverges
     /**
      * @param property the property to set
      */
-    void setProperty( String property )
-    {
+    void setProperty(String property) {
         this.property = property;
     }
 
     /**
      * @param regex the regex to set
      */
-    void setRegex( String regex )
-    {
+    void setRegex(String regex) {
         this.regex = regex;
     }
-    
+
     /**
      * @param message the message to set
      */
-    void setMessage( String message )
-    {
+    void setMessage(String message) {
         this.message = message;
     }
 
     /**
      * Creates the DOM of the invoking rule, but returns the children alphabetically sorted.
      */
-    private static class CreateInvokingRuleDom
-    {
+    private static class CreateInvokingRuleDom {
 
         private final Xpp3Dom ruleDom;
         private final SortedMap<String, Xpp3Dom> map = new TreeMap<>();
 
         /** Real work is done in the constructor */
-        public CreateInvokingRuleDom( RequirePropertyDiverges rule )
-        {
-            ruleDom = new Xpp3Dom( rule.getRuleName() );
-            addToMapWhenNotNull( rule.property, "property" );
-            addToMapWhenNotNull( rule.message, "message" );
-            addToMapWhenNotNull( rule.regex, "regex" );
+        CreateInvokingRuleDom(RequirePropertyDiverges rule) {
+            ruleDom = new Xpp3Dom(rule.getRuleName());
+            addToMapWhenNotNull(rule.property, "property");
+            addToMapWhenNotNull(rule.message, "message");
+            addToMapWhenNotNull(rule.regex, "regex");
             addChildrenToRuleDom();
         }
 
@@ -466,48 +409,41 @@ public class RequirePropertyDiverges
             return ruleDom;
         }
 
-        private void addToMapWhenNotNull( String member, final String memberName )
-        {
-            if ( member != null )
-            {
-                final Xpp3Dom memberDom = new Xpp3Dom( memberName );
-                memberDom.setValue( member );
-                map.put( memberName, memberDom );
+        private void addToMapWhenNotNull(String member, final String memberName) {
+            if (member != null) {
+                final Xpp3Dom memberDom = new Xpp3Dom(memberName);
+                memberDom.setValue(member);
+                map.put(memberName, memberDom);
             }
         }
-        
-        private void addChildrenToRuleDom()
-        {
-            for ( Xpp3Dom entry : map.values() )
-            {
-                ruleDom.addChild( entry );
+
+        private void addChildrenToRuleDom() {
+            for (Xpp3Dom entry : map.values()) {
+                ruleDom.addChild(entry);
             }
         }
     }
-    
-    //*********************
-    
+
+    // *********************
+
     /**
      * {@inheritDoc}
      */
-    public String getCacheId()
-    {
+    public String getCacheId() {
         return "0";
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean isCacheable()
-    {
+    public boolean isCacheable() {
         return false;
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean isResultValid( EnforcerRule cachedRule )
-    {
+    public boolean isResultValid(EnforcerRule cachedRule) {
         return false;
     }
 }

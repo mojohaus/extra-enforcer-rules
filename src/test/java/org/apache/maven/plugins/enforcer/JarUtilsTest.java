@@ -7,16 +7,14 @@ import static org.apache.maven.plugins.enforcer.ArtifactBuilder.newBuilder;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class JarUtilsTest
-{
+public class JarUtilsTest {
     /**
      * "Sunny day" test: the method should return true for a jar artifact.
      */
     @Test
-    public void isJarFileShouldReturnTrueForJarFile()
-    {
-        Artifact artifact = newBuilder().withType( "jar" ).build();
-        assertTrue( JarUtils.isJarFile( artifact ) );
+    public void isJarFileShouldReturnTrueForJarFile() {
+        Artifact artifact = newBuilder().withType("jar").build();
+        assertTrue(JarUtils.isJarFile(artifact));
     }
 
     /**
@@ -24,13 +22,9 @@ public class JarUtilsTest
      * a folder with a bunch of packages/class files in it).
      */
     @Test
-    public void isJarFileShouldReturnFalseForDirectory()
-    {
-        Artifact artifact = newBuilder()
-            .withType( "jar" )
-            .withAnyDirectory()
-            .build();
-        assertFalse( JarUtils.isJarFile( artifact ) );
+    public void isJarFileShouldReturnFalseForDirectory() {
+        Artifact artifact = newBuilder().withType("jar").withAnyDirectory().build();
+        assertFalse(JarUtils.isJarFile(artifact));
     }
 
     /**
@@ -38,9 +32,8 @@ public class JarUtilsTest
      * not "jar". For example: a war or a zip file.
      */
     @Test
-    public void isJarFileShouldReturnFalseWhenArtifactTypeIsNotJar()
-    {
-        Artifact artifact = newBuilder().withType( "war" ).build();
-        assertFalse( JarUtils.isJarFile( artifact ) );
+    public void isJarFileShouldReturnFalseWhenArtifactTypeIsNotJar() {
+        Artifact artifact = newBuilder().withType("war").build();
+        assertFalse(JarUtils.isJarFile(artifact));
     }
 }

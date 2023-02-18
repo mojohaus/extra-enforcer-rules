@@ -29,146 +29,130 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Developer;
 import org.apache.maven.project.MavenProject;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *
  * @author Mirko Friedenhagen
  */
-public class RequireRolesTest
-{
+public class RequireRolesTest {
 
-    final EnforcerRuleHelper helper = Mockito.mock( EnforcerRuleHelper.class );
+    final EnforcerRuleHelper helper = Mockito.mock(EnforcerRuleHelper.class);
 
     @Test
-    public void shouldSucceedBecauseArchitectAsDeveloperAndBusinessEngineerAsContributorArePresent() throws Exception
-    {
+    public void shouldSucceedBecauseArchitectAsDeveloperAndBusinessEngineerAsContributorArePresent() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        newRequireDeveloperRoles( "architect" /*required role*/, null /* valid roles not needed */).execute( helper );
-        newRequireContributorRoles( "business engineer" /*required role*/, "*" /* valid roles */).execute( helper );
+        newRequireDeveloperRoles("architect" /*required role*/, null /* valid roles not needed */)
+                .execute(helper);
+        newRequireContributorRoles("business engineer" /*required role*/, "*" /* valid roles */)
+                .execute(helper);
     }
 
-    @Test( expected = EnforcerRuleException.class )
-    public void shouldFailBecauseContributorWithRoleQualityManagerIsMissing() throws Exception
-    {
+    @Test(expected = EnforcerRuleException.class)
+    public void shouldFailBecauseContributorWithRoleQualityManagerIsMissing() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        newRequireContributorRoles( "business engineer, quality manager", null ).execute( helper );
+        newRequireContributorRoles("business engineer, quality manager", null).execute(helper);
     }
 
-    @Test( expected = EnforcerRuleException.class )
-    public void shouldFailBecauseDeveloperWithRoleCodeMonkeyIsMissing() throws Exception
-    {
+    @Test(expected = EnforcerRuleException.class)
+    public void shouldFailBecauseDeveloperWithRoleCodeMonkeyIsMissing() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        newRequireDeveloperRoles( "codemonkey" /* required but not in project */, 
-                                  null ).execute( helper );
+        newRequireDeveloperRoles("codemonkey" /* required but not in project */, null)
+                .execute(helper);
     }
 
-    @Test( expected = EnforcerRuleException.class )
-    public void shouldFailBecauseContributorRoleBusinessEngineerIsInvalid() throws Exception
-    {
+    @Test(expected = EnforcerRuleException.class)
+    public void shouldFailBecauseContributorRoleBusinessEngineerIsInvalid() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        newRequireContributorRoles( null /* no required roles needed */, 
-                                    "hacker" /* only valid role */).execute( helper );
+        newRequireContributorRoles(null /* no required roles needed */, "hacker" /* only valid role */)
+                .execute(helper);
     }
 
-    @Test( expected = EnforcerRuleException.class )
-    public void shouldFailBecauseNoContributorRolesAtAllAreValid() throws Exception
-    {
+    @Test(expected = EnforcerRuleException.class)
+    public void shouldFailBecauseNoContributorRolesAtAllAreValid() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        newRequireContributorRoles( null /* no required roles needed */, 
-                                    "" /*but no role is valid at all */).execute( helper );
+        newRequireContributorRoles(null /* no required roles needed */, "" /*but no role is valid at all */)
+                .execute(helper);
     }
 
     @Test
-    public void shouldSucceedAsNoRolesAreRequiredAndAllAreAccepted() throws Exception
-    {
+    public void shouldSucceedAsNoRolesAreRequiredAndAllAreAccepted() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        newRequireContributorRoles( null /* no required roles */, 
-                                    "*" /* any role is valid */).execute( helper );
-        newRequireContributorRoles( null /* no required roles */, 
-                                    null /* any role is valid */).execute( helper );
+        newRequireContributorRoles(null /* no required roles */, "*" /* any role is valid */)
+                .execute(helper);
+        newRequireContributorRoles(null /* no required roles */, null /* any role is valid */)
+                .execute(helper);
     }
 
     /**
      * Test of getRolesFromString method, of class AbstractRequireRoles.
      */
     @Test
-    public void testGetRolesFromString()
-    {
+    public void testGetRolesFromString() {
         HashSet<String> expResult = new HashSet<>(Arrays.asList("architect", "codemonkey", "business engineer"));
         final RequireContributorRoles sut = new RequireContributorRoles();
-        Set<String> result = sut.getRolesFromString( " architect,  business engineer   , codemonkey " );
-        assertEquals( expResult, result );
+        Set<String> result = sut.getRolesFromString(" architect,  business engineer   , codemonkey ");
+        assertEquals(expResult, result);
     }
 
     /**
      * Test of getRolesFromMaven method, of class AbstractRequireRoles.
      */
     @Test
-    public void testGetRolesFromMaven()
-    {
-        HashSet<String> expResult = new HashSet<>(Arrays.asList(
-                "quality manager", "product owner", "business engineer"));
+    public void testGetRolesFromMaven() {
+        HashSet<String> expResult =
+                new HashSet<>(Arrays.asList("quality manager", "product owner", "business engineer"));
         final Contributor singleHero = new Contributor();
-        singleHero.addRole( "quality manager" );
-        singleHero.addRole( "business engineer" );
-        singleHero.addRole( "product owner" );
+        singleHero.addRole("quality manager");
+        singleHero.addRole("business engineer");
+        singleHero.addRole("product owner");
         List<Contributor> listFromMaven = Collections.singletonList(singleHero);
         final HashSet<String> result = new HashSet<>();
-        for ( final Contributor contributor : listFromMaven )
-        {
-            @SuppressWarnings( "unchecked" )
+        for (final Contributor contributor : listFromMaven) {
+            @SuppressWarnings("unchecked")
             List<String> roles = contributor.getRoles();
             result.addAll(roles);
         }
-        assertEquals( expResult, result );
+        assertEquals(expResult, result);
     }
 
-    private void addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper() throws Exception
-    {
+    private void addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper() throws Exception {
         final MavenProject mavenProject = new MavenProject();
         final Developer developer = new Developer();
-        developer.addRole( "architect" );
-        mavenProject.addDeveloper( developer );
+        developer.addRole("architect");
+        mavenProject.addDeveloper(developer);
         final Contributor contributor = new Contributor();
-        contributor.addRole( "business engineer" );
-        mavenProject.addContributor( contributor );
-        Mockito.when( helper.evaluate( "${project}" ) ).thenReturn( mavenProject );
+        contributor.addRole("business engineer");
+        mavenProject.addContributor(contributor);
+        Mockito.when(helper.evaluate("${project}")).thenReturn(mavenProject);
     }
 
-    
     private RequireDeveloperRoles newRequireDeveloperRoles(
-            final String commaSeparatedRequiredRoles,
-            final String commaSeparatedValidRoles )
-    {
+            final String commaSeparatedRequiredRoles, final String commaSeparatedValidRoles) {
         final RequireDeveloperRoles sut = new RequireDeveloperRoles();
-        if ( commaSeparatedRequiredRoles != null )
-        {
-            sut.setRequiredRoles( commaSeparatedRequiredRoles );
+        if (commaSeparatedRequiredRoles != null) {
+            sut.setRequiredRoles(commaSeparatedRequiredRoles);
         }
 
-        if ( commaSeparatedValidRoles != null )
-        {
-            sut.setValidRoles( commaSeparatedValidRoles );
+        if (commaSeparatedValidRoles != null) {
+            sut.setValidRoles(commaSeparatedValidRoles);
         }
         return sut;
     }
-    
+
     private RequireContributorRoles newRequireContributorRoles(
-            final String commaSeparatedRequiredRoles,
-            final String commaSeparatedValidRoles )
-    {
+            final String commaSeparatedRequiredRoles, final String commaSeparatedValidRoles) {
         final RequireContributorRoles sut = new RequireContributorRoles();
-        if ( commaSeparatedRequiredRoles != null )
-        {
-            sut.setRequiredRoles( commaSeparatedRequiredRoles );
+        if (commaSeparatedRequiredRoles != null) {
+            sut.setRequiredRoles(commaSeparatedRequiredRoles);
         }
 
-        if ( commaSeparatedValidRoles != null )
-        {
-            sut.setValidRoles( commaSeparatedValidRoles );
+        if (commaSeparatedValidRoles != null) {
+            sut.setValidRoles(commaSeparatedValidRoles);
         }
         return sut;
-    }}
+    }
+}

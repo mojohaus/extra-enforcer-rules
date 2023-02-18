@@ -17,19 +17,18 @@
 package org.apache.maven.plugins.enforcer;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 public class EnforceBytecodeVersionTest {
 
     @Test
-    public void renderVersion()
-    {
-        assertEquals( "JDK 1.5", EnforceBytecodeVersion.renderVersion( 49, 0 ) );
-        assertEquals( "JDK 1.7", EnforceBytecodeVersion.renderVersion( 51, 0 ) );
-        assertEquals( "JDK 11", EnforceBytecodeVersion.renderVersion( 55, 0 ) );
-        assertEquals( "JDK 12", EnforceBytecodeVersion.renderVersion( 56, 0 ) );
-        assertEquals( "51.3", EnforceBytecodeVersion.renderVersion( 51, 3 ) );
-        assertEquals( "44.0", EnforceBytecodeVersion.renderVersion( 44, 0 ) );
+    public void renderVersion() {
+        assertEquals("JDK 1.5", EnforceBytecodeVersion.renderVersion(49, 0));
+        assertEquals("JDK 1.7", EnforceBytecodeVersion.renderVersion(51, 0));
+        assertEquals("JDK 11", EnforceBytecodeVersion.renderVersion(55, 0));
+        assertEquals("JDK 12", EnforceBytecodeVersion.renderVersion(56, 0));
+        assertEquals("51.3", EnforceBytecodeVersion.renderVersion(51, 3));
+        assertEquals("44.0", EnforceBytecodeVersion.renderVersion(44, 0));
     }
-
 }

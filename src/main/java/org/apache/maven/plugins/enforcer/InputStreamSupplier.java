@@ -28,7 +28,6 @@ import java.io.InputStream;
  * @author Slawomir Jaranowski
  */
 @FunctionalInterface
-interface InputStreamSupplier
-{
+interface InputStreamSupplier {
     InputStream get() throws IOException;
 }

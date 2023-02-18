@@ -22,19 +22,15 @@ package org.apache.maven.plugins.enforcer;
 import org.apache.maven.enforcer.rule.api.EnforcerLevel;
 import org.apache.maven.enforcer.rule.api.EnforcerRule2;
 
-abstract class AbstractMojoHausEnforcerRule
-        implements EnforcerRule2
-{
+abstract class AbstractMojoHausEnforcerRule implements EnforcerRule2 {
     private EnforcerLevel level = EnforcerLevel.ERROR;
 
     @Override
-    public EnforcerLevel getLevel()
-    {
+    public EnforcerLevel getLevel() {
         return level;
     }
 
-    public void setLevel( EnforcerLevel level )
-    {
+    public void setLevel(EnforcerLevel level) {
         this.level = level;
     }
 }
