@@ -24,11 +24,9 @@ import org.freebsd.file.FileEncoding;
  * @see <a href="https://github.com/mikedon/encoding-enforcer">mikedon/encoding-enforcer</a>
  * @see <a href="https://github.com/ericbn/encoding-enforcer">ericbn/encoding-enforcer</a>
  */
-public class RequireEncoding
-        extends AbstractMojoHausEnforcerRule
-{
+public class RequireEncoding extends AbstractMojoHausEnforcerRule {
     private static final String ISO_8859_15 = "ISO-8859-15";
-    
+
     /**
      * Validate files match this encoding. If not specified then default to ${project.build.sourceEncoding}.
      */
@@ -64,95 +62,77 @@ public class RequireEncoding
      */
     private boolean acceptIso8859Subset = false;
 
-    public void execute( EnforcerRuleHelper helper )
-        throws EnforcerRuleException
-    {
-        try
-        {
-            if ( StringUtils.isBlank( encoding ) )
-            {
-                encoding = (String) helper.evaluate( "${project.build.sourceEncoding}" );
+    public void execute(EnforcerRuleHelper helper) throws EnforcerRuleException {
+        try {
+            if (StringUtils.isBlank(encoding)) {
+                encoding = (String) helper.evaluate("${project.build.sourceEncoding}");
             }
             Log log = helper.getLog();
 
-            Set< String > acceptedEncodings = new HashSet<>(Collections.singletonList(encoding));
-            if ( encoding.equals( StandardCharsets.US_ASCII.name() ) )
-            {
-                log.warn( "Encoding US-ASCII is hard to detect. Use UTF-8 or ISO-8859-1" );
+            Set<String> acceptedEncodings = new HashSet<>(Collections.singletonList(encoding));
+            if (encoding.equals(StandardCharsets.US_ASCII.name())) {
+                log.warn("Encoding US-ASCII is hard to detect. Use UTF-8 or ISO-8859-1");
             }
 
-            if ( acceptAsciiSubset && ( encoding.equals( StandardCharsets.ISO_8859_1.name() ) || encoding.equals(ISO_8859_15) || encoding.equals( StandardCharsets.UTF_8.name() ) ) )
-            {
-                acceptedEncodings.add( StandardCharsets.US_ASCII.name() );
+            if (acceptAsciiSubset
+                    && (encoding.equals(StandardCharsets.ISO_8859_1.name())
+                            || encoding.equals(ISO_8859_15)
+                            || encoding.equals(StandardCharsets.UTF_8.name()))) {
+                acceptedEncodings.add(StandardCharsets.US_ASCII.name());
             }
-            if ( acceptIso8859Subset && encoding.equals(ISO_8859_15) )
-            {
-                acceptedEncodings.add( "ISO-8859-1" );
+            if (acceptIso8859Subset && encoding.equals(ISO_8859_15)) {
+                acceptedEncodings.add("ISO-8859-1");
             }
 
-            String basedir = (String) helper.evaluate( "${basedir}" );
+            String basedir = (String) helper.evaluate("${basedir}");
             DirectoryScanner ds = new DirectoryScanner();
-            ds.setBasedir( basedir );
-            if ( StringUtils.isNotBlank( includes ) )
-            {
-                ds.setIncludes( includes.split( "[,|]" ) );
+            ds.setBasedir(basedir);
+            if (StringUtils.isNotBlank(includes)) {
+                ds.setIncludes(includes.split("[,|]"));
             }
-            if ( StringUtils.isNotBlank( excludes ) )
-            {
-                ds.setExcludes( excludes.split( "[,|]" ) );
+            if (StringUtils.isNotBlank(excludes)) {
+                ds.setExcludes(excludes.split("[,|]"));
             }
-            if ( useDefaultExcludes )
-            {
+            if (useDefaultExcludes) {
                 ds.addDefaultExcludes();
             }
             ds.scan();
             StringBuilder filesInMsg = new StringBuilder();
-            for ( String file : ds.getIncludedFiles() )
-            {
-                String fileEncoding = getEncoding( encoding, new File( basedir, file ), log );
-                if ( log.isDebugEnabled() )
-                {
-                    log.debug( file + "==>" + fileEncoding );
+            for (String file : ds.getIncludedFiles()) {
+                String fileEncoding = getEncoding(encoding, new File(basedir, file), log);
+                if (log.isDebugEnabled()) {
+                    log.debug(file + "==>" + fileEncoding);
                 }
-                if ( fileEncoding != null && !acceptedEncodings.contains( fileEncoding ) )
-                {
-                    filesInMsg.append( file );
-                    filesInMsg.append( "==>" );
-                    filesInMsg.append( fileEncoding );
-                    filesInMsg.append( "\n" );
-                    if ( failFast )
-                    {
-                        throw new EnforcerRuleException( filesInMsg.toString() );
+                if (fileEncoding != null && !acceptedEncodings.contains(fileEncoding)) {
+                    filesInMsg.append(file);
+                    filesInMsg.append("==>");
+                    filesInMsg.append(fileEncoding);
+                    filesInMsg.append("\n");
+                    if (failFast) {
+                        throw new EnforcerRuleException(filesInMsg.toString());
                     }
                 }
             }
-            if ( filesInMsg.length() > 0 )
-            {
-                throw new EnforcerRuleException( "Files not encoded in " + encoding + ":\n" + filesInMsg );
+            if (filesInMsg.length() > 0) {
+                throw new EnforcerRuleException("Files not encoded in " + encoding + ":\n" + filesInMsg);
             }
-        }
-        catch ( IOException ex )
-        {
-            throw new EnforcerRuleException( "Reading Files", ex );
-        }
-        catch ( ExpressionEvaluationException e )
-        {
-            throw new EnforcerRuleException( "Unable to lookup an expression " + e.getLocalizedMessage(), e );
+        } catch (IOException ex) {
+            throw new EnforcerRuleException("Reading Files", ex);
+        } catch (ExpressionEvaluationException e) {
+            throw new EnforcerRuleException("Unable to lookup an expression " + e.getLocalizedMessage(), e);
         }
     }
 
-    protected String getEncoding( String requiredEncoding, File file, Log log )
-        throws IOException
-    {
+    protected String getEncoding(String requiredEncoding, File file, Log log) throws IOException {
         FileEncoding fileEncoding = new FileEncoding();
-        if ( !fileEncoding.guessFileEncoding( Files.readAllBytes( file.toPath() ) ) )
-        {
+        if (!fileEncoding.guessFileEncoding(Files.readAllBytes(file.toPath()))) {
             return null;
         }
 
-        if ( log.isDebugEnabled() )
-        {
-            log.debug( String.format( "%s: (%s) %s; charset=%s", file, fileEncoding.getCode(), fileEncoding.getType(), fileEncoding.getCodeMime() ) );
+        if (log.isDebugEnabled()) {
+            log.debug(String.format(
+                    "%s: (%s) %s; charset=%s",
+                    file, fileEncoding.getCode(), fileEncoding.getType(), fileEncoding.getCodeMime()));
         }
 
         return fileEncoding.getCodeMime().toUpperCase();
@@ -164,8 +144,7 @@ public class RequireEncoding
      * return a hash computed from the values of your parameters. If your rule is not cacheable, then the result here is
      * not important, you may return anything.
      */
-    public String getCacheId()
-    {
+    public String getCacheId() {
         return null;
     }
 
@@ -174,8 +153,7 @@ public class RequireEncoding
      * things, a given rule may be executed more than once for the same project. This means that even things that change
      * from project to project may still be cacheable in certain instances.
      */
-    public boolean isCacheable()
-    {
+    public boolean isCacheable() {
         return false;
     }
 
@@ -185,48 +163,39 @@ public class RequireEncoding
      * the results of objects returned by the helper need to be queried. You may for example, store certain objects in
      * your rule and then query them later.
      */
-    public boolean isResultValid( EnforcerRule cachedRule )
-    {
+    public boolean isResultValid(EnforcerRule cachedRule) {
         return false;
     }
 
-    public String getEncoding()
-    {
+    public String getEncoding() {
         return encoding;
     }
 
-    public void setEncoding( String encoding )
-    {
+    public void setEncoding(String encoding) {
         this.encoding = encoding;
     }
 
-    public String getIncludes()
-    {
+    public String getIncludes() {
         return includes;
     }
 
-    public void setIncludes( String includes )
-    {
+    public void setIncludes(String includes) {
         this.includes = includes;
     }
 
-    public String getExcludes()
-    {
+    public String getExcludes() {
         return excludes;
     }
 
-    public void setExcludes( String excludes )
-    {
+    public void setExcludes(String excludes) {
         this.excludes = excludes;
     }
 
-    public boolean isUseDefaultExcludes()
-    {
+    public boolean isUseDefaultExcludes() {
         return useDefaultExcludes;
     }
 
-    public void setUseDefaultExcludes( boolean useDefaultExcludes )
-    {
+    public void setUseDefaultExcludes(boolean useDefaultExcludes) {
         this.useDefaultExcludes = useDefaultExcludes;
     }
 }

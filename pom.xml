@@ -12,9 +12,7 @@
 
   <name>Extra Enforcer Rules</name>
 
-  <description>
-    Extra Enforcer Rules. These are extra rules for Apache Maven's Enforcer Plugin.
-  </description>
+  <description>Extra Enforcer Rules. These are extra rules for Apache Maven's Enforcer Plugin.</description>
   <url>https://www.mojohaus.org/extra-enforcer-rules/</url>
 
   <inceptionYear>2011</inceptionYear>
@@ -26,13 +24,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-  <scm>
-    <connection>scm:git:https://github.com/mojohaus/extra-enforcer-rules.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/mojohaus/extra-enforcer-rules.git</developerConnection>
-    <url>https://github.com/mojohaus/extra-enforcer-rules/tree/master</url>
-    <tag>HEAD</tag>
-  </scm>
 
   <developers>
     <developer>
@@ -57,6 +48,13 @@
       <timezone>Europe/Warsaw</timezone>
     </developer>
   </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/mojohaus/extra-enforcer-rules.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/mojohaus/extra-enforcer-rules.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/mojohaus/extra-enforcer-rules/tree/master</url>
+  </scm>
 
   <properties>
     <!-- some of plugins requires JDK 11 -->
@@ -159,12 +157,12 @@
   </build>
 
   <reporting>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-invoker-plugin</artifactId>
-        </plugin>
-      </plugins>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
+      </plugin>
+    </plugins>
   </reporting>
 
   <profiles>
@@ -219,6 +217,10 @@
       <activation>
         <jdk>[11,)</jdk>
       </activation>
+
+      <properties>
+        <checkstyle.violation.ignore>MagicNumber</checkstyle.violation.ignore>
+      </properties>
 
       <build>
         <!--- newer versions of plugins requires JDK 11 -->

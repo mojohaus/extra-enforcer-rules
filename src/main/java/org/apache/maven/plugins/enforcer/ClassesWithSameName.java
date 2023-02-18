@@ -44,11 +44,11 @@ import org.apache.maven.plugin.logging.Log;
  * you'd choose the maven way (mockito-core) or the convenient-for-non-maven-users
  * way (mockito-all) but not both.
  */
-public class ClassesWithSameName
-{
+public class ClassesWithSameName {
     private final Log log;
     /** the path to the .class file. Example: org/apache/maven/Stuff.class */
     private final String classFilePath;
+
     private final List<ClassFile> list = new ArrayList<>();
 
     /**
@@ -57,16 +57,14 @@ public class ClassesWithSameName
      *                         next one lets us require at least one at compile time (instead of runtime).
      * @param additionalClassFiles (optional) additional class files
      */
-    public ClassesWithSameName( Log log, ClassFile initialClassFile, ClassFile... additionalClassFiles )
-    {
+    public ClassesWithSameName(Log log, ClassFile initialClassFile, ClassFile... additionalClassFiles) {
         this.log = log;
         classFilePath = initialClassFile.getClassFilePath();
-        list.add( initialClassFile );
+        list.add(initialClassFile);
 
-        for ( ClassFile classFile : additionalClassFiles )
-        {
-            throwIfClassNameDoesNotMatch( classFile, classFilePath );
-            list.add( classFile );
+        for (ClassFile classFile : additionalClassFiles) {
+            throwIfClassNameDoesNotMatch(classFile, classFilePath);
+            list.add(classFile);
         }
     }
 
@@ -76,17 +74,13 @@ public class ClassesWithSameName
      *         add("Class2.class")
      *         previous()   // returns "Class1.class"
      */
-    public ClassFile previous()
-    {
-        if ( list.size() > 1 )
-        {
+    public ClassFile previous() {
+        if (list.size() > 1) {
             int lastIndex = list.size() - 2;
-            return list.get( lastIndex );
-        }
-        else
-        {
-            throw new IllegalArgumentException( "there was only " + list.size()
-                + " element(s) in the list, so there is no 2nd-to-last element to retrieve " );
+            return list.get(lastIndex);
+        } else {
+            throw new IllegalArgumentException("there was only " + list.size()
+                    + " element(s) in the list, so there is no 2nd-to-last element to retrieve ");
         }
     }
 
@@ -95,23 +89,20 @@ public class ClassesWithSameName
      * (though the artifact can be different).
      * @param classFile The path to the .class file. Example: org/apache/maven/Stuff.class
      */
-    public void add( ClassFile classFile )
-    {
-        throwIfClassNameDoesNotMatch( classFile, classFilePath );
-        list.add( classFile );
+    public void add(ClassFile classFile) {
+        throwIfClassNameDoesNotMatch(classFile, classFilePath);
+        list.add(classFile);
     }
 
     /**
      * @return Return a Set rather than a List so we can use this as the key in another Map.
      *         List.of(3,2,1) doesn't equal List.of(1,2,3) but Set.of(3,2,1) equals Set.of(1,2,3)
      */
-    public Set<Artifact> getAllArtifactsThisClassWasFoundIn()
-    {
+    public Set<Artifact> getAllArtifactsThisClassWasFoundIn() {
         Set<Artifact> result = new HashSet<>();
 
-        for ( ClassFile classFile : list )
-        {
-            result.add( classFile.getArtifactThisClassWasFoundIn() );
+        for (ClassFile classFile : list) {
+            result.add(classFile.getArtifactThisClassWasFoundIn());
         }
 
         return result;
@@ -125,30 +116,25 @@ public class ClassesWithSameName
      *                            one of the same class, regardless of bytecode.
      * @return true if there are duplicates, false if not.
      */
-    public boolean hasDuplicates( boolean ignoreWhenIdentical )
-    {
+    public boolean hasDuplicates(boolean ignoreWhenIdentical) {
         boolean compareJustClassNames = !ignoreWhenIdentical;
-        if ( compareJustClassNames )
-        {
+        if (compareJustClassNames) {
             return list.size() > 1;
         }
 
-        if ( list.size() <= 1 )
-        {
+        if (list.size() <= 1) {
             return false;
         }
 
-        String previousHash = list.get( 0 ).getHash();
-        for ( int i = 1; i < list.size(); i++ )
-        {
-            String currentHash = list.get( i ).getHash();
-            if ( !previousHash.equals( currentHash ) )
-            {
+        String previousHash = list.get(0).getHash();
+        for (int i = 1; i < list.size(); i++) {
+            String currentHash = list.get(i).getHash();
+            if (!previousHash.equals(currentHash)) {
                 return true;
             }
         }
 
-        log.debug( "ignoring duplicates of class " + classFilePath + " since the bytecode matches exactly" );
+        log.debug("ignoring duplicates of class " + classFilePath + " since the bytecode matches exactly");
 
         return false;
     }
@@ -165,30 +151,24 @@ public class ClassesWithSameName
      *         Example (ignoreWhenIdentical = true):
      *         org/apache/maven/Stuff.class  -- the bytecode exactly matches in these: a.jar and b.jar
      */
-    public String toOutputString( boolean ignoreWhenIdentical )
-    {
+    public String toOutputString(boolean ignoreWhenIdentical) {
         String result = classFilePath;
 
-        if ( list.size() >= 2 && ignoreWhenIdentical )
-        {
+        if (list.size() >= 2 && ignoreWhenIdentical) {
             StringBuilder duplicationInfo = new StringBuilder();
-            for ( Set<Artifact> groupedArtifacts : groupArtifactsWhoseClassesAreExactMatch().values() )
-            {
-                if ( groupedArtifacts.size() <= 1 )
-                {
+            for (Set<Artifact> groupedArtifacts :
+                    groupArtifactsWhoseClassesAreExactMatch().values()) {
+                if (groupedArtifacts.size() <= 1) {
                     continue;
                 }
 
-                if ( duplicationInfo.length() == 0 )
-                {
-                    duplicationInfo.append( "  -- the bytecode exactly matches in these: " );
-                }
-                else
-                {
-                    duplicationInfo.append( "; and more exact matches in these: " );
+                if (duplicationInfo.length() == 0) {
+                    duplicationInfo.append("  -- the bytecode exactly matches in these: ");
+                } else {
+                    duplicationInfo.append("; and more exact matches in these: ");
                 }
 
-                duplicationInfo.append( joinWithSeparator( groupedArtifacts, " and " ) );
+                duplicationInfo.append(joinWithSeparator(groupedArtifacts, " and "));
             }
 
             result += duplicationInfo.toString();
@@ -197,50 +177,40 @@ public class ClassesWithSameName
         return result;
     }
 
-    private static void throwIfClassNameDoesNotMatch( ClassFile classFile, String otherClassFilePath )
-    {
-        if ( !classFile.getClassFilePath().equals( otherClassFilePath ) )
-        {
-            throw new IllegalArgumentException( "Expected class " + otherClassFilePath
-                + " but got " + classFile.getClassFilePath() );
+    private static void throwIfClassNameDoesNotMatch(ClassFile classFile, String otherClassFilePath) {
+        if (!classFile.getClassFilePath().equals(otherClassFilePath)) {
+            throw new IllegalArgumentException(
+                    "Expected class " + otherClassFilePath + " but got " + classFile.getClassFilePath());
         }
     }
 
-    private String joinWithSeparator( Set<Artifact> artifacts, String separator )
-    {
+    private String joinWithSeparator(Set<Artifact> artifacts, String separator) {
         StringBuilder result = new StringBuilder();
         boolean first = true;
-        for ( Artifact artifact : artifacts )
-        {
-            if ( first )
-            {
+        for (Artifact artifact : artifacts) {
+            if (first) {
                 first = false;
-            }
-            else
-            {
-                result.append( separator );
+            } else {
+                result.append(separator);
             }
 
-            result.append( artifact );
+            result.append(artifact);
         }
 
         return result.toString();
     }
 
-    private Map<String, Set<Artifact>> groupArtifactsWhoseClassesAreExactMatch()
-    {
+    private Map<String, Set<Artifact>> groupArtifactsWhoseClassesAreExactMatch() {
         Map<String, Set<Artifact>> groupedArtifacts = new LinkedHashMap<>();
 
-        for ( ClassFile classFile : list )
-        {
-            Set<Artifact> artifacts = groupedArtifacts.get( classFile.getHash() );
-            if ( artifacts == null )
-            {
+        for (ClassFile classFile : list) {
+            Set<Artifact> artifacts = groupedArtifacts.get(classFile.getHash());
+            if (artifacts == null) {
                 artifacts = new LinkedHashSet<>();
             }
-            artifacts.add( classFile.getArtifactThisClassWasFoundIn() );
+            artifacts.add(classFile.getArtifactThisClassWasFoundIn());
 
-            groupedArtifacts.put( classFile.getHash(), artifacts );
+            groupedArtifacts.put(classFile.getHash(), artifacts);
         }
 
         return groupedArtifacts;

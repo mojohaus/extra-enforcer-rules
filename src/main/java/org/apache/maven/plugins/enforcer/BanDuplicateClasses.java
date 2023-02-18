@@ -44,22 +44,20 @@ import static org.apache.maven.plugins.enforcer.JarUtils.isJarFile;
 /**
  * Bans duplicate classes on the classpath.
  */
-public class BanDuplicateClasses
-    extends AbstractResolveDependencies
-{
+public class BanDuplicateClasses extends AbstractResolveDependencies {
 
     /**
      * Default ignores which are needed for JDK 9, cause in JDK 9 and above the <code>module-info.class</code> will be
      * duplicated in any jar file. Furthermore in use cases for multi release jars the <code>module-info.class</code> is
      * also contained several times.
      */
-    private static final String[] DEFAULT_CLASSES_IGNORES = { "module-info", "META-INF/versions/*/module-info" };
+    private static final String[] DEFAULT_CLASSES_IGNORES = {"module-info", "META-INF/versions/*/module-info"};
 
     /**
      * The failure message
      */
     private String message;
-    
+
     /**
      * List of classes to ignore. Wildcard at the end accepted
      */
@@ -75,7 +73,7 @@ public class BanDuplicateClasses
      * List of dependencies for which you want to ignore specific classes.
      */
     private List<Dependency> dependencies;
-    
+
     /**
      * Only verify dependencies with one of these scopes
      */
@@ -88,191 +86,163 @@ public class BanDuplicateClasses
     private boolean ignoreWhenIdentical;
 
     @Override
-    protected void handleArtifacts( Set<Artifact> artifacts ) throws EnforcerRuleException
-    {
+    protected void handleArtifacts(Set<Artifact> artifacts) throws EnforcerRuleException {
         List<IgnorableDependency> ignorableDependencies = new ArrayList<>();
 
         IgnorableDependency ignoreableClasses = new IgnorableDependency();
-        ignoreableClasses.applyIgnoreClasses( DEFAULT_CLASSES_IGNORES, false );
-        if ( ignoreClasses != null )
-        {
-            ignoreableClasses.applyIgnoreClasses( ignoreClasses, false );
+        ignoreableClasses.applyIgnoreClasses(DEFAULT_CLASSES_IGNORES, false);
+        if (ignoreClasses != null) {
+            ignoreableClasses.applyIgnoreClasses(ignoreClasses, false);
         }
-        ignorableDependencies.add( ignoreableClasses );
+        ignorableDependencies.add(ignoreableClasses);
 
-        if ( dependencies != null )
-        {
-            for ( Dependency dependency : dependencies )
-            {
-                getLog().info( "Adding ignorable dependency: " + dependency );
+        if (dependencies != null) {
+            for (Dependency dependency : dependencies) {
+                getLog().info("Adding ignorable dependency: " + dependency);
                 IgnorableDependency ignorableDependency = new IgnorableDependency();
-                if ( dependency.getGroupId() != null )
-                {
-                    ignorableDependency.groupId = Pattern.compile( asRegex( dependency.getGroupId() ) );
+                if (dependency.getGroupId() != null) {
+                    ignorableDependency.groupId = Pattern.compile(asRegex(dependency.getGroupId()));
                 }
-                if ( dependency.getArtifactId() != null )
-                {
-                    ignorableDependency.artifactId = Pattern.compile( asRegex( dependency.getArtifactId() ) );
+                if (dependency.getArtifactId() != null) {
+                    ignorableDependency.artifactId = Pattern.compile(asRegex(dependency.getArtifactId()));
                 }
-                if ( dependency.getType() != null )
-                {
-                    ignorableDependency.type = Pattern.compile( asRegex( dependency.getType() ) );
+                if (dependency.getType() != null) {
+                    ignorableDependency.type = Pattern.compile(asRegex(dependency.getType()));
                 }
-                if ( dependency.getClassifier() != null )
-                {
-                    ignorableDependency.classifier = Pattern.compile( asRegex( dependency.getClassifier() ) );
+                if (dependency.getClassifier() != null) {
+                    ignorableDependency.classifier = Pattern.compile(asRegex(dependency.getClassifier()));
                 }
-                ignorableDependency.applyIgnoreClasses( dependency.getIgnoreClasses(), true );
-                ignorableDependencies.add( ignorableDependency );
+                ignorableDependency.applyIgnoreClasses(dependency.getIgnoreClasses(), true);
+                ignorableDependencies.add(ignorableDependency);
             }
         }
 
         Map<String, ClassesWithSameName> classesSeen = new HashMap<>();
         Set<String> duplicateClassNames = new HashSet<>();
-        for ( Artifact o : artifacts )
-        {
-            if( scopes != null && !scopes.contains( o.getScope() ) )
-            {
-                if( getLog().isDebugEnabled() )
-                {
-                    getLog().debug( "Skipping " + o + " due to scope" );
+        for (Artifact o : artifacts) {
+            if (scopes != null && !scopes.contains(o.getScope())) {
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Skipping " + o + " due to scope");
                 }
                 continue;
             }
             File file = o.getFile();
-            getLog().debug( "Searching for duplicate classes in " + file );
-            if ( file == null || !file.exists() )
-            {
-                getLog().warn( "Could not find " + o + " at " + file );
-            }
-            else if ( file.isDirectory() )
-            {
-                try
-                {
-                    for ( String name : FileUtils.getFileNames( file, null, null, false ) )
-                    {
-                        getLog().debug( "  " + name );
-                        checkAndAddName( o, name, () -> Files.newInputStream( file.toPath().resolve( name ) ),
-                                         classesSeen, duplicateClassNames, ignorableDependencies );
+            getLog().debug("Searching for duplicate classes in " + file);
+            if (file == null || !file.exists()) {
+                getLog().warn("Could not find " + o + " at " + file);
+            } else if (file.isDirectory()) {
+                try {
+                    for (String name : FileUtils.getFileNames(file, null, null, false)) {
+                        getLog().debug("  " + name);
+                        checkAndAddName(
+                                o,
+                                name,
+                                () -> Files.newInputStream(file.toPath().resolve(name)),
+                                classesSeen,
+                                duplicateClassNames,
+                                ignorableDependencies);
                     }
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     throw new EnforcerRuleException(
-                        "Unable to process dependency " + o + " due to " + e.getLocalizedMessage(), e );
+                            "Unable to process dependency " + o + " due to " + e.getLocalizedMessage(), e);
                 }
-            }
-            else if ( isJarFile( o ) )
-            {
-                try
-                {
-                    //@todo use UnArchiver as defined per type
-                    try ( JarFile jar = new JarFile( file ) )
-                    {
-                        for ( JarEntry entry : Collections.list( jar.entries() ) )
-                        {
+            } else if (isJarFile(o)) {
+                try {
+                    // @todo use UnArchiver as defined per type
+                    try (JarFile jar = new JarFile(file)) {
+                        for (JarEntry entry : Collections.list(jar.entries())) {
                             String fileName = entry.getName();
 
-                            checkAndAddName( o, fileName, () -> jar.getInputStream( entry ),
-                                             classesSeen, duplicateClassNames, ignorableDependencies );
+                            checkAndAddName(
+                                    o,
+                                    fileName,
+                                    () -> jar.getInputStream(entry),
+                                    classesSeen,
+                                    duplicateClassNames,
+                                    ignorableDependencies);
                         }
                     }
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     throw new EnforcerRuleException(
-                        "Unable to process dependency " + o + " due to " + e.getLocalizedMessage(), e );
+                            "Unable to process dependency " + o + " due to " + e.getLocalizedMessage(), e);
                 }
             }
         }
-        if ( !duplicateClassNames.isEmpty() )
-        {
+        if (!duplicateClassNames.isEmpty()) {
             Map<Set<Artifact>, List<String>> inverted = new HashMap<>();
-            for ( String className : duplicateClassNames )
-            {
-                ClassesWithSameName classesWithSameName = classesSeen.get( className );
+            for (String className : duplicateClassNames) {
+                ClassesWithSameName classesWithSameName = classesSeen.get(className);
                 Set<Artifact> artifactsOfDuplicateClass = classesWithSameName.getAllArtifactsThisClassWasFoundIn();
 
-                List<String> s = inverted.get( artifactsOfDuplicateClass );
-                if ( s == null )
-                {
+                List<String> s = inverted.get(artifactsOfDuplicateClass);
+                if (s == null) {
                     s = new ArrayList<>();
                 }
-                s.add( classesWithSameName.toOutputString( ignoreWhenIdentical ) );
-                inverted.put( artifactsOfDuplicateClass, s );
+                s.add(classesWithSameName.toOutputString(ignoreWhenIdentical));
+                inverted.put(artifactsOfDuplicateClass, s);
             }
-            StringBuilder buf = new StringBuilder( message == null ? "Duplicate classes found:" : message );
-            buf.append( '\n' );
-            for ( Map.Entry<Set<Artifact>, List<String>> entry : inverted.entrySet() )
-            {
-                buf.append( "\n  Found in:" );
-                for ( Artifact a : entry.getKey() )
-                {
-                    buf.append( "\n    " );
-                    buf.append( a );
+            StringBuilder buf = new StringBuilder(message == null ? "Duplicate classes found:" : message);
+            buf.append('\n');
+            for (Map.Entry<Set<Artifact>, List<String>> entry : inverted.entrySet()) {
+                buf.append("\n  Found in:");
+                for (Artifact a : entry.getKey()) {
+                    buf.append("\n    ");
+                    buf.append(a);
                 }
-                buf.append( "\n  Duplicate classes:" );
-                for ( String classNameWithDuplicationInfo : entry.getValue() )
-                {
-                    buf.append( "\n    " );
-                    buf.append( classNameWithDuplicationInfo );
+                buf.append("\n  Duplicate classes:");
+                for (String classNameWithDuplicationInfo : entry.getValue()) {
+                    buf.append("\n    ");
+                    buf.append(classNameWithDuplicationInfo);
                 }
-                buf.append( '\n' );
+                buf.append('\n');
             }
-            throw new EnforcerRuleException( buf.toString() );
+            throw new EnforcerRuleException(buf.toString());
         }
-
     }
 
-    private void checkAndAddName( Artifact artifact, String pathToClassFile, InputStreamSupplier inputStreamSupplier, Map<String,
-                                  ClassesWithSameName> classesSeen, Set<String> duplicateClasses,
-                                  Collection<IgnorableDependency> ignores )
-        throws EnforcerRuleException, IOException
-    {
-        if ( !pathToClassFile.endsWith( ".class" ) )
-        {
+    private void checkAndAddName(
+            Artifact artifact,
+            String pathToClassFile,
+            InputStreamSupplier inputStreamSupplier,
+            Map<String, ClassesWithSameName> classesSeen,
+            Set<String> duplicateClasses,
+            Collection<IgnorableDependency> ignores)
+            throws EnforcerRuleException, IOException {
+        if (!pathToClassFile.endsWith(".class")) {
             return;
         }
 
-        for ( IgnorableDependency c : ignores )
-        {
-            if ( c.matchesArtifact( artifact ) && c.matches( pathToClassFile ) )
-            {
-                if ( classesSeen.containsKey( pathToClassFile ) )
-                {
-                    getLog().debug( "Ignoring excluded class " + pathToClassFile );
+        for (IgnorableDependency c : ignores) {
+            if (c.matchesArtifact(artifact) && c.matches(pathToClassFile)) {
+                if (classesSeen.containsKey(pathToClassFile)) {
+                    getLog().debug("Ignoring excluded class " + pathToClassFile);
                 }
                 return;
             }
         }
 
-        ClassesWithSameName classesWithSameName = classesSeen.get( pathToClassFile );
-        boolean isFirstTimeSeeingThisClass = ( classesWithSameName == null );
+        ClassesWithSameName classesWithSameName = classesSeen.get(pathToClassFile);
+        boolean isFirstTimeSeeingThisClass = (classesWithSameName == null);
 
-        ClassFile classFile = new ClassFile( pathToClassFile, artifact, inputStreamSupplier );
+        ClassFile classFile = new ClassFile(pathToClassFile, artifact, inputStreamSupplier);
 
-        if ( isFirstTimeSeeingThisClass )
-        {
-            classesSeen.put( pathToClassFile, new ClassesWithSameName( getLog(), classFile ) );
+        if (isFirstTimeSeeingThisClass) {
+            classesSeen.put(pathToClassFile, new ClassesWithSameName(getLog(), classFile));
             return;
         }
 
-        classesWithSameName.add( classFile );
+        classesWithSameName.add(classFile);
 
-        if ( !classesWithSameName.hasDuplicates( ignoreWhenIdentical ) )
-        {
+        if (!classesWithSameName.hasDuplicates(ignoreWhenIdentical)) {
             return;
         }
 
-        if ( findAllDuplicates )
-        {
-            duplicateClasses.add( pathToClassFile );
-        }
-        else
-        {
+        if (findAllDuplicates) {
+            duplicateClasses.add(pathToClassFile);
+        } else {
             Artifact previousArtifact = classesWithSameName.previous().getArtifactThisClassWasFoundIn();
 
-            String buf = ( message == null ? "Duplicate class found:" : message ) + '\n'
+            String buf = (message == null ? "Duplicate class found:" : message) + '\n'
                     + "\n  Found in:"
                     + "\n    "
                     + previousArtifact
@@ -283,7 +253,7 @@ public class BanDuplicateClasses
                     + pathToClassFile
                     + '\n'
                     + "There may be others but <findAllDuplicates> was set to false, so failing fast";
-            throw new EnforcerRuleException( buf );
+            throw new EnforcerRuleException(buf);
         }
     }
 }

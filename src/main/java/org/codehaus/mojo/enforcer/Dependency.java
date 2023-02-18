@@ -24,17 +24,16 @@ package org.codehaus.mojo.enforcer;
  *
  * @version $Id: $
  */
-public class Dependency
-{
+public class Dependency {
 
     private String groupId;
-    
+
     private String artifactId;
-    
+
     private String classifier;
-    
+
     private String type;
-    
+
     /**
      * List of classes to ignore. Wildcard at the end accepted
      */
@@ -45,8 +44,7 @@ public class Dependency
      *
      * @return a {@link java.lang.String} object.
      */
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return groupId;
     }
 
@@ -55,8 +53,7 @@ public class Dependency
      *
      * @param groupId a {@link java.lang.String} object.
      */
-    public void setGroupId( String groupId )
-    {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
@@ -65,8 +62,7 @@ public class Dependency
      *
      * @return a {@link java.lang.String} object.
      */
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return artifactId;
     }
 
@@ -75,8 +71,7 @@ public class Dependency
      *
      * @param artifactId a {@link java.lang.String} object.
      */
-    public void setArtifactId( String artifactId )
-    {
+    public void setArtifactId(String artifactId) {
         this.artifactId = artifactId;
     }
 
@@ -85,8 +80,7 @@ public class Dependency
      *
      * @return a {@link java.lang.String} object.
      */
-    public String getClassifier()
-    {
+    public String getClassifier() {
         return classifier;
     }
 
@@ -95,8 +89,7 @@ public class Dependency
      *
      * @param classifier a {@link java.lang.String} object.
      */
-    public void setClassifier( String classifier )
-    {
+    public void setClassifier(String classifier) {
         this.classifier = classifier;
     }
 
@@ -105,8 +98,7 @@ public class Dependency
      *
      * @return a {@link java.lang.String} object.
      */
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
@@ -115,8 +107,7 @@ public class Dependency
      *
      * @param type a {@link java.lang.String} object.
      */
-    public void setType( String type )
-    {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -125,8 +116,7 @@ public class Dependency
      *
      * @return an array of {@link java.lang.String} objects.
      */
-    public String[] getIgnoreClasses()
-    {
+    public String[] getIgnoreClasses() {
         return ignoreClasses;
     }
 
@@ -135,20 +125,17 @@ public class Dependency
      *
      * @param ignoreClasses an array of {@link java.lang.String} objects.
      */
-    public void setIgnoreClasses( String[] ignoreClasses )
-    {
+    public void setIgnoreClasses(String[] ignoreClasses) {
         this.ignoreClasses = ignoreClasses;
     }
-    
+
     /** {@inheritDoc} */
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append( groupId ).append( ':' ).append( artifactId ).append( ':' ).append( type );
-        if ( classifier != null )
-        {
-            sb.append( ':' ).append( classifier );
+        sb.append(groupId).append(':').append(artifactId).append(':').append(type);
+        if (classifier != null) {
+            sb.append(':').append(classifier);
         }
         return sb.toString();
     }

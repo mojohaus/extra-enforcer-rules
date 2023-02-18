@@ -40,8 +40,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
  */
-abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoHausEnforcerRule
-{
+abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoHausEnforcerRule {
     /**
      * Specify the required roles as comma separated list.
      */
@@ -54,51 +53,45 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoH
 
     /**
      * Execute the rule.
-     * 
+     *
      * @param helper the helper
      * @throws EnforcerRuleException the enforcer rule exception
      */
-    public void execute( EnforcerRuleHelper helper )
-        throws EnforcerRuleException
-    {
-        MavenProject mavenProject = getMavenProject( helper );
+    public void execute(EnforcerRuleHelper helper) throws EnforcerRuleException {
+        MavenProject mavenProject = getMavenProject(helper);
 
         // Trying to prevent side-effects with unmodifiable sets (already got burned)
-        final Set<String> requiredRolesSet = Collections.unmodifiableSet( getRolesFromString( requiredRoles ) );
-        final Set<String> rolesFromProject = Collections.unmodifiableSet(getRolesFromProject( mavenProject ));
+        final Set<String> requiredRolesSet = Collections.unmodifiableSet(getRolesFromString(requiredRoles));
+        final Set<String> rolesFromProject = Collections.unmodifiableSet(getRolesFromProject(mavenProject));
 
-        checkRequiredRoles( requiredRolesSet, rolesFromProject );
-        checkValidRoles( requiredRolesSet, rolesFromProject );
+        checkRequiredRoles(requiredRolesSet, rolesFromProject);
+        checkValidRoles(requiredRolesSet, rolesFromProject);
     }
 
-    private void checkRequiredRoles( final Set<String> requiredRolesSet, final Set<String> rolesFromProject )
-        throws EnforcerRuleException
-    {
+    private void checkRequiredRoles(final Set<String> requiredRolesSet, final Set<String> rolesFromProject)
+            throws EnforcerRuleException {
         final Set<String> copyOfRequiredRolesSet = new LinkedHashSet<>(requiredRolesSet);
-        copyOfRequiredRolesSet.removeAll( rolesFromProject );
-        if ( copyOfRequiredRolesSet.size() > 0 )
-        {
+        copyOfRequiredRolesSet.removeAll(rolesFromProject);
+        if (copyOfRequiredRolesSet.size() > 0) {
             final String message =
-                String.format( "Found no %s representing role(s) '%s'", getRoleName(), copyOfRequiredRolesSet );
-            throw new EnforcerRuleException( message );
+                    String.format("Found no %s representing role(s) '%s'", getRoleName(), copyOfRequiredRolesSet);
+            throw new EnforcerRuleException(message);
         }
     }
 
-    private void checkValidRoles( final Set<String> requiredRolesSet, final Set<String> rolesFromProject )
-        throws EnforcerRuleException
-    {
+    private void checkValidRoles(final Set<String> requiredRolesSet, final Set<String> rolesFromProject)
+            throws EnforcerRuleException {
         final Set<String> copyOfRolesFromProject = new LinkedHashSet<>(rolesFromProject);
-        final Set<String> allowedRoles = getRolesFromString( validRoles );
-        if ( !allowedRoles.contains( "*" ) )
-        {
-            allowedRoles.addAll( requiredRolesSet );
+        final Set<String> allowedRoles = getRolesFromString(validRoles);
+        if (!allowedRoles.contains("*")) {
+            allowedRoles.addAll(requiredRolesSet);
 
             // results in invalid roles
-            copyOfRolesFromProject.removeAll( allowedRoles );
-            if ( copyOfRolesFromProject.size() > 0 )
-            {
-                final String message = String.format( "Found invalid %s role(s) '%s'", getRoleName(), copyOfRolesFromProject );
-                throw new EnforcerRuleException( message );
+            copyOfRolesFromProject.removeAll(allowedRoles);
+            if (copyOfRolesFromProject.size() > 0) {
+                final String message =
+                        String.format("Found invalid %s role(s) '%s'", getRoleName(), copyOfRolesFromProject);
+                throw new EnforcerRuleException(message);
             }
         }
     }
@@ -109,18 +102,15 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoH
      * @param mavenProject
      * @return roles from POM.
      */
-    @SuppressWarnings( "unchecked" )
-    final Set<String> getRolesFromProject( MavenProject mavenProject )
-    {
+    @SuppressWarnings("unchecked")
+    final Set<String> getRolesFromProject(MavenProject mavenProject) {
         final Set<String> result = new HashSet<>();
-        for ( final T roleFromPom : getRoles( mavenProject ) )
-        {
+        for (final T roleFromPom : getRoles(mavenProject)) {
             List<String> roles = roleFromPom.getRoles();
             result.addAll(roles);
         }
         return result;
     }
-
 
     /**
      * Returns the rolename.
@@ -135,7 +125,7 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoH
      * @param mavenProject
      * @return the list of {@link Contributor}s or {@link Developer}s.
      */
-    protected abstract List<T> getRoles( final MavenProject mavenProject );
+    protected abstract List<T> getRoles(MavenProject mavenProject);
 
     /**
      * Returns the set of required roles from the property.
@@ -143,18 +133,15 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoH
      * @param csRoles comma-separated roles to be split
      * @return
      */
-    Set<String> getRolesFromString( final String csRoles )
-    {
-        return splitCsvToSet( csRoles );
+    Set<String> getRolesFromString(final String csRoles) {
+        return splitCsvToSet(csRoles);
     }
 
-    static Set<String> splitCsvToSet( final String csv )
-    {
-        final String [] splitValues = StringUtils.split( csv, "," );
+    static Set<String> splitCsvToSet(final String csv) {
+        final String[] splitValues = StringUtils.split(csv, ",");
         final Set<String> result = new HashSet<>();
-        for ( String value : splitValues )
-        {
-            result.add( value.trim() );
+        for (String value : splitValues) {
+            result.add(value.trim());
         }
         return result;
     }
@@ -167,15 +154,11 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoH
      *
      * @throws EnforcerRuleException
      */
-    MavenProject getMavenProject( EnforcerRuleHelper helper ) throws EnforcerRuleException
-    {
-        try
-        {
-            return ( MavenProject ) helper.evaluate( "${project}" );
-        }
-        catch ( ExpressionEvaluationException eee )
-        {
-            throw new EnforcerRuleException( "Unable to get project.", eee );
+    MavenProject getMavenProject(EnforcerRuleHelper helper) throws EnforcerRuleException {
+        try {
+            return (MavenProject) helper.evaluate("${project}");
+        } catch (ExpressionEvaluationException eee) {
+            throw new EnforcerRuleException("Unable to get project.", eee);
         }
     }
 
@@ -183,40 +166,34 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractMojoH
     /**
      * @param requiredRoles the requiredRoles to set.
      */
-    void setRequiredRoles( String requiredRoles )
-    {
+    void setRequiredRoles(String requiredRoles) {
         this.requiredRoles = requiredRoles;
     }
-    
-    void setValidRoles( String validRoles )
-    {
+
+    void setValidRoles(String validRoles) {
         this.validRoles = validRoles;
     }
-    
 
-    //*********************
-    
+    // *********************
+
     /**
      * {@inheritDoc}
      */
-    public String getCacheId()
-    {
+    public String getCacheId() {
         return "0";
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean isCacheable()
-    {
+    public boolean isCacheable() {
         return false;
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean isResultValid( EnforcerRule cachedRule )
-    {
+    public boolean isResultValid(EnforcerRule cachedRule) {
         return false;
     }
 }

@@ -22,36 +22,32 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class AbstractRequireRolesTest
-{
-    private final String CSV_TO_SPLIT = "a,b,c";
-    private final String CSV_WITH_SPACES_TO_SPLIT = " a, b ,c ";
+public class AbstractRequireRolesTest {
+    private static final String CSV_TO_SPLIT = "a,b,c";
+    private static final String CSV_WITH_SPACES_TO_SPLIT = " a, b ,c ";
 
     @Test
-    public void testCsvSplitSize()
-    {
-        Set<String> values = AbstractRequireRoles.splitCsvToSet( CSV_TO_SPLIT );
+    public void testCsvSplitSize() {
+        Set<String> values = AbstractRequireRoles.splitCsvToSet(CSV_TO_SPLIT);
 
         assert values.size() == 3;
     }
 
     @Test
-    public void testCsvSplitExpectedElements()
-    {
-        Set<String> values = AbstractRequireRoles.splitCsvToSet( CSV_TO_SPLIT );
+    public void testCsvSplitExpectedElements() {
+        Set<String> values = AbstractRequireRoles.splitCsvToSet(CSV_TO_SPLIT);
 
-        assert values.contains( "a" );
-        assert values.contains( "b" );
-        assert values.contains( "c" );
+        assert values.contains("a");
+        assert values.contains("b");
+        assert values.contains("c");
     }
 
     @Test
-    public void testCsvSplitTrimsValues()
-    {
-        Set<String> values = AbstractRequireRoles.splitCsvToSet( CSV_WITH_SPACES_TO_SPLIT );
+    public void testCsvSplitTrimsValues() {
+        Set<String> values = AbstractRequireRoles.splitCsvToSet(CSV_WITH_SPACES_TO_SPLIT);
 
-        assert values.contains( "a" );
-        assert values.contains( "b" );
-        assert values.contains( "c" );
+        assert values.contains("a");
+        assert values.contains("b");
+        assert values.contains("c");
     }
 }

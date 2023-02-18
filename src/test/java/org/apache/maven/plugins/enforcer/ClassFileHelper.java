@@ -30,62 +30,54 @@ import org.junit.rules.TemporaryFolder;
 /**
  * Test utility to make writing tests with {@link ClassFile}s easier.
  */
-public class ClassFileHelper
-{
+public class ClassFileHelper {
     private static int uniqueId = 0;
 
     private final TemporaryFolder temporaryFolder;
 
-    public ClassFileHelper( TemporaryFolder temporaryFolder )
-    {
+    public ClassFileHelper(TemporaryFolder temporaryFolder) {
         this.temporaryFolder = temporaryFolder;
     }
 
-    public ClassFile createWithContent( String pathToClassFile, String fileContents ) throws IOException
-    {
+    public ClassFile createWithContent(String pathToClassFile, String fileContents) throws IOException {
         uniqueId++;
-        String uniqueIdStr = Integer.toString( uniqueId );
+        String uniqueIdStr = Integer.toString(uniqueId);
 
-        File tempDirectory = createTempDirectory( uniqueIdStr );
-        createClassFile( tempDirectory, pathToClassFile, fileContents );
+        File tempDirectory = createTempDirectory(uniqueIdStr);
+        createClassFile(tempDirectory, pathToClassFile, fileContents);
 
         Artifact artifact = ArtifactBuilder.newBuilder()
-            .withFileOrDirectory( tempDirectory )
-            .withVersion( uniqueIdStr )
-            .withType( "some type that isn't 'jar' so our code assumes it's a directory" )
-            .build();
+                .withFileOrDirectory(tempDirectory)
+                .withVersion(uniqueIdStr)
+                .withType("some type that isn't 'jar' so our code assumes it's a directory")
+                .build();
 
-        return new ClassFile( pathToClassFile, artifact,
-                              () -> Files.newInputStream( tempDirectory.toPath().resolve( pathToClassFile ) ) );
+        return new ClassFile(
+                pathToClassFile,
+                artifact,
+                () -> Files.newInputStream(tempDirectory.toPath().resolve(pathToClassFile)));
     }
 
-    private File createTempDirectory( String uniqueIdStr )
-    {
-        try
-        {
-            return temporaryFolder.newFolder( uniqueIdStr );
-        }
-        catch ( IOException exception )
-        {
-            throw new RuntimeException( "unable to create temporary folder", exception );
+    private File createTempDirectory(String uniqueIdStr) {
+        try {
+            return temporaryFolder.newFolder(uniqueIdStr);
+        } catch (IOException exception) {
+            throw new RuntimeException("unable to create temporary folder", exception);
         }
     }
 
-    private void createClassFile( File directory, String pathToClassFile, String fileContents ) throws IOException
-    {
-        File file = new File( directory, pathToClassFile );
+    private void createClassFile(File directory, String pathToClassFile, String fileContents) throws IOException {
+        File file = new File(directory, pathToClassFile);
 
         boolean madeDirs = file.getParentFile().mkdirs();
-        if ( !madeDirs )
-        {
-            throw new RuntimeException( "unable to create parent directories for " + file );
+        if (!madeDirs) {
+            throw new RuntimeException("unable to create parent directories for " + file);
         }
 
         file.createNewFile();
 
-        try ( FileWriter writer = new FileWriter( file ) )
-        {
-            writer.write( fileContents );
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(fileContents);
         }
     }
 }

@@ -31,76 +31,61 @@ import java.util.Set;
 /**
  * LogParser for BanDuplicateClasses Enforcer Rule used for integration test verification by parsing the messages from the BanDuplicateClasses rule.
  */
-public class BanDuplicateClassesLogParser
-{
+public class BanDuplicateClassesLogParser {
     private static final String DUPLICATE_START_LINE =
-        "[ERROR] Rule 0: org.apache.maven.plugins.enforcer.BanDuplicateClasses failed with message:";
-    
+            "[ERROR] Rule 0: org.apache.maven.plugins.enforcer.BanDuplicateClasses failed with message:";
+
     private final File logFile;
-    
-    public BanDuplicateClassesLogParser( File logFile )
-    {
+
+    public BanDuplicateClassesLogParser(File logFile) {
         this.logFile = logFile;
     }
 
     /**
      * Parse out the violations from BanDuplicateClasses in a log file.
-     * 
+     *
      * @return A map where the keys are sets of jars which contain duplicate classes, and the values are sets of classes
      *         which are duplicated in those jars.
      * @throws IOException if the reader for the log file throws one
      */
-    public Map<Set<String>, Set<String>> parse( )
-        throws IOException
-    {
+    public Map<Set<String>, Set<String>> parse() throws IOException {
         Map<Set<String>, Set<String>> duplicates = new HashMap<>();
 
-        try ( BufferedReader reader = new BufferedReader( new FileReader( logFile ) ) )
-        {
+        try (BufferedReader reader = new BufferedReader(new FileReader(logFile))) {
             String line;
-            while ( ( line = reader.readLine() ) != null )
-            {
-                if ( DUPLICATE_START_LINE.equals( line.trim() ) )
-                {
+            while ((line = reader.readLine()) != null) {
+                if (DUPLICATE_START_LINE.equals(line.trim())) {
                     break;
                 }
             }
-            while ( ( line = reader.readLine() ) != null )
-            {
-                if ( line.startsWith( "[INFO] ---" ) )
-                {
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("[INFO] ---")) {
                     break;
                 }
-                if ( line.equals( "  Found in:" ) )
-                {
-                    Set<String> jars = readFoundInJars( reader );
-                    Set<String> classes = readDuplicateClasses( reader );
-                    duplicates.put( jars, classes );
+                if (line.equals("  Found in:")) {
+                    Set<String> jars = readFoundInJars(reader);
+                    Set<String> classes = readDuplicateClasses(reader);
+                    duplicates.put(jars, classes);
                 }
             }
         }
         return duplicates;
     }
 
-    private static Set<String> readFoundInJars( BufferedReader reader )
-        throws IOException
-    {
+    private static Set<String> readFoundInJars(BufferedReader reader) throws IOException {
         Set<String> jars = new HashSet<>();
-        for ( String line = reader.readLine(); line != null && !"  Duplicate classes:".equals( line ); line =
-            reader.readLine() )
-        {
-            jars.add( line.trim() );
+        for (String line = reader.readLine();
+                line != null && !"  Duplicate classes:".equals(line);
+                line = reader.readLine()) {
+            jars.add(line.trim());
         }
         return jars;
     }
 
-    private static Set<String> readDuplicateClasses( BufferedReader reader )
-        throws IOException
-    {
+    private static Set<String> readDuplicateClasses(BufferedReader reader) throws IOException {
         Set<String> classes = new HashSet<>();
-        for ( String line = reader.readLine(); line != null && line.length() > 0; line = reader.readLine() )
-        {
-            classes.add( line.trim() );
+        for (String line = reader.readLine(); line != null && line.length() > 0; line = reader.readLine()) {
+            classes.add(line.trim());
         }
         return classes;
     }

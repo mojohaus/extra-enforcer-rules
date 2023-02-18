@@ -30,18 +30,15 @@ import org.apache.maven.project.MavenProject;
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
  */
-public class RequireContributorRoles extends AbstractRequireRoles<Contributor>
-{
+public class RequireContributorRoles extends AbstractRequireRoles<Contributor> {
 
     @Override
-    protected final String getRoleName()
-    {
+    protected final String getRoleName() {
         return "contributor";
     }
 
     @Override
-    protected List<Contributor> getRoles( MavenProject mavenProject )
-    {
+    protected List<Contributor> getRoles(MavenProject mavenProject) {
         return mavenProject.getContributors();
     }
 }

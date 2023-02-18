@@ -30,18 +30,15 @@ import org.apache.maven.project.MavenProject;
  * @author Mirko Friedenhagen
  * @since 1.0-alpha-3
  */
-public class RequireDeveloperRoles extends AbstractRequireRoles<Developer>
-{
+public class RequireDeveloperRoles extends AbstractRequireRoles<Developer> {
 
     @Override
-    protected String getRoleName()
-    {
+    protected String getRoleName() {
         return "developer";
     }
 
     @Override
-    protected List<Developer> getRoles( MavenProject mavenProject )
-    {
+    protected List<Developer> getRoles(MavenProject mavenProject) {
         return mavenProject.getDevelopers();
     }
 }

@@ -22,4 +22,3 @@ package org.codehaus.mojo.extraenforcerrules.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
