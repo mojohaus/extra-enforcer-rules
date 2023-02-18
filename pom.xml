@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
-    <version>70</version>
+    <version>73</version>
   </parent>
 
   <artifactId>extra-enforcer-rules</artifactId>
@@ -141,9 +141,6 @@
             </goals>
             <configuration>
               <rules>
-                <requireMavenVersion>
-                  <version>${maven.version}</version>
-                </requireMavenVersion>
                 <bannedDependencies>
                   <excludes>
                     <exclude>org.apache.maven.enforcer:enforcer-rules</exclude>
@@ -212,16 +209,6 @@
           </plugin>
         </plugins>
       </build>
-    </profile>
-
-    <profile>
-      <id>java9+</id>
-      <activation>
-        <jdk>[9,)</jdk>
-      </activation>
-      <properties>
-        <maven.compiler.release>8</maven.compiler.release>
-      </properties>
     </profile>
   </profiles>
 </project>
