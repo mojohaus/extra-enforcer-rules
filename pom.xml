@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>extra-enforcer-rules</artifactId>
-  <version>1.6.2-SNAPSHOT</version>
+  <version>1.6.2</version>
 
   <name>Extra Enforcer Rules</name>
 
@@ -52,7 +52,7 @@
   <scm>
     <connection>scm:git:https://github.com/mojohaus/extra-enforcer-rules.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mojohaus/extra-enforcer-rules.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>1.6.2</tag>
     <url>https://github.com/mojohaus/extra-enforcer-rules/tree/master</url>
   </scm>
 
@@ -65,7 +65,7 @@
     <!-- we need dot less properties for .vm -->
     <enforcerPluginVersion>${maven-enforcer-plugin.version}</enforcerPluginVersion>
     <maven.version>3.2.5</maven.version>
-    <project.build.outputTimestamp>2022-07-23T12:17:48Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2023-03-28T21:55:50Z</project.build.outputTimestamp>
   </properties>
 
   <dependencyManagement>
