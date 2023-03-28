@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>extra-enforcer-rules</artifactId>
-  <version>1.6.2</version>
+  <version>1.6.3-SNAPSHOT</version>
 
   <name>Extra Enforcer Rules</name>
 
@@ -65,7 +65,7 @@
     <!-- we need dot less properties for .vm -->
     <enforcerPluginVersion>${maven-enforcer-plugin.version}</enforcerPluginVersion>
     <maven.version>3.2.5</maven.version>
-    <project.build.outputTimestamp>2023-03-28T21:55:50Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2023-03-28T21:56:44Z</project.build.outputTimestamp>
   </properties>
 
   <dependencyManagement>
