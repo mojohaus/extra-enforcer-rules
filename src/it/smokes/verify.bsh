@@ -7,7 +7,7 @@ try
     File file = new File( basedir, "build.log" );
     String buf = FileUtils.fileRead( file );
 
-    Pattern p = Pattern.compile( "\\Qorg.apache.maven.plugins.enforcer.BanDuplicateClasses failed with message\\E" );
+    Pattern p = Pattern.compile( "\\Qorg.codehaus.mojo.extraenforcer.dependencies.BanDuplicateClasses failed with message\\E" );
     Matcher m = p.matcher( buf.toString() );
     if ( !m.find() )
     {

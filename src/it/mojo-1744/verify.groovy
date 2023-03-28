@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import org.codehaus.mojo.extraenforcerrules.it.BanDuplicateClassesLogParser;
+import org.codehaus.mojo.extraenforcer.it.BanDuplicateClassesLogParser;
 
 File log = new File( basedir, 'build.log' )
 assert log.exists()
