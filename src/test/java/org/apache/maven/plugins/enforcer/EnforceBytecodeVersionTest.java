@@ -30,5 +30,6 @@ public class EnforceBytecodeVersionTest {
         assertEquals("JDK 12", EnforceBytecodeVersion.renderVersion(56, 0));
         assertEquals("51.3", EnforceBytecodeVersion.renderVersion(51, 3));
         assertEquals("44.0", EnforceBytecodeVersion.renderVersion(44, 0));
+        assertEquals("JDK 21", EnforceBytecodeVersion.renderVersion(65, 0));
     }
 }

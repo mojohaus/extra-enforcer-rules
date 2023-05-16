@@ -120,6 +120,9 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
 
         // Java 20
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("20", 64);
+
+        // Java 21
+        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("21", 65);
     }
 
     static String renderVersion(int major, int minor) {
