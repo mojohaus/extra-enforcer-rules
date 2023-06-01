@@ -1,3 +1,4 @@
-org.apache.maven.plugins.enforcer
-org.codehaus.mojo.enforcer
+org.codehaus.mojo.extraenforcer.dependencies
+org.codehaus.mojo.extraenforcer.encoding
+org.codehaus.mojo.extraenforcer.model
 org.freebsd.file
