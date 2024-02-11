@@ -299,8 +299,7 @@ public class EnforceBytecodeVersion
             jarFile = new JarFile( f );
             getLog().debug( f.getName() + " => " + f.getPath() );
             byte[] magicAndClassFileVersion = new byte[8];
-            StringBuilder artifactInfo = new StringBuilder();
-            artifactInfo.append( "(" ).append( a.getGroupId() ).append( ":" ).append( a.getArtifactId() ).append( ") " );
+            String artifactInfo =  "("  + a.getGroupId() + ":"  + a.getArtifactId() + ") ";
             JAR: for ( Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); )
             {
                 JarEntry entry = e.nextElement();
