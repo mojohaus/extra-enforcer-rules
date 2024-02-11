@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
-    <version>74</version>
+    <version>78</version>
   </parent>
 
   <artifactId>extra-enforcer-rules</artifactId>
@@ -61,22 +61,11 @@
     <recommendedJavaBuildVersion>11</recommendedJavaBuildVersion>
 
     <!-- override from parent pom, here we need more control -->
-    <maven-enforcer-plugin.version>3.3.0</maven-enforcer-plugin.version>
+    <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
     <!-- we need dot less properties for .vm -->
     <enforcerPluginVersion>${maven-enforcer-plugin.version}</enforcerPluginVersion>
-    <maven.version>3.6.3</maven.version>
     <project.build.outputTimestamp>2023-06-01T15:30:27Z</project.build.outputTimestamp>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-plugin-api</artifactId>
-        <version>${maven.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <!-- enforcer API -->
@@ -91,7 +80,7 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
-      <version>${maven.version}</version>
+      <version>${mavenVersion}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -118,7 +107,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
