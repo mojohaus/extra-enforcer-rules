@@ -46,7 +46,10 @@
   <repositories>
     <repository>
       <id>local-project-repo</id>
-      <url>${project.baseUri}local-repo</url>
+      <url>file://${project.basedir}/local-repo</url>
+      <releases>
+        <checksumPolicy>ignore</checksumPolicy>
+      </releases>
     </repository>
   </repositories>
 </project>
