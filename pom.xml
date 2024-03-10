@@ -52,7 +52,7 @@
   <scm>
     <connection>scm:git:https://github.com/mojohaus/extra-enforcer-rules.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mojohaus/extra-enforcer-rules.git</developerConnection>
-    <tag>1.7.0</tag>
+    <tag>HEAD</tag>
     <url>https://github.com/mojohaus/extra-enforcer-rules/tree/master</url>
   </scm>
 
@@ -84,11 +84,6 @@
     </dependency>
 
     <!-- Maven shared -->
-    <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-dependency-tree</artifactId>
-      <version>3.2.1</version>
-    </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-common-artifact-filters</artifactId>

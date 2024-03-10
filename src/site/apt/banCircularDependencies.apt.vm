@@ -24,11 +24,18 @@
 Ban Circular Dependencies
 
   This rule checks the dependencies and fails if the groupId:artifactId combination exists in the list of direct or transitive dependencies.
-  
-  <<Note that this rule is of no use for Maven 2. It is only useful if you use or plan to use Maven 3. 
-  (For more information about this, see {{{http://mojo.10943.n7.nabble.com/VOTE-Release-extra-enforcer-rules-version-1-0-alpha-4-td39196.html#a39216}this thread.}})>>
 
-    []
+  The following parameters are supported by this rule:
+
+  * <<scopes>> - a list of scopes (e.g. test, provided) to include when scanning artifacts
+
+  * <<ignoredScopes>> - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
+
+  * <<ignoreOptionals>> - a boolean, if <<<true>>> all dependencies which have <<<<optional>true</optional>>>> are ignored.
+
+  * <<searchTransitive>> - a boolean, specify if transitive dependencies should be searched (default) or only look at direct dependencies.
+
+  []
 
 
   Sample Plugin Configuration:

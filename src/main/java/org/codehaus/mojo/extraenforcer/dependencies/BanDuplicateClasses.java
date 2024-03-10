@@ -41,7 +41,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleError;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.RepositorySystem;
 
@@ -82,20 +81,14 @@ public class BanDuplicateClasses extends AbstractResolveDependencies {
     private List<Dependency> dependencies;
 
     /**
-     * Only verify dependencies with one of these scopes
-     */
-    private List<String> scopes;
-
-    /**
      * If {@code true} do not fail the build when duplicate classes exactly match each other. In other words, ignore
      * duplication if the bytecode in the class files match. Default is {@code false}.
      */
     private boolean ignoreWhenIdentical;
 
     @Inject
-    protected BanDuplicateClasses(
-            MavenSession session, RepositorySystem repositorySystem, DependencyGraphBuilder graphBuilder) {
-        super(session, repositorySystem, graphBuilder);
+    protected BanDuplicateClasses(MavenSession session, RepositorySystem repositorySystem) {
+        super(session, repositorySystem);
     }
 
     @Override
@@ -133,10 +126,6 @@ public class BanDuplicateClasses extends AbstractResolveDependencies {
         Map<String, ClassesWithSameName> classesSeen = new HashMap<>();
         Set<String> duplicateClassNames = new HashSet<>();
         for (Artifact o : artifacts) {
-            if (scopes != null && !scopes.contains(o.getScope())) {
-                getLog().debug(() -> "Skipping " + o + " due to scope");
-                continue;
-            }
             File file = o.getFile();
             getLog().debug(() -> "Searching for duplicate classes in " + file);
             if (file == null || !file.exists()) {
