@@ -31,11 +31,6 @@
 						</enforceBytecodeVersion>
 					</rules>
 				</configuration>
-				<executions>
-					<execution>
-						<phase>compile</phase>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

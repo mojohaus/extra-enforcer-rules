@@ -182,8 +182,7 @@
                 <enforcerPluginVersion>${maven-enforcer-plugin.version}</enforcerPluginVersion>
               </filterProperties>
               <goals>
-                <goal>clean</goal>
-                <goal>initialize</goal>
+                <goal>enforcer:enforce</goal>
               </goals>
             </configuration>
             <executions>
