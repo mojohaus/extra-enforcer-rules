@@ -67,9 +67,9 @@ Require Encoding
                 <requireEncoding>
                   <encoding>UTF-8</encoding>
                   <includes>src/main/resources/**,src/test/resources/**</includes>
+                  <fastFail>false</fastFail>
                 </requireEncoding>
               </rules>
-              <fastFail>false</fastFail>
             </configuration>
           </execution>
         </executions>
