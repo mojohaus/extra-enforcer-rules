@@ -162,16 +162,13 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
         public Pattern type;
         public List<Pattern> ignores = new ArrayList<>();
 
-        public IgnorableDependency applyIgnoreClasses(String[] ignores, boolean indent) {
+        public void applyIgnoreClasses(String[] ignores, boolean indent) {
             String prefix = indent ? "  " : "";
             for (String ignore : ignores) {
-                getLog().info(prefix + "Adding ignore: " + ignore);
-                ignore = ignore.replace('.', '/');
-                String pattern = asRegex(ignore);
-                getLog().debug(prefix + "Ignore: " + ignore + " maps to regex " + pattern);
+                String pattern = asRegex(ignore.replace('.', '/'));
+                getLog().debug(() -> prefix + "Ignore: " + ignore + " maps to regex " + pattern);
                 this.ignores.add(Pattern.compile(pattern));
             }
-            return this;
         }
 
         public boolean matchesArtifact(Artifact dup) {
