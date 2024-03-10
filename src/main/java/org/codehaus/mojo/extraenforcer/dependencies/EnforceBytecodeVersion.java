@@ -46,7 +46,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.shared.artifact.filter.AbstractStrictPatternArtifactFilter;
 import org.apache.maven.shared.artifact.filter.StrictPatternExcludesArtifactFilter;
 import org.apache.maven.shared.artifact.filter.StrictPatternIncludesArtifactFilter;
-import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.aether.RepositorySystem;
 
 /**
@@ -154,7 +153,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
     private String message;
 
     /**
-     * JDK version as used for example in the maven-compiler-plugin: 1.5, 1.6 and so on. If in need of more precise
+     * JDK version as used for example in the maven-compiler-plugin: 8, 11 and so on. If in need of more precise
      * configuration please see {@link #maxJavaMajorVersionNumber} and {@link #maxJavaMinorVersionNumber} Mandatory if
      * {@link #maxJavaMajorVersionNumber} not specified.
      */
@@ -224,14 +223,13 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
         }
         if (maxJdkVersion == null && maxJavaMajorVersionNumber == -1) {
             throw new IllegalArgumentException(
-                    "Exactly one of maxJdkVersion or " + "maxJavaMajorVersionNumber options should be set.");
+                    "Exactly one of maxJdkVersion or maxJavaMajorVersionNumber options should be set.");
         }
         if (maxJdkVersion != null) {
             Integer needle = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get(maxJdkVersion);
             if (needle == null) {
                 throw new IllegalArgumentException(
-                        "Unknown JDK version given. Should be something like "
-                                + "\"1.7\", \"8\", \"11\", \"12\", \"13\", \"14\", \"15\", \"16\", \"17\", \"18\", \"19\", \"20\"");
+                        "Unknown JDK version given. Should be something like \"8\", \"11\", \"17\", \"21\" ..");
             }
             maxJavaMajorVersionNumber = needle;
             if (!strict && needle < 53) {
@@ -291,25 +289,16 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
                         }
                     }
 
-                    InputStream is = null;
-                    try {
-                        is = jarFile.getInputStream(entry);
+                    try (InputStream is = jarFile.getInputStream(entry)) {
                         int total = magicAndClassFileVersion.length;
                         while (total > 0) {
                             int read =
                                     is.read(magicAndClassFileVersion, magicAndClassFileVersion.length - total, total);
-
                             if (read == -1) {
                                 throw new EOFException(f.toString());
                             }
-
                             total -= read;
                         }
-
-                        is.close();
-                        is = null;
-                    } finally {
-                        IOUtil.close(is);
                     }
 
                     int minor = (magicAndClassFileVersion[4] << 8) + magicAndClassFileVersion[5];
