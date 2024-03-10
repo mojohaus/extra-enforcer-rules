@@ -41,7 +41,11 @@ Require Encoding
    * <<useDefaultExcludes>> - enable SCM file exclusions, enbled by default.
 
    * <<failFast>> - Should the rule fail after the first error or should the errors be aggregated. Default true.
-   
+
+   * <<acceptAsciiSubset>> - a boolean, accept US-ASCII as an subset of UTF-8 and ISO-8859-1/-15, default <<<false>>>.
+
+   * <<acceptIso8859Subset>> - a boolean, accept ISO-8859-1 as a subset of ISO-8859-15, default <<<false>>>.
+
    []
 
 
