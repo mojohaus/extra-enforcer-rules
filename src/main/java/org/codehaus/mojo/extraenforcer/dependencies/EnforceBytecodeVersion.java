@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -47,7 +46,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.shared.artifact.filter.AbstractStrictPatternArtifactFilter;
 import org.apache.maven.shared.artifact.filter.StrictPatternExcludesArtifactFilter;
 import org.apache.maven.shared.artifact.filter.StrictPatternIncludesArtifactFilter;
-import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.aether.RepositorySystem;
 
@@ -138,9 +136,8 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
     }
 
     @Inject
-    protected EnforceBytecodeVersion(
-            MavenSession session, RepositorySystem repositorySystem, DependencyGraphBuilder graphBuilder) {
-        super(session, repositorySystem, graphBuilder);
+    protected EnforceBytecodeVersion(MavenSession session, RepositorySystem repositorySystem) {
+        super(session, repositorySystem);
     }
 
     static String renderVersion(int major, int minor) {
@@ -177,9 +174,6 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
      */
     int maxJavaMinorVersionNumber = 0;
 
-    /** Specify if transitive dependencies should be searched (default) or only look at direct dependencies. */
-    private boolean searchTransitive = true;
-
     /**
      * @see AbstractStrictPatternArtifactFilter
      */
@@ -194,17 +188,6 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
      * Process module-info and Multi-Release JAR classes if true
      */
     private boolean strict = false;
-
-    /**
-     * Optional list of dependency scopes to ignore. {@code test} and {@code provided} make sense here.
-     */
-    private String[] ignoredScopes;
-
-    /**
-     * Ignore all dependencies which have {@code &lt;optional&gt;true&lt;/optional&gt;}.
-     * @since 1.2
-     */
-    private boolean ignoreOptionals = false;
 
     private List<IgnorableDependency> ignorableDependencies = new ArrayList<>();
 
@@ -228,11 +211,6 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
 
             throw new EnforcerRuleException(message);
         }
-    }
-
-    @Override
-    protected boolean isSearchTransitive() {
-        return searchTransitive;
     }
 
     protected CharSequence getErrorMessage(Artifact artifact) {
@@ -392,15 +370,6 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
     }
 
     /**
-     * Sets the search transitive.
-     *
-     * @param theSearchTransitive the searchTransitive to set
-     */
-    public void setSearchTransitive(boolean theSearchTransitive) {
-        this.searchTransitive = theSearchTransitive;
-    }
-
-    /**
      * Process module-info and Multi-Release JAR classes if true
      * @param strict the strictness to set
      */
@@ -416,7 +385,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
      * @return the resulting set of dependencies
      */
     private Set<Artifact> filterArtifacts(Set<Artifact> dependencies) {
-        if (includes == null && excludes == null && ignoredScopes == null && !ignoreOptionals) {
+        if (includes == null && excludes == null) {
             return dependencies;
         }
 
@@ -430,12 +399,6 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
 
         Set<Artifact> result = new HashSet<>();
         for (Artifact artifact : dependencies) {
-            if (ignoredScopes != null && Arrays.asList(ignoredScopes).contains(artifact.getScope())) {
-                continue;
-            }
-            if (ignoreOptionals && artifact.isOptional()) {
-                continue;
-            }
             if (filter.include(artifact)) {
                 result.add(artifact);
             }

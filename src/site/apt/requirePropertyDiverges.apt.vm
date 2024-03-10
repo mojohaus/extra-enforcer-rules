@@ -38,9 +38,9 @@ Require Property Diverges
 
   The following parameters are supported by this rule:
 
-   * <<<property>>> - name of the property which should diverge. Must be given.
+   * <<property>> - name of the property which should diverge. Must be given.
 
-   * <<<regex>>> - match the property value to a given regular expression. 
+   * <<regex>> - match the property value to a given regular expression.
    When not given, this rule checks that the property in the child does not equal
    the one from the defining ancestor. 
 

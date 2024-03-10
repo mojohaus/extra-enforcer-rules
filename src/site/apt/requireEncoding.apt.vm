@@ -32,15 +32,15 @@ Require Encoding
 
   The following parameters are supported by this rule:
 
-   * <<<encoding>>> - Required encoding. Default value <<<$\{project.build.sourceEncoding\}>>>.
+   * <<encoding>> - Required encoding. Default value <<<$\{project.build.sourceEncoding\}>>>.
    
-   * <<<includes>>> - List of files to include, separated by comma or pipe
+   * <<includes>> - List of files to include, separated by comma or pipe
 
-   * <<<excludes>>> - List of files to exclude, separated by comma or pipe
+   * <<excludes>> - List of files to exclude, separated by comma or pipe
 
-   * <<<useDefaultExcludes>>> - enable SCM file exclusions, enbled by default.
+   * <<useDefaultExcludes>> - enable SCM file exclusions, enbled by default.
 
-   * <<<failFast>>> - Should the rule fail after the first error or should the errors be aggregated. Default true.
+   * <<failFast>> - Should the rule fail after the first error or should the errors be aggregated. Default true.
    
    []
 

@@ -33,14 +33,13 @@ Require Developer Roles
 
   The following parameters are supported by this rule:
 
-   * <<<requiredRoles>>> - Comma separated list of roles which must be represented
+   * <<requiredRoles>> - Comma separated list of roles which must be represented
    by at least one developer.
 
-   * <<<validRoles>>> - Comma separated list of roles which are additionally allowed. <<<requiredRoles>>> are always valid, so the union of <<<requiredRoles>>> and <<<validRoles>>> forms the set of all accepted roles.
+   * <<validRoles>> - Comma separated list of roles which are additionally allowed. <<<requiredRoles>>> are always valid, so the union of <<<requiredRoles>>> and <<<validRoles>>> forms the set of all accepted roles.
    By default it has the value <<<*>>>, which means every role is accepted. This rule does <<not>> support Ant-patterns.
    
    []
-
 
   Sample Plugin Configuration:
 

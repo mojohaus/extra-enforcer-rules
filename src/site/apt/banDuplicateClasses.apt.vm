@@ -28,22 +28,27 @@ Ban Duplicate Classes
 
   This rule checks the dependencies and fails if any class is present in more than one dependency.
 
-   The following parameters are supported by this rule:
+  The following parameters are supported by this rule:
 
-   * ignoreClasses - a list of classes to ignore duplicates of. Wildcards can be specified using the * character.
+    * <<ignoreClasses>> - a list of classes to ignore duplicates of. Wildcards can be specified using the * character.
 
-   * findAllDuplicates - a boolean to indicate whether the rule should find all duplicates or fail fast at the first duplicate. Defaults to <<<false>>>.
+    * <<findAllDuplicates>> - a boolean to indicate whether the rule should find all duplicates or fail fast at the first duplicate. Defaults to <<<false>>>.
 
-   * ignoreWhenIdentical - when <<<true>>> indicates duplicate classes don't fail the build when their bytecode exactly matches each other. Defaults to <<<false>>>.
+    * <<ignoreWhenIdentical>> - when <<<true>>> indicates duplicate classes don't fail the build when their bytecode exactly matches each other. Defaults to <<<false>>>.
 
-   * message - an optional message to provide when duplicates are found.
-   
-   * dependencies - a list of dependencies for which you want to ignore specific classes.
+    * <<message>> - an optional message to provide when duplicates are found.
 
-   * scopes - only verify dependencies with one of these scopes
+    * <<dependencies>> - a list of dependencies for which you want to ignore specific classes.
 
-   []
+    * <<scopes>> - a list of scopes (e.g. test, provided) to include when scanning artifacts
 
+    * <<ignoredScopes>> - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
+
+    * <<ignoreOptionals>> - a boolean, if <<<true>>> all dependencies which have <<<<optional>true</optional>>>> are ignored.
+
+    * <<searchTransitive>> - a boolean, specify if transitive dependencies should be searched (default) or only look at direct dependencies.
+
+    []
 
   Sample Plugin Configuration:
 
