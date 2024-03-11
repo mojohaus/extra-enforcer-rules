@@ -66,6 +66,8 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
      */
     private String regex = null;
 
+    private String reference = "DEFINING";
+
     private static final String RULE_NAME =
             StringUtils.lowercaseFirstLetter(RequirePropertyDiverges.class.getSimpleName());
 
@@ -89,13 +91,15 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
         Object propValue = getPropertyValue();
         checkPropValueNotBlank(propValue);
 
+        ParentReference parentReference = getParentReference();
+
         getLog().debug(() -> getRuleName() + ": checking property '" + property + "' for project " + project);
 
-        final MavenProject parent = findDefiningParent(project);
+        final MavenProject parent = findParent(project, parentReference);
 
-        // fail fast if the defining parent could not be found due to a bug in the rule
+        // fail fast if the reference parent could not be found due to a bug in the rule
         if (parent == null) {
-            throw new IllegalStateException("Failed to find parent POM which defines the current rule");
+            throw new IllegalStateException("Failed to find reference POM which defines the current value");
         }
 
         if (project.equals(parent)) {
@@ -112,7 +116,7 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
     }
 
     /**
-     * Checks the value of the project against the one given in the defining ancestor project.
+     * Checks the value of the project against the one given in the reference ancestor project.
      *
      * @param project
      * @param parent
@@ -154,6 +158,26 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
     }
 
     /**
+     * Finds the ancestor project which defines the reference value.
+     *
+     * @param project to inspect
+     * @param reference project to diverge from
+     * @return the defining ancestor project.
+     */
+    final MavenProject findParent(final MavenProject project, ParentReference reference) {
+        switch (reference) {
+            case BASE:
+                return findBaseParent(project);
+            case DEFINING:
+                return findDefiningParent(project);
+            case PARENT:
+                return findDirectParent(project);
+            default:
+                throw new IllegalArgumentException("Unhandled ParentReference: " + reference.name());
+        }
+    }
+
+    /**
      * Finds the ancestor project which defines the rule.
      *
      * @param project to inspect
@@ -174,6 +198,32 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
             parent = parent.getParent();
         }
         return parent;
+    }
+
+    /**
+     * Finds the direct ancestor project.
+     *
+     * @param project to inspect
+     * @return the top-most local project or current project if it has no parent.
+     *
+     */
+    final MavenProject findDirectParent(MavenProject project) {
+        MavenProject parent = project.getParent();
+        return parent == null ? project : parent;
+    }
+
+    /**
+     * Finds the top-most local ancestor project.
+     *
+     * @param project to inspect
+     * @return the top-most local project.
+     */
+    final MavenProject findBaseParent(final MavenProject project) {
+        MavenProject current = project;
+        while (current.getParentFile() != null) {
+            current = project.getParent();
+        }
+        return current;
     }
 
     /**
@@ -338,6 +388,31 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
     }
 
     /**
+     * Extracted for easier testability.
+     *
+     * @return the ParentReference constant.
+     * @throws EnforcerRuleException if null or no ParentReference matches (case-insensitively)
+     */
+    ParentReference getParentReference() throws EnforcerRuleException {
+        return getParentReference(reference);
+    }
+
+    /**
+     * Extracted for easier testability.
+     *
+     * @param parentReferenceName name of the ParentReference.
+     * @return the ParentReference constant.
+     * @throws EnforcerRuleException if null or no ParentReference matches (case-insensitively)
+     */
+    ParentReference getParentReference(String parentReferenceName) throws EnforcerRuleException {
+        try {
+            return ParentReference.valueOf(StringUtils.upperCase(StringUtils.strip(parentReferenceName)));
+        } catch (IllegalArgumentException iae) {
+            throw new EnforcerRuleError("Unknown parent reference value: " + parentReferenceName, iae);
+        }
+    }
+
+    /**
      * Either return the submitted errorMessage or replace it with the custom message set in the rule extended
      * by the property name.
      *
@@ -373,6 +448,13 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
      */
     void setMessage(String message) {
         this.message = message;
+    }
+
+    /**
+     * @param reference the reference to set
+     */
+    void setReference(String reference) {
+        this.reference = reference;
     }
 
     /**
@@ -415,5 +497,20 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
                 ruleDom.addChild(entry);
             }
         }
+    }
+
+    enum ParentReference {
+        /**
+         * The top-most local project (i.e.: the highest parent whose POM does not come from a repository)
+         */
+        BASE,
+        /**
+         * The parent where the current requirePropertyDiverges rule is defined
+         */
+        DEFINING,
+        /**
+         * The immediate parent (same as ${project.parent})
+         */
+        PARENT
     }
 }
