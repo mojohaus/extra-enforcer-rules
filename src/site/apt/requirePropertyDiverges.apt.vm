@@ -40,6 +40,14 @@ Require Property Diverges
 
    * <<property>> - name of the property which should diverge. Must be given.
 
+   * <<reference>> - parent level to use as evaluation context for the reference value:
+
+      * DEFINING - the rule-defining POM. Default historical behaviour.
+
+      * PARENT - the direct parent of the current POM. The rule is skipped if the POM has no parent.
+
+      * BASE - the top-most local POM of the project. The rule is skipped if the current POM is the top-most POM.
+
    * <<regex>> - match the property value to a given regular expression.
    When not given, this rule checks that the property in the child does not equal
    the one from the defining ancestor. 
@@ -47,7 +55,7 @@ Require Property Diverges
    []
 
   Note that certain properties (e.g. <<<project.url>>> or <<<project.scm.connection>>>
-  are automatically extended with the child's <<<project.artifactId>>>, so using
+  are automatically extended with the child's <<<project.artifactId>>> (see {{{https://maven.apache.org/ref/current/maven-model-builder/#inheritance-assembly}Inheritance assembly}}), so using
   a regex will help in this case, see sample below.
  
   Another caveat: properties defined in the <<<properties>>> section will be 
