@@ -401,7 +401,7 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
      * Extracted for easier testability.
      *
      * @param parentReferenceName name of the ParentReference.
-     * @return the ParentReference constant.
+     * @return the ParentReference enum constant.
      * @throws EnforcerRuleException if null or no ParentReference matches (case-insensitively)
      */
     ParentReference getParentReference(String parentReferenceName) throws EnforcerRuleException {

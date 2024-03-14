@@ -19,6 +19,8 @@ package org.codehaus.mojo.extraenforcer.model;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.enforcer.rule.api.EnforcerLogger;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.model.Build;
@@ -222,6 +224,87 @@ public class RequirePropertyDivergesTest {
         testCheckAgainstParentValue("company.parent-pom", "company.project1");
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testGetParentReferenceNull() throws EnforcerRuleException {
+        RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
+        instance.getParentReference(null);
+    }
+
+    @Test(expected = EnforcerRuleException.class)
+    public void testGetParentReferenceEmpty() throws EnforcerRuleException {
+        RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
+        instance.getParentReference("");
+    }
+
+    @Test
+    public void testGetParentReferenceKnownValues() throws EnforcerRuleException {
+        RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
+        assertEquals(RequirePropertyDiverges.ParentReference.BASE, instance.getParentReference("BaSE"));
+        assertEquals(RequirePropertyDiverges.ParentReference.DEFINING, instance.getParentReference("Defining"));
+        assertEquals(RequirePropertyDiverges.ParentReference.PARENT, instance.getParentReference("PaRenT"));
+    }
+
+    @Test(expected = EnforcerRuleException.class)
+    public void testGetParentReferenceUnknownValue() throws EnforcerRuleException {
+        RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
+        instance.getParentReference("BOGUS");
+    }
+
+    @Test
+    public void testGetParentReferenceDefault() throws EnforcerRuleException {
+        RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
+        assertEquals(RequirePropertyDiverges.ParentReference.DEFINING, instance.getParentReference());
+    }
+
+    @Test
+    public void testFindParentDefining() throws EnforcerRuleException {
+        RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
+        MavenProject root = createParentProject();
+        MavenProject base = createMavenProject("company", "main-pom");
+        MavenProject child = createMavenProject("company", "child");
+        child.setParent(base);
+        base.setParent(root);
+        // Rule is defined in "root", expect root always
+        assertEquals(root, instance.findParent(root, RequirePropertyDiverges.ParentReference.DEFINING));
+        assertEquals(root, instance.findParent(base, RequirePropertyDiverges.ParentReference.DEFINING));
+        assertEquals(root, instance.findParent(child, RequirePropertyDiverges.ParentReference.DEFINING));
+    }
+
+    @Test
+    public void testFindParentParent() throws EnforcerRuleException {
+        RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
+        MavenProject root = createParentProject();
+        MavenProject base = createMavenProject("company", "main-pom");
+        MavenProject child = createMavenProject("company", "child");
+        child.setParent(base);
+        base.setParent(root);
+        // "root" has no parent, expect root (self)
+        assertEquals(root, instance.findParent(root, RequirePropertyDiverges.ParentReference.PARENT));
+        // base's parent is root, expect root
+        assertEquals(root, instance.findParent(base, RequirePropertyDiverges.ParentReference.PARENT));
+        // child's parent is base, expect base
+        assertEquals(base, instance.findParent(child, RequirePropertyDiverges.ParentReference.PARENT));
+    }
+
+    @Test
+    public void testFindParentBase() throws EnforcerRuleException {
+        RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
+        MavenProject root = createParentProject();
+        MavenProject base = createMavenProject("company", "main-pom");
+        base.setParentFile(null);
+        MavenProject child = createMavenProject("company", "child");
+        child.setParent(base);
+        child.setParentFile(mock(File.class));
+        base.setParent(root);
+
+        // "root" is not local, expect root (self)
+        assertEquals(root, instance.findParent(root, RequirePropertyDiverges.ParentReference.BASE));
+        // base is the top-most local (has no parentFile), expect base (self)
+        assertEquals(base, instance.findParent(base, RequirePropertyDiverges.ParentReference.BASE));
+        // child has a local parent, expect base
+        assertEquals(base, instance.findParent(child, RequirePropertyDiverges.ParentReference.BASE));
+    }
+
     void testCheckAgainstParentValue(final String parentGroupId, final String childGroupId)
             throws ExpressionEvaluationException, EnforcerRuleException {
         MavenProject project = createMavenProject(childGroupId, "child");
@@ -251,7 +334,7 @@ public class RequirePropertyDivergesTest {
     }
 
     void setUpHelper(final MavenProject project, final String propertyValue) throws RuntimeException {
-        //            when(helper.evaluate("${project}")).thenReturn(project);
+        // when(helper.evaluate("${project}")).thenReturn(project);
         try {
             when(evaluator.evaluate("${checkedProperty}")).thenReturn(propertyValue);
         } catch (ExpressionEvaluationException e) {
