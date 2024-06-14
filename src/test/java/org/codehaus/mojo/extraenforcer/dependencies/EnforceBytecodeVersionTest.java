@@ -18,7 +18,7 @@ package org.codehaus.mojo.extraenforcer.dependencies;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class EnforceBytecodeVersionTest {
 
