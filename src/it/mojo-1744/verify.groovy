@@ -23,16 +23,16 @@ assert log.exists()
 def duplicates =  new BanDuplicateClassesLogParser( log ).parse();
 
 assert duplicates == [
-  (["org.jvnet.hudson.plugins.m2release:nexus:jar:0.0.1:compile",
-    "org.slf4j:jcl-over-slf4j:jar:1.5.11:compile"] as Set)
-  : (["org/apache/commons/logging/impl/SLF4JLocationAwareLog.class"] as Set),
-  (["org.jvnet.hudson.plugins.m2release:nexus:jar:0.0.1:compile",
-    "org.slf4j:jcl-over-slf4j:jar:1.5.11:compile",
-    "commons-logging:commons-logging:jar:1.1.1:compile"] as Set)
-  : (["org/apache/commons/logging/impl/NoOpLog.class"] as Set),
-  (["commons-logging:commons-logging:jar:1.1.1:compile",
-    "org.jvnet.hudson.plugins.m2release:nexus:jar:0.0.1:compile"] as Set)
+  (["org.jvnet.hudson.plugins.m2release:nexus:jar:0.0.1",
+    "org.slf4j:jcl-over-slf4j:jar:1.5.11"] as TreeSet)
+  : (["org/apache/commons/logging/impl/SLF4JLocationAwareLog.class"] as TreeSet),
+  (["commons-logging:commons-logging:jar:1.1.1",
+    "org.jvnet.hudson.plugins.m2release:nexus:jar:0.0.1"] as TreeSet)
   : (["org/apache/commons/logging/impl/SimpleLog.class",
       "org/apache/commons/logging/impl/SimpleLog\$1.class",
-      "org/apache/commons/logging/Log.class"] as Set)
-]
+      "org/apache/commons/logging/Log.class"] as TreeSet),
+  (["commons-logging:commons-logging:jar:1.1.1",
+    "org.jvnet.hudson.plugins.m2release:nexus:jar:0.0.1",
+    "org.slf4j:jcl-over-slf4j:jar:1.5.11"] as TreeSet)
+  : (["org/apache/commons/logging/impl/NoOpLog.class"] as TreeSet)
+] as LinkedHashMap
