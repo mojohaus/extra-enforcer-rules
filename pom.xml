@@ -57,8 +57,6 @@
   </scm>
 
   <properties>
-    <checkstyle.violation.ignore>MagicNumber</checkstyle.violation.ignore>
-
     <!-- override from parent pom, here we need more control -->
     <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
     <!-- we need dot less properties for .vm -->
@@ -149,8 +147,14 @@
   <reporting>
     <plugins>
       <plugin>
+        <!-- disable as it is not a Maven plugin project -->
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-invoker-plugin</artifactId>
+        <artifactId>maven-plugin-report-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports />
+          </reportSet>
+        </reportSets>
       </plugin>
     </plugins>
   </reporting>

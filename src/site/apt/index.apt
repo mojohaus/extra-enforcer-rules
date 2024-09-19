@@ -25,10 +25,10 @@
 
 Extra Enforcer Rules
 
-  {{{http://maven.apache.org/plugins/maven-enforcer-plugin/}Apache's Maven Enforcer Plugin}} is used to apply and
+  {{{https://maven.apache.org/plugins/maven-enforcer-plugin/}Apache's Maven Enforcer Plugin}} is used to apply and
   enforce rules on your Maven projects.
 
-  The Enforcer plugin ships with a set of {{{http://maven.apache.org/enforcer/enforcer-rules/index.html}standard rules}}
+  The Enforcer plugin ships with a set of {{{https://maven.apache.org/enforcer/enforcer-rules/index.html}standard rules}}
 
   The Mojo project hosts this project to provide extra rules which are not part of the standard rule set.
 
