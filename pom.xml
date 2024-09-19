@@ -58,7 +58,7 @@
 
   <properties>
     <checkstyle.violation.ignore>MagicNumber</checkstyle.violation.ignore>
-
+    <mockito.version>4.11.0</mockito.version>
     <!-- override from parent pom, here we need more control -->
     <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
     <!-- we need dot less properties for .vm -->
@@ -99,14 +99,20 @@
 
     <!-- testing support -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>4.11.0</version>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

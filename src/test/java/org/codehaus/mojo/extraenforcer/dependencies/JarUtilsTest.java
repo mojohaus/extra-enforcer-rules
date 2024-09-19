@@ -1,18 +1,18 @@
 package org.codehaus.mojo.extraenforcer.dependencies;
 
 import org.apache.maven.artifact.Artifact;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.codehaus.mojo.extraenforcer.dependencies.ArtifactBuilder.newBuilder;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JarUtilsTest {
+class JarUtilsTest {
     /**
      * "Sunny day" test: the method should return true for a jar artifact.
      */
     @Test
-    public void isJarFileShouldReturnTrueForJarFile() {
+    void isJarFileShouldReturnTrueForJarFile() {
         Artifact artifact = newBuilder().withType("jar").build();
         assertTrue(JarUtils.isJarFile(artifact));
     }
@@ -22,7 +22,7 @@ public class JarUtilsTest {
      * a folder with a bunch of packages/class files in it).
      */
     @Test
-    public void isJarFileShouldReturnFalseForDirectory() {
+    void isJarFileShouldReturnFalseForDirectory() {
         Artifact artifact = newBuilder().withType("jar").withAnyDirectory().build();
         assertFalse(JarUtils.isJarFile(artifact));
     }
@@ -32,7 +32,7 @@ public class JarUtilsTest {
      * not "jar". For example: a war or a zip file.
      */
     @Test
-    public void isJarFileShouldReturnFalseWhenArtifactTypeIsNotJar() {
+    void isJarFileShouldReturnFalseWhenArtifactTypeIsNotJar() {
         Artifact artifact = newBuilder().withType("war").build();
         assertFalse(JarUtils.isJarFile(artifact));
     }

@@ -22,6 +22,7 @@ package org.codehaus.mojo.extraenforcer.dependencies;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -31,13 +32,9 @@ import org.apache.maven.artifact.versioning.VersionRange;
  * Test helper for working with {@link Artifact}s.
  */
 public class ArtifactBuilder {
-    private String groupId = "groupId";
-    private String artifactId = "artifactId";
     private VersionRange versionRange = VersionRange.createFromVersion("1.0");
-    private String scope = "scope";
     private String type = "type";
-    private String classifier = "classifier";
-    private File fileOrDirectory = getAnyFile();
+    private Path fileOrDirectory = getAnyFile();
 
     public static ArtifactBuilder newBuilder() {
         return new ArtifactBuilder();
@@ -58,29 +55,30 @@ public class ArtifactBuilder {
         return this;
     }
 
-    public ArtifactBuilder withFileOrDirectory(File directory) {
+    public ArtifactBuilder withFileOrDirectory(Path directory) {
         fileOrDirectory = directory;
         return this;
     }
 
     public Artifact build() {
-        Artifact artifact = new DefaultArtifact(groupId, artifactId, versionRange, scope, type, classifier, null);
-        artifact.setFile(fileOrDirectory);
+        Artifact artifact =
+                new DefaultArtifact("groupId", "artifactId", versionRange, "scope", type, "classifier", null);
+        artifact.setFile(fileOrDirectory.toFile());
 
         return artifact;
     }
 
-    private static File getAnyFile() {
+    private static Path getAnyFile() {
         // the actual file isn't important, just so long as it exists
         URL url = ArtifactBuilder.class.getResource("/utf8.txt");
         try {
-            return new File(url.toURI());
+            return new File(url.toURI()).toPath();
         } catch (URISyntaxException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    private File getAnyDirectory() {
-        return getAnyFile().getParentFile();
+    private Path getAnyDirectory() {
+        return getAnyFile().getParent();
     }
 }

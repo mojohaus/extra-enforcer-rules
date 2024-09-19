@@ -19,30 +19,21 @@ package org.codehaus.mojo.extraenforcer.model;
  * under the License.
  */
 
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  *
  * @author mfriedenhagen
  */
-@RunWith(MockitoJUnitRunner.class)
-public class RuleXpp3DomTest {
-
-    @Mock
-    private MavenProject project;
-
-    @Mock
-    private ExpressionEvaluator evaluator;
+@ExtendWith(MockitoExtension.class)
+class RuleXpp3DomTest {
 
     @InjectMocks
     private RequirePropertyDiverges sut1;
@@ -51,14 +42,14 @@ public class RuleXpp3DomTest {
     private RequirePropertyDiverges sut2;
 
     @Test
-    public void checkRuleWithoutRegex() {
+    void checkRuleWithoutRegex() {
         sut1.setProperty("foo");
         sut2.setProperty("foo");
         checkEquals();
     }
 
     @Test
-    public void checkRuleWithoutRegexButMessage() {
+    void checkRuleWithoutRegexButMessage() {
         sut1.setProperty("foo");
         sut1.setMessage("Oops");
         sut2.setProperty("foo");
@@ -67,14 +58,14 @@ public class RuleXpp3DomTest {
     }
 
     @Test
-    public void checkRuleWithoutRegexDiverges() {
+    void checkRuleWithoutRegexDiverges() {
         sut1.setProperty("foo");
         sut2.setProperty("foo2");
         checkDiverges();
     }
 
     @Test
-    public void checkRuleWithRegex() {
+    void checkRuleWithRegex() {
         sut1.setProperty("foo");
         sut1.setRegex("http://company/wiki/company-parent-pom.*");
         sut2.setProperty("foo");
@@ -83,7 +74,7 @@ public class RuleXpp3DomTest {
     }
 
     @Test
-    public void checkRuleWithRegexDiverges() {
+    void checkRuleWithRegexDiverges() {
         sut1.setProperty("foo");
         sut1.setRegex("http://company/wiki/company-parent-pom.*");
         sut2.setProperty("foo");

@@ -84,7 +84,7 @@ public class BanDuplicateClassesLogParser {
 
     private static Set<String> readDuplicateClasses(BufferedReader reader) throws IOException {
         Set<String> classes = new HashSet<>();
-        for (String line = reader.readLine(); line != null && line.length() > 0; line = reader.readLine()) {
+        for (String line = reader.readLine(); line != null && !line.isEmpty(); line = reader.readLine()) {
             classes.add(line.trim());
         }
         return classes;

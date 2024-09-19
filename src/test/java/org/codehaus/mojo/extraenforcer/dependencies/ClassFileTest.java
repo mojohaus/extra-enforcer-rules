@@ -1,29 +1,33 @@
 package org.codehaus.mojo.extraenforcer.dependencies;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import java.nio.file.Path;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ClassFileTest {
     private static final String PATH_TO_CLASS_FILE =
             ClassFileTest.class.getName().replace('.', '/') + ".class";
 
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+    private ClassFileHelper classFileHelper;
 
-    private final ClassFileHelper classFileHelper = new ClassFileHelper(tempFolder);
+    @BeforeEach
+    void setUp(@TempDir Path tempFolder) {
+        classFileHelper = new ClassFileHelper(tempFolder);
+    }
 
     @Test
-    public void getHashComputesHashOfFile() throws Exception {
+    void getHashComputesHashOfFile() throws Exception {
         ClassFile classFile = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "the content of the file");
 
         assertEquals("7b7f48e1c0e847133d8881d5743d253756bf44e490e2252556ad4816a0a77b67", classFile.getHash());
     }
 
     @Test
-    public void getHashReturnsConsistentHashWhenInvokedTwice() throws Exception {
+    void getHashReturnsConsistentHashWhenInvokedTwice() throws Exception {
         ClassFile classFile = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "file content");
 
         String hash1 = classFile.getHash();

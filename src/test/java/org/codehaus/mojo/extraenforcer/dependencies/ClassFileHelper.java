@@ -23,9 +23,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.maven.artifact.Artifact;
-import org.junit.rules.TemporaryFolder;
 
 /**
  * Test utility to make writing tests with {@link ClassFile}s easier.
@@ -33,9 +33,9 @@ import org.junit.rules.TemporaryFolder;
 public class ClassFileHelper {
     private static int uniqueId = 0;
 
-    private final TemporaryFolder temporaryFolder;
+    private final Path temporaryFolder;
 
-    public ClassFileHelper(TemporaryFolder temporaryFolder) {
+    public ClassFileHelper(Path temporaryFolder) {
         this.temporaryFolder = temporaryFolder;
     }
 
@@ -43,8 +43,8 @@ public class ClassFileHelper {
         uniqueId++;
         String uniqueIdStr = Integer.toString(uniqueId);
 
-        File tempDirectory = createTempDirectory(uniqueIdStr);
-        createClassFile(tempDirectory, pathToClassFile, fileContents);
+        Path tempDirectory = Files.createTempDirectory(temporaryFolder, uniqueIdStr);
+        createClassFile(tempDirectory.toFile(), pathToClassFile, fileContents);
 
         Artifact artifact = ArtifactBuilder.newBuilder()
                 .withFileOrDirectory(tempDirectory)
@@ -53,17 +53,7 @@ public class ClassFileHelper {
                 .build();
 
         return new ClassFile(
-                pathToClassFile,
-                artifact,
-                () -> Files.newInputStream(tempDirectory.toPath().resolve(pathToClassFile)));
-    }
-
-    private File createTempDirectory(String uniqueIdStr) {
-        try {
-            return temporaryFolder.newFolder(uniqueIdStr);
-        } catch (IOException exception) {
-            throw new RuntimeException("unable to create temporary folder", exception);
-        }
+                pathToClassFile, artifact, () -> Files.newInputStream(tempDirectory.resolve(pathToClassFile)));
     }
 
     private void createClassFile(File directory, String pathToClassFile, String fileContents) throws IOException {
