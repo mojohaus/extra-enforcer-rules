@@ -1,9 +1,7 @@
 package org.codehaus.mojo.extraenforcer.dependencies;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -17,19 +15,16 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleError;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.collection.CollectRequest;
-import org.eclipse.aether.collection.CollectResult;
-import org.eclipse.aether.collection.DependencyCollectionException;
-import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.graph.DependencyNode;
-import org.eclipse.aether.graph.DependencyVisitor;
-import org.eclipse.aether.resolution.ArtifactRequest;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 
@@ -79,70 +74,47 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
     protected abstract void handleArtifacts(Set<Artifact> artifacts) throws EnforcerRuleException;
 
     private Set<Artifact> getDependenciesToCheck() throws EnforcerRuleException {
-        Set<Artifact> artifacts = null;
         try {
-            Collection<DependencyNode> dependencies = collectProjectDependencies();
-            artifacts = resolveArtifacts(dependencies);
-        } catch (DependencyCollectionException | ArtifactResolutionException e) {
+            ArtifactTypeRegistry artifactTypeRegistry =
+                    session.getRepositorySession().getArtifactTypeRegistry();
+
+            final MavenProject currentProject = session.getCurrentProject();
+
+            final List<DependencyFilter> filters = new ArrayList<>(3);
+            Optional.ofNullable(createOptionalFilter()).ifPresent(filters::add);
+            Optional.ofNullable(createScopeDependencyFilter()).ifPresent(filters::add);
+            filters.add((node, parents) -> searchTransitive || parents.size() <= 1);
+            DependencyFilter dependencyFilter = new AndDependencyFilter(filters);
+
+            List<Dependency> dependencies = currentProject.getDependencies().stream()
+                    .map(d -> RepositoryUtils.toDependency(d, artifactTypeRegistry))
+                    .collect(Collectors.toList());
+
+            List<Dependency> managedDependencies = Optional.ofNullable(currentProject.getDependencyManagement())
+                    .map(DependencyManagement::getDependencies)
+                    .map(list -> list.stream()
+                            .map(d -> RepositoryUtils.toDependency(d, artifactTypeRegistry))
+                            .collect(Collectors.toList()))
+                    .orElse(null);
+
+            CollectRequest collectRequest = new CollectRequest();
+            collectRequest.setManagedDependencies(managedDependencies);
+            collectRequest.setRepositories(currentProject.getRemoteProjectRepositories());
+            collectRequest.setDependencies(dependencies);
+            collectRequest.setRootArtifact(RepositoryUtils.toArtifact(currentProject.getArtifact()));
+
+            DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, dependencyFilter);
+
+            final DependencyResult dependencyResult =
+                    this.repositorySystem.resolveDependencies(session.getRepositorySession(), dependencyRequest);
+
+            return dependencyResult.getArtifactResults().stream()
+                    .map(ArtifactResult::getArtifact)
+                    .map(RepositoryUtils::toArtifact)
+                    .collect(Collectors.toSet());
+        } catch (DependencyResolutionException e) {
             throw new EnforcerRuleError(e.getMessage(), e);
         }
-        return artifacts;
-    }
-
-    private Collection<DependencyNode> collectProjectDependencies() throws DependencyCollectionException {
-
-        ArtifactTypeRegistry artifactTypeRegistry =
-                session.getRepositorySession().getArtifactTypeRegistry();
-
-        DependencyFilter optionalFilter = createOptionalFilter();
-        DependencyFilter scopeFilter = createScopeDependencyFilter();
-        DependencyFilter dependencyFilter = AndDependencyFilter.newInstance(optionalFilter, scopeFilter);
-
-        List<org.eclipse.aether.graph.Dependency> dependencies = session.getCurrentProject().getDependencies().stream()
-                .map(d -> RepositoryUtils.toDependency(d, artifactTypeRegistry))
-                .filter(d -> dependencyFilter == null
-                        || dependencyFilter.accept(new DefaultDependencyNode(d), Collections.emptyList()))
-                .collect(Collectors.toList());
-
-        List<Dependency> managedDependencies = Optional.ofNullable(
-                        session.getCurrentProject().getDependencyManagement())
-                .map(DependencyManagement::getDependencies)
-                .map(list -> list.stream()
-                        .map(d -> RepositoryUtils.toDependency(d, artifactTypeRegistry))
-                        .collect(Collectors.toList()))
-                .orElse(null);
-
-        CollectRequest collectRequest = new CollectRequest();
-        collectRequest.setManagedDependencies(managedDependencies);
-        collectRequest.setRepositories(session.getCurrentProject().getRemoteProjectRepositories());
-        collectRequest.setDependencies(dependencies);
-
-        CollectResult collectResult =
-                repositorySystem.collectDependencies(session.getRepositorySession(), collectRequest);
-
-        Set<DependencyNode> collectedDependencyNodes = new HashSet<>();
-        collectResult.getRoot().accept(new DependencyVisitor() {
-
-            int depth;
-
-            @Override
-            public boolean visitEnter(org.eclipse.aether.graph.DependencyNode node) {
-                if ((dependencyFilter == null || dependencyFilter.accept(node, Collections.emptyList()))
-                        && node.getArtifact() != null) {
-                    collectedDependencyNodes.add(node);
-                }
-                depth++;
-                return searchTransitive || depth <= 1;
-            }
-
-            @Override
-            public boolean visitLeave(org.eclipse.aether.graph.DependencyNode node) {
-                depth--;
-                return true;
-            }
-        });
-
-        return collectedDependencyNodes;
     }
 
     private DependencyFilter createOptionalFilter() {
@@ -172,29 +144,6 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
             }
             return true;
         };
-    }
-
-    private Set<Artifact> resolveArtifacts(Collection<DependencyNode> dependencies) throws ArtifactResolutionException {
-
-        List<ArtifactRequest> requestArtifacts = dependencies.stream()
-                .map(d -> new ArtifactRequest()
-                        .setDependencyNode(d)
-                        .setRepositories(session.getCurrentProject().getRemoteProjectRepositories()))
-                .collect(Collectors.toList());
-
-        List<ArtifactResult> artifactResult =
-                repositorySystem.resolveArtifacts(session.getRepositorySession(), requestArtifacts);
-
-        return artifactResult.stream()
-                .map(result ->
-                        result.getRequest().getDependencyNode().getDependency().setArtifact(result.getArtifact()))
-                .map(dependency -> {
-                    Artifact artifact = RepositoryUtils.toArtifact(dependency.getArtifact());
-                    artifact.setScope(dependency.getScope());
-                    artifact.setOptional(dependency.getOptional());
-                    return artifact;
-                })
-                .collect(Collectors.toSet());
     }
 
     /**
