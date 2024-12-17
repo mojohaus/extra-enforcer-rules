@@ -12,7 +12,7 @@
     <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>tomcat-catalina</artifactId>
-      <version>9.0.96</version>
+      <version>9.0.98</version>
     </dependency>
     <!-- Depends on 'org.jboss.spec.javax.servlet:jboss-servlet-api_3.0_spec' which contains javax.servlet classes -->
     <dependency>
