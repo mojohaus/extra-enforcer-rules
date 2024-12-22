@@ -48,6 +48,8 @@ Extra Enforcer Rules
   
   * {{{./requireEncoding.html}requireEncoding}} - verifies that source files have a required encoding.
 
+  * {{{./earModuleClasspath.html}earModuleClasspath}} - verifies that Class-Path manifest entries in EJBs inside a EAR are valid.
+
   []
   
 * Usage
