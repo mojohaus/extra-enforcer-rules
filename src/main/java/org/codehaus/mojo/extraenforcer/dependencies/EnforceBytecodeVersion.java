@@ -136,7 +136,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
         // Java 24
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("24", 68);
 
-        // Java 24
+        // Java 25
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("25", 69);
     }
 
