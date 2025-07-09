@@ -42,6 +42,7 @@ under the License.
       <item name="Enforce Bytecode Version" href="enforceBytecodeVersion.html"/>
       <item name="Ban Circular Dependencies" href="banCircularDependencies.html"/>
       <item name="Require Encoding" href="requireEncoding.html"/>
+      <item name="Ear Module Classpath" href="earModuleClasspath.html"/>
     </menu>
   </body>
 </site>
