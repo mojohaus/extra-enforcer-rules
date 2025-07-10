@@ -244,7 +244,8 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
      */
     final boolean isDefiningProject(final List<Xpp3Dom> rulesFromModel, final Xpp3Dom invokingRule) {
         for (final Xpp3Dom rule : rulesFromModel) {
-            if (rule.equals(invokingRule)) {
+            // compare string representation as with Maven4 3ba8f2d equals does not work as before.
+            if (rule.toString().equals(invokingRule.toString())) {
                 return true;
             }
         }
