@@ -201,8 +201,8 @@ public class RequirePropertyDivergesTest {
     }
 
     @Test
-    public void testGetRuleName() {
-        assertEquals("requirePropertyDiverges", RequirePropertyDiverges.getRuleName());
+    public void testRuleName() {
+        assertEquals("requirePropertyDiverges", RequirePropertyDiverges.ruleName());
     }
 
     @Test(expected = EnforcerRuleException.class)
@@ -345,7 +345,7 @@ public class RequirePropertyDivergesTest {
     Xpp3Dom createPluginConfiguration() {
         final Xpp3Dom configuration = new Xpp3Dom("configuration");
         final Xpp3Dom rules = new Xpp3Dom("rules");
-        final Xpp3Dom rule = new Xpp3Dom(RequirePropertyDiverges.getRuleName());
+        final Xpp3Dom rule = new Xpp3Dom(RequirePropertyDiverges.ruleName());
         rules.addChild(rule);
         final Xpp3Dom property = new Xpp3Dom("property");
         property.setValue("checkedProperty");
