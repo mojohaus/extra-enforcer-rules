@@ -93,7 +93,7 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
 
         ParentReference parentReference = getParentReference();
 
-        getLog().debug(() -> getRuleName() + ": checking property '" + property + "' for project " + project);
+        getLog().debug(() -> ruleName() + ": checking property '" + property + "' for project " + project);
 
         final MavenProject parent = findParent(project, parentReference);
 
@@ -104,7 +104,7 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
 
         if (project.equals(parent)) {
             getLog().debug(() ->
-                    getRuleName() + ": skip for property '" + property + "' as " + project + " defines rule.");
+                    ruleName() + ": skip for property '" + property + "' as " + project + " defines rule.");
         } else {
             getLog().debug(() -> "Check configuration defined in " + parent);
             if (regex == null) {
@@ -256,7 +256,7 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
      *
      * @return configuration name.
      */
-    static final String getRuleName() {
+    static String ruleName() {
         return RULE_NAME;
     }
 
@@ -318,7 +318,7 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
         if (configuration != null) {
             final Xpp3Dom rules = configuration.getChild("rules");
             if (rules != null) {
-                final List<Xpp3Dom> originalListFromPom = Arrays.asList(rules.getChildren(getRuleName()));
+                final List<Xpp3Dom> originalListFromPom = Arrays.asList(rules.getChildren(ruleName()));
                 ruleConfigurations.addAll(createRuleListWithNameSortedChildren(originalListFromPom));
             }
         }
@@ -334,7 +334,7 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
     private List<Xpp3Dom> createRuleListWithNameSortedChildren(final List<Xpp3Dom> originalListFromPom) {
         final List<Xpp3Dom> listWithSortedEntries = new ArrayList<>(originalListFromPom.size());
         for (Xpp3Dom unsortedXpp3Dom : originalListFromPom) {
-            final Xpp3Dom sortedXpp3Dom = new Xpp3Dom(getRuleName());
+            final Xpp3Dom sortedXpp3Dom = new Xpp3Dom(ruleName());
             final SortedMap<String, Xpp3Dom> childrenMap = new TreeMap<>();
             final Xpp3Dom[] children = unsortedXpp3Dom.getChildren();
             for (Xpp3Dom child : children) {
@@ -468,7 +468,7 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
 
         /** Real work is done in the constructor */
         CreateInvokingRuleDom(RequirePropertyDiverges rule) {
-            ruleDom = new Xpp3Dom(getRuleName());
+            ruleDom = new Xpp3Dom(ruleName());
             addToMapWhenNotNull(rule.property, "property");
             addToMapWhenNotNull(rule.message, "message");
             addToMapWhenNotNull(rule.regex, "regex");
