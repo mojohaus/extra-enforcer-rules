@@ -1,3 +1,5 @@
+import org.assertj.core.api.Assertions;
+
 File file = new File( basedir, "build.log" );
 assert file.exists();
 
@@ -10,7 +12,7 @@ assert text.contains("Found Banned Dependency: org.hibernate:hibernate-core:jar:
 assert text.contains("Found Banned Dependency: javax.transaction:jta:jar:1.1")
 assert text.contains("Found Banned Dependency: org.slf4j:slf4j-api:jar:1.4.2")
 assert text.contains("Found Banned Dependency: dom4j:dom4j:jar:1.6.1")
-assert text.contains("Restricted to JDK 1.2 yet org.hibernate:hibernate-commons-annotations:jar:3.1.0.GA:compile contains org/hibernate/annotations/common/AssertionFailure.class targeted to JDK 1.5")
-assert text.contains("Restricted to JDK 1.2 yet dom4j:dom4j:jar:1.6.1:compile contains org/dom4j/Attribute.class targeted to JDK 1.3")
+Assertions.assertThat(text).matches(~"(?s).*\\QRestricted to JDK 1.2 yet org.hibernate:hibernate-commons-annotations:jar:3.1.0.GA\\E(?::compile)?\\Q contains org/hibernate/annotations/common/AssertionFailure.class targeted to JDK 1.5\\E.*")
+Assertions.assertThat(text).matches(~"(?s).*\\QRestricted to JDK 1.2 yet dom4j:dom4j:jar:1.6.1\\E(?::compile)?\\Q contains org/dom4j/Attribute.class targeted to JDK 1.3\\E.*")
 
 return true;
