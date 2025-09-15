@@ -191,7 +191,9 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
                 .map(dependency -> {
                     Artifact artifact = RepositoryUtils.toArtifact(dependency.getArtifact());
                     artifact.setScope(dependency.getScope());
-                    artifact.setOptional(dependency.getOptional());
+                    if (dependency.getOptional() != null) {
+                        artifact.setOptional(dependency.getOptional());
+                    }
                     return artifact;
                 })
                 .collect(Collectors.toSet());
