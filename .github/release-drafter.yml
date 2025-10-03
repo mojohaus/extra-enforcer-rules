@@ -1,2 +1,1 @@
 _extends: .github
-tag-template: extra-enforcer-rules-$NEXT_MINOR_VERSION
