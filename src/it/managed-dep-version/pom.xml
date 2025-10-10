@@ -1,0 +1,60 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.commonjava.maven.enforcer.it</groupId>
+  <artifactId>managed-dep-version</artifactId>
+  <version>1</version>
+  <packaging>jar</packaging>
+
+  <name>managed-dep-version</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <checkProfiles>false</checkProfiles>
+    <failOnViolation>true</failOnViolation>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>3.8.1</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>@enforcerPluginVersion@</version>
+        <dependencies>
+          <dependency>
+            <groupId>@project.groupId@</groupId>
+            <artifactId>@project.artifactId@</artifactId>
+            <version>@project.version@</version>
+          </dependency>
+        </dependencies>
+		<configuration>
+		  <rules>
+			<requireManagedDeps>
+			  <checkProfiles>${checkProfiles}</checkProfiles>
+			  <failOnViolation>${failOnViolation}</failOnViolation>
+			</requireManagedDeps>
+		  </rules>
+		</configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
