@@ -45,7 +45,7 @@ public class EnforceManagedDepsRule extends AbstractEnforcerRule {
 
     private boolean failOnViolation = true;
 
-    private String[] regexIgnored = null;
+    private Pattern[] regexIgnoredPatterns;
 
     private final MavenProject project;
 
@@ -117,12 +117,17 @@ public class EnforceManagedDepsRule extends AbstractEnforcerRule {
     private boolean checkRegex(Dependency dependency) {
         boolean result = false;
 
-        if (regexIgnored != null) {
-            for (String r : regexIgnored) {
-                Pattern p = Pattern.compile(r);
+        if (regexIgnoredPatterns != null) {
+
+            getLog().debug("Check if dependency is ignored, groupId: " + dependency.getGroupId() + ", artifactId: "
+                    + dependency.getArtifactId());
+
+            for (Pattern p : regexIgnoredPatterns) {
                 if (p.matcher(dependency.getGroupId()).find()
                         || p.matcher(dependency.getArtifactId()).find()) {
                     result = true;
+                    getLog().debug("Found ignored dependency, groupId: " + dependency.getGroupId() + ", artifactId: "
+                            + dependency.getArtifactId());
                     break;
                 }
             }
@@ -130,16 +135,8 @@ public class EnforceManagedDepsRule extends AbstractEnforcerRule {
         return result;
     }
 
-    public boolean isCheckProfiles() {
-        return checkProfiles;
-    }
-
     public void setCheckProfiles(final boolean checkProfiles) {
         this.checkProfiles = checkProfiles;
-    }
-
-    public boolean isFailOnViolation() {
-        return failOnViolation;
     }
 
     public void setFailOnViolation(final boolean failOnViolation) {
@@ -147,6 +144,15 @@ public class EnforceManagedDepsRule extends AbstractEnforcerRule {
     }
 
     public void setRegexIgnored(String[] regexIgnored) {
-        this.regexIgnored = regexIgnored;
+        if (regexIgnored != null) {
+            int index = 0;
+            regexIgnoredPatterns = new Pattern[regexIgnored.length];
+            for (String r : regexIgnored) {
+                Pattern p = Pattern.compile(r);
+                getLog().debug("Prepared pattern from regexIgnored: " + r);
+                regexIgnoredPatterns[index] = p;
+                index++;
+            }
+        }
     }
 }
