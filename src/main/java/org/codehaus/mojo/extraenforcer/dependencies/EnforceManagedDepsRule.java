@@ -59,7 +59,7 @@ public class EnforceManagedDepsRule extends AbstractEnforcerRule {
 
         final Model model = project.getOriginalModel();
 
-        final Set<Dependency> failed = new HashSet<Dependency>();
+        final Set<Dependency> failed = new HashSet<>();
 
         getLog().debug("Checking model...");
 
