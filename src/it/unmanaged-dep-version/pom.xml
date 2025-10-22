@@ -13,7 +13,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <checkProfiles>false</checkProfiles>
-    <failOnViolation>true</failOnViolation>
   </properties>
 
   <dependencies>
@@ -41,7 +40,6 @@
 		  <rules>
 			<requireManagedDeps>
 			  <checkProfiles>${checkProfiles}</checkProfiles>
-			  <failOnViolation>${failOnViolation}</failOnViolation>
 			</requireManagedDeps>
 		  </rules>
 		</configuration>
