@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.maven.enforcer.rule.api.AbstractEnforcerRule;
+import org.apache.maven.enforcer.rule.api.EnforcerLevel;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
@@ -42,8 +43,6 @@ import org.apache.maven.project.MavenProject;
 @Named("requireManagedDeps")
 public class EnforceManagedDepsRule extends AbstractEnforcerRule {
     private boolean checkProfiles = true;
-
-    private boolean failOnViolation = true;
 
     private Pattern[] regexIgnoredPatterns;
 
@@ -67,7 +66,7 @@ public class EnforceManagedDepsRule extends AbstractEnforcerRule {
 
         if (checkProfiles) {
             getLog().debug("Checking profiles...");
-            final List<Profile> profiles = project.getOriginalModel().getProfiles();
+            final List<Profile> profiles = model.getProfiles();
             if (profiles != null && !profiles.isEmpty()) {
                 for (final Profile profile : profiles) {
                     check(profile, failed);
@@ -78,7 +77,7 @@ public class EnforceManagedDepsRule extends AbstractEnforcerRule {
         final String message = buildFailureMessage(failed);
 
         if (message != null) {
-            if (this.failOnViolation) {
+            if (EnforcerLevel.ERROR == getLevel()) {
                 throw new EnforcerRuleException(message);
             } else {
                 getLog().warn(message);
@@ -137,10 +136,6 @@ public class EnforceManagedDepsRule extends AbstractEnforcerRule {
 
     public void setCheckProfiles(final boolean checkProfiles) {
         this.checkProfiles = checkProfiles;
-    }
-
-    public void setFailOnViolation(final boolean failOnViolation) {
-        this.failOnViolation = failOnViolation;
     }
 
     public void setRegexIgnored(String[] regexIgnored) {
