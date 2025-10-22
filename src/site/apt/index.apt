@@ -48,6 +48,8 @@ Extra Enforcer Rules
   
   * {{{./requireEncoding.html}requireEncoding}} - verifies that source files have a required encoding.
 
+  * {{{./requireManagedDeps.html}requireManagedDeps}} - verifies that dependencies are managed.
+
   []
   
 * Usage
