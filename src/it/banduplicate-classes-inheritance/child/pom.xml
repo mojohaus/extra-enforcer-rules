@@ -21,6 +21,15 @@
               <ignoreClasses combine.children="append">
                 <ignoreClass>some.other.Class</ignoreClass>
               </ignoreClasses>
+              <dependencies combine.children="append">
+                <dependency>
+                  <groupId>org.slf4j</groupId>
+                  <artifactId>jcl-over-slf4j</artifactId>
+                  <ignoreClasses>
+                    <ignoreClass>org.slf4j.*</ignoreClass>
+                  </ignoreClasses>
+                </dependency>
+              </dependencies>
             </banDuplicateClasses>
           </rules>
         </configuration>

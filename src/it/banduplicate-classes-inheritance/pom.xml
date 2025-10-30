@@ -43,6 +43,15 @@
               <ignoreClasses>
                 <ignoreClass>org.apache.commons.logging.*</ignoreClass>
               </ignoreClasses>
+              <dependencies>
+                <dependency>
+                  <groupId>commons-logging</groupId>
+                  <artifactId>commons-logging</artifactId>
+                  <ignoreClasses>
+                    <ignoreClass>org.apache.commons.logging.impl.WeakHashtable*</ignoreClass>
+                  </ignoreClasses>
+                </dependency>
+              </dependencies>
             </banDuplicateClasses>
           </rules>
         </configuration>
