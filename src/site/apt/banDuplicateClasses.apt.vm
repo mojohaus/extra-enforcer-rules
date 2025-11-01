@@ -136,6 +136,69 @@ Ban Duplicate Classes
 +---+
 
 
+* Inheriting Configuration from Parent POMs
+
+  When you want to extend <<<banDuplicateClasses>>> configuration from a parent POM in a child POM, you must use Maven's <<<combine.children="append">>> attribute on the collection elements (<<<ignoreClasses>>> and <<<dependencies>>>) to append to the parent's configuration rather than replacing it.
+
+  Without this attribute, Maven will replace the parent's configuration entirely.
+
+** Parent POM Example
+
++---+
+<plugin>
+  <artifactId>maven-enforcer-plugin</artifactId>
+  <configuration>
+    <rules>
+      <banDuplicateClasses>
+        <ignoreClasses>
+          <ignoreClass>org.apache.commons.logging.*</ignoreClass>
+        </ignoreClasses>
+        <dependencies>
+          <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <ignoreClasses>
+              <ignoreClass>org.apache.commons.logging.impl.WeakHashtable*</ignoreClass>
+            </ignoreClasses>
+          </dependency>
+        </dependencies>
+      </banDuplicateClasses>
+    </rules>
+  </configuration>
+</plugin>
++---+
+
+** Child POM Example
+
++---+
+<plugin>
+  <artifactId>maven-enforcer-plugin</artifactId>
+  <configuration>
+    <rules>
+      <banDuplicateClasses>
+        <ignoreClasses combine.children="append">
+          <ignoreClass>some.other.Class</ignoreClass>
+        </ignoreClasses>
+        <dependencies combine.children="append">
+          <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <ignoreClasses>
+              <ignoreClass>org.slf4j.*</ignoreClass>
+            </ignoreClasses>
+          </dependency>
+        </dependencies>
+      </banDuplicateClasses>
+    </rules>
+  </configuration>
+</plugin>
++---+
+
+  Note: The <<<combine.children="append">>> attribute must be placed on the collection element in the child POM (not the parent POM).
+
+  See {{{https://maven.apache.org/pom.html#Plugins}Maven POM Reference}} for more details on configuration combination.
+
+
 * Trademarks
 
   Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.
