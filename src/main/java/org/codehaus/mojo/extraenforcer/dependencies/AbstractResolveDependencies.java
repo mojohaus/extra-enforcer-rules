@@ -3,8 +3,8 @@ package org.codehaus.mojo.extraenforcer.dependencies;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -120,7 +120,10 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
         CollectResult collectResult =
                 repositorySystem.collectDependencies(session.getRepositorySession(), collectRequest);
 
-        Set<DependencyNode> collectedDependencyNodes = new HashSet<>();
+        // Use a map to track the nearest (winning) node for each artifact
+        // Key: groupId:artifactId, Value: NodeWithDepth
+        Map<String, NodeWithDepth> nearestNodes = new java.util.HashMap<>();
+
         collectResult.getRoot().accept(new DependencyVisitor() {
 
             int depth;
@@ -129,7 +132,27 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
             public boolean visitEnter(org.eclipse.aether.graph.DependencyNode node) {
                 if ((dependencyFilter == null || dependencyFilter.accept(node, Collections.emptyList()))
                         && node.getArtifact() != null) {
-                    collectedDependencyNodes.add(node);
+
+                    // Create a key for this artifact (groupId:artifactId)
+                    String key = node.getArtifact().getGroupId() + ":"
+                            + node.getArtifact().getArtifactId();
+
+                    // Check if we've seen this artifact before
+                    NodeWithDepth existing = nearestNodes.get(key);
+                    if (existing == null || depth < existing.depth) {
+                        // This node is nearer (or first occurrence), so it wins
+                        nearestNodes.put(key, new NodeWithDepth(node, depth));
+                        getLog().debug(() -> "Selected " + key + " at depth " + depth + " (scope: "
+                                + (node.getDependency() != null
+                                        ? node.getDependency().getScope()
+                                        : "null") + ")");
+                    } else {
+                        getLog().debug(() -> "Skipped " + key + " at depth " + depth + " (scope: "
+                                + (node.getDependency() != null
+                                        ? node.getDependency().getScope()
+                                        : "null") + ") - already have it at depth "
+                                + existing.depth);
+                    }
                 }
                 depth++;
                 return searchTransitive || depth <= 1;
@@ -141,6 +164,10 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
                 return true;
             }
         });
+
+        // Extract just the nodes from the map
+        Set<DependencyNode> collectedDependencyNodes =
+                nearestNodes.values().stream().map(nwd -> nwd.node).collect(Collectors.toSet());
 
         return collectedDependencyNodes;
     }
@@ -280,6 +307,20 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
                 }
             }
             return false;
+        }
+    }
+
+    /**
+     * Helper class to track a dependency node along with its depth in the tree.
+     * Used for implementing Maven's "nearest wins" conflict resolution.
+     */
+    private static class NodeWithDepth {
+        final DependencyNode node;
+        final int depth;
+
+        NodeWithDepth(DependencyNode node, int depth) {
+            this.node = node;
+            this.depth = depth;
         }
     }
 }

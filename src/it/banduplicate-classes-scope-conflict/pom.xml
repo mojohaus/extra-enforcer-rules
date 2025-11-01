@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.codehaus.mojo.extra-enforcer-rules.it</groupId>
+  <artifactId>banduplicate-classes-scope-conflict</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Test banDuplicateClasses with scope conflict</name>
+
+  <description>
+    Test that banDuplicateClasses correctly handles the case where:
+    - A direct dependency is declared with 'provided' scope
+    - A transitive dependency brings in the same artifact with 'compile' scope
+    
+    Maven's dependency mediation should use the direct 'provided' dependency (nearest wins),
+    so there should be no duplicate classes reported.
+  </description>
+
+  <dependencies>
+    <!-- Direct dependency with provided scope - this should win -->
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.2</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <!-- This brings in commons-logging 1.1.1 as a transitive compile dependency -->
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>1.8.3</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>@enforcerPluginVersion@</version>
+        <dependencies>
+          <dependency>
+            <groupId>@project.groupId@</groupId>
+            <artifactId>@project.artifactId@</artifactId>
+            <version>@project.version@</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <rules>
+            <banDuplicateClasses>
+              <findAllDuplicates>true</findAllDuplicates>
+            </banDuplicateClasses>
+          </rules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
