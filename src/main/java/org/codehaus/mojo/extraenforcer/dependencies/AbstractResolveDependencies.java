@@ -3,6 +3,7 @@ package org.codehaus.mojo.extraenforcer.dependencies;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -122,7 +123,7 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
 
         // Use a map to track the nearest (winning) node for each artifact
         // Key: groupId:artifactId, Value: NodeWithDepth
-        Map<String, NodeWithDepth> nearestNodes = new java.util.HashMap<>();
+        Map<String, NodeWithDepth> nearestNodes = new HashMap<>();
 
         collectResult.getRoot().accept(new DependencyVisitor() {
 
