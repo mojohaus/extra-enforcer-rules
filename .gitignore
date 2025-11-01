@@ -145,3 +145,6 @@ crashlytics.properties
 crashlytics-build.properties
 
 
+
+# Integration test build logs
+build.log
