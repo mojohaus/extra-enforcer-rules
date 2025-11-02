@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import org.apache.maven.artifact.Artifact;
-import org.junit.rules.TemporaryFolder;
 
 /**
  * Test utility to make writing tests with {@link ClassFile}s easier.
@@ -33,9 +32,9 @@ import org.junit.rules.TemporaryFolder;
 public class ClassFileHelper {
     private static int uniqueId = 0;
 
-    private final TemporaryFolder temporaryFolder;
+    private final File temporaryFolder;
 
-    public ClassFileHelper(TemporaryFolder temporaryFolder) {
+    public ClassFileHelper(File temporaryFolder) {
         this.temporaryFolder = temporaryFolder;
     }
 
@@ -60,7 +59,7 @@ public class ClassFileHelper {
 
     private File createTempDirectory(String uniqueIdStr) {
         try {
-            return temporaryFolder.newFolder(uniqueIdStr);
+            return newFolder(temporaryFolder, uniqueIdStr);
         } catch (IOException exception) {
             throw new RuntimeException("unable to create temporary folder", exception);
         }
@@ -79,5 +78,14 @@ public class ClassFileHelper {
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(fileContents);
         }
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 }

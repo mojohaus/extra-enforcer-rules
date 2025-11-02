@@ -16,14 +16,14 @@
 
 package org.codehaus.mojo.extraenforcer.dependencies;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class EnforceBytecodeVersionTest {
+class EnforceBytecodeVersionTest {
 
     @Test
-    public void renderVersion() {
+    void renderVersion() {
         assertEquals("JDK 1.5", EnforceBytecodeVersion.renderVersion(49, 0));
         assertEquals("JDK 1.7", EnforceBytecodeVersion.renderVersion(51, 0));
         assertEquals("JDK 11", EnforceBytecodeVersion.renderVersion(55, 0));

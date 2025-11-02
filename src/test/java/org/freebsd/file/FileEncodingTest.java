@@ -2,28 +2,28 @@ package org.freebsd.file;
 
 import java.nio.charset.StandardCharsets;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FileEncodingTest {
+class FileEncodingTest {
 
     private FileEncoding rule;
 
-    @Before
-    public void initFields() {
+    @BeforeEach
+    void initFields() {
         rule = new FileEncoding();
     }
 
     @Test
-    public void detectAscii() {
+    void detectAscii() {
         assertEncoding(
                 new byte[] {'a', 'b', 'c', 'A', 'B', 'C', '1', '2', '3'}, StandardCharsets.US_ASCII.name(), "ASCII");
     }
 
     @Test
-    public void detectISO() {
+    void detectISO() {
         assertEncoding(
                 new byte[] {'a', 'b', 'c', 'A', 'B', 'C', '1', '2', '3', (byte) 0xF7},
                 StandardCharsets.ISO_8859_1.name(),
@@ -31,7 +31,7 @@ public class FileEncodingTest {
     }
 
     @Test
-    public void detectUTF7() {
+    void detectUTF7() {
         assertEncoding(new byte[] {'+', '/', 'v', '8', 'B', 'C', '1', '2', '3'}, "UTF-7", "UTF-7 UNICODE");
         assertEncoding(new byte[] {'+', '/', 'v', '9', 'B', 'C', '1', '2', '3'}, "UTF-7", "UTF-7 UNICODE");
         assertEncoding(new byte[] {'+', '/', 'v', '+', 'B', 'C', '1', '2', '3'}, "UTF-7", "UTF-7 UNICODE");
@@ -39,7 +39,7 @@ public class FileEncodingTest {
     }
 
     @Test
-    public void detectUTF8() {
+    void detectUTF8() {
         assertEncoding(
                 new byte[] {'a', 'b', 'c', 'A', 'B', 'C', '1', '2', '3', (byte) 0xC3, (byte) 0xB6},
                 StandardCharsets.UTF_8.name(),
@@ -47,7 +47,7 @@ public class FileEncodingTest {
     }
 
     @Test
-    public void detectUTF8WithBoom() {
+    void detectUTF8WithBoom() {
         assertEncoding(
                 new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF, 'a', 'b', 'c', 'A', 'B', 'C', '1', '2', '3'},
                 StandardCharsets.UTF_8.name(),
@@ -74,7 +74,7 @@ public class FileEncodingTest {
     }
 
     @Test
-    public void detectUTF16LE() {
+    void detectUTF16LE() {
         assertEncoding(
                 new byte[] {(byte) 0xFF, (byte) 0xFE, (byte) 0xD6, (byte) 0x00, (byte) 0x41, (byte) 0x00},
                 StandardCharsets.UTF_16LE.name(),
@@ -82,7 +82,7 @@ public class FileEncodingTest {
     }
 
     @Test
-    public void detectUTF16BE() {
+    void detectUTF16BE() {
         assertEncoding(
                 new byte[] {(byte) 0xFE, (byte) 0xFF, (byte) 0x00, (byte) 0xD6, (byte) 0x00, (byte) 0x41},
                 StandardCharsets.UTF_16BE.name(),
@@ -90,7 +90,7 @@ public class FileEncodingTest {
     }
 
     @Test
-    public void detectExtendedAscii() {
+    void detectExtendedAscii() {
         assertEncoding(
                 new byte[] {'a', 'b', 'c', 'A', 'B', 'C', '1', '2', '3', (byte) 0x96},
                 "UNKNOWN-8BIT",
