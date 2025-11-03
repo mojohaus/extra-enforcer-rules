@@ -155,8 +155,7 @@ class RequirePropertyDivergesTest {
         final MavenProject parent = createParentProject();
         project.setParent(parent);
         setUpHelper(project, "parentValue");
-        assertThrows(EnforcerRuleException.class, () ->
-            mockInstance.execute());
+        assertThrows(EnforcerRuleException.class, () -> mockInstance.execute());
     }
 
     /**
@@ -176,8 +175,7 @@ class RequirePropertyDivergesTest {
     void checkPropValueNotBlankNull() {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
         instance.setProperty("checkedProperty");
-        assertThrows(EnforcerRuleException.class, () ->
-            instance.checkPropValueNotBlank(null));
+        assertThrows(EnforcerRuleException.class, () -> instance.checkPropValueNotBlank(null));
     }
 
     @Test
@@ -216,14 +214,14 @@ class RequirePropertyDivergesTest {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
         when(evaluator.evaluate("${checkedProperty}")).thenThrow(ExpressionEvaluationException.class);
         instance.setProperty("checkedProperty");
-        assertThrows(EnforcerRuleException.class, () ->
-            instance.getPropertyValue());
+        assertThrows(EnforcerRuleException.class, () -> instance.getPropertyValue());
     }
 
     @Test
     void checkAgainstParentValueFailing() throws Exception {
-        assertThrows(EnforcerRuleException.class, () ->
-                testCheckAgainstParentValue("company.parent-pom", "company.parent-pom"));
+        assertThrows(
+                EnforcerRuleException.class,
+                () -> testCheckAgainstParentValue("company.parent-pom", "company.parent-pom"));
     }
 
     @Test
@@ -234,15 +232,13 @@ class RequirePropertyDivergesTest {
     @Test
     void getParentReferenceNull() throws Exception {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
-        assertThrows(NullPointerException.class, () ->
-            instance.getParentReference(null));
+        assertThrows(NullPointerException.class, () -> instance.getParentReference(null));
     }
 
     @Test
     void getParentReferenceEmpty() {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
-        assertThrows(EnforcerRuleException.class, () ->
-            instance.getParentReference(""));
+        assertThrows(EnforcerRuleException.class, () -> instance.getParentReference(""));
     }
 
     @Test
@@ -256,8 +252,7 @@ class RequirePropertyDivergesTest {
     @Test
     void getParentReferenceUnknownValue() {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
-        assertThrows(EnforcerRuleException.class, () ->
-            instance.getParentReference("BOGUS"));
+        assertThrows(EnforcerRuleException.class, () -> instance.getParentReference("BOGUS"));
     }
 
     @Test

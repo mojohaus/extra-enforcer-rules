@@ -12,7 +12,7 @@ public class ClassFileTest {
             ClassFileTest.class.getName().replace('.', '/') + ".class";
 
     @TempDir
-    public File tempFolder;
+    private File tempFolder;
 
     private final ClassFileHelper classFileHelper = new ClassFileHelper(tempFolder);
 

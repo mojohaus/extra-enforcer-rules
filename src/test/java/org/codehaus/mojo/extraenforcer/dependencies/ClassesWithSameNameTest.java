@@ -50,7 +50,7 @@ public class ClassesWithSameNameTest {
     private static final EnforcerLogger LOG = mock(EnforcerLogger.class);
 
     @TempDir
-    public File temporaryFolder;
+    private File temporaryFolder;
 
     private ClassFileHelper classFileHelper;
 
@@ -172,8 +172,7 @@ public class ClassesWithSameNameTest {
      * 1 and 2 don't match 3 and 4.
      */
     @Test
-    void toOutputStringOutputsFourArtifactsWhereBytecodeIsExactMatchInTwoAndExactMatchInOtherTwo()
-            throws Exception {
+    void toOutputStringOutputsFourArtifactsWhereBytecodeIsExactMatchInTwoAndExactMatchInOtherTwo() throws Exception {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "file content of 1 and 2");
         ClassFile classFile2 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "file content of 1 and 2");
         ClassFile classFile3 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "file content of 3 and 4");
@@ -199,9 +198,7 @@ public class ClassesWithSameNameTest {
     void previousShouldThrowIfOnlyOneArtifact() throws Exception {
         ClassFile classFile = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "file content of 1 and 2");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile);
-        assertThrows(IllegalArgumentException.class, () ->
-
-            classesWithSameName.previous());
+        assertThrows(IllegalArgumentException.class, () -> classesWithSameName.previous());
     }
 
     @Test
@@ -231,9 +228,7 @@ public class ClassesWithSameNameTest {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
         ClassFile classFile2 = classFileHelper.createWithContent("some/other/path.class", "");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile1);
-        assertThrows(IllegalArgumentException.class, () ->
-
-            classesWithSameName.add(classFile2));
+        assertThrows(IllegalArgumentException.class, () -> classesWithSameName.add(classFile2));
     }
 
     @Test
@@ -241,7 +236,6 @@ public class ClassesWithSameNameTest {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
         ClassFile classFile2 = classFileHelper.createWithContent("some/other/path.class", "");
         assertThrows(IllegalArgumentException.class, () -> {
-
             new ClassesWithSameName(LOG, classFile1, classFile2);
         });
     }

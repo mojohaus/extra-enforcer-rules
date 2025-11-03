@@ -54,32 +54,35 @@ class RequireRolesTest {
     @Test
     void shouldFailBecauseContributorWithRoleQualityManagerIsMissing() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        assertThrows(EnforcerRuleException.class, () ->
-            newRequireContributorRoles("business engineer, quality manager", null).execute());
+        assertThrows(EnforcerRuleException.class, () -> newRequireContributorRoles(
+                        "business engineer, quality manager", null)
+                .execute());
     }
 
     @Test
     void shouldFailBecauseDeveloperWithRoleCodeMonkeyIsMissing() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        assertThrows(EnforcerRuleException.class, () ->
-            newRequireDeveloperRoles("codemonkey" /* required but not in project */, null)
-                    .execute());
+        assertThrows(
+                EnforcerRuleException.class,
+                () -> newRequireDeveloperRoles("codemonkey" /* required but not in project */, null)
+                        .execute());
     }
 
     @Test
     void shouldFailBecauseContributorRoleBusinessEngineerIsInvalid() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        assertThrows(EnforcerRuleException.class, () ->
-            newRequireContributorRoles(null /* no required roles needed */, "hacker" /* only valid role */)
-                    .execute());
+        assertThrows(
+                EnforcerRuleException.class,
+                () -> newRequireContributorRoles(null /* no required roles needed */, "hacker" /* only valid role */)
+                        .execute());
     }
 
     @Test
     void shouldFailBecauseNoContributorRolesAtAllAreValid() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        assertThrows(EnforcerRuleException.class, () ->
-            newRequireContributorRoles(null /* no required roles needed */, "" /*but no role is valid at all */)
-                    .execute());
+        assertThrows(EnforcerRuleException.class, () -> newRequireContributorRoles(
+                        null /* no required roles needed */, "" /*but no role is valid at all */)
+                .execute());
     }
 
     @Test
