@@ -29,20 +29,21 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Developer;
 import org.apache.maven.project.MavenProject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  *
  * @author Mirko Friedenhagen
  */
-public class RequireRolesTest {
+class RequireRolesTest {
 
     private MavenProject mavenProject;
 
     @Test
-    public void shouldSucceedBecauseArchitectAsDeveloperAndBusinessEngineerAsContributorArePresent() throws Exception {
+    void shouldSucceedBecauseArchitectAsDeveloperAndBusinessEngineerAsContributorArePresent() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
         newRequireDeveloperRoles("architect" /*required role*/, null /* valid roles not needed */)
                 .execute();
@@ -50,35 +51,42 @@ public class RequireRolesTest {
                 .execute();
     }
 
-    @Test(expected = EnforcerRuleException.class)
-    public void shouldFailBecauseContributorWithRoleQualityManagerIsMissing() throws Exception {
+    @Test
+    void shouldFailBecauseContributorWithRoleQualityManagerIsMissing() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        newRequireContributorRoles("business engineer, quality manager", null).execute();
-    }
-
-    @Test(expected = EnforcerRuleException.class)
-    public void shouldFailBecauseDeveloperWithRoleCodeMonkeyIsMissing() throws Exception {
-        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        newRequireDeveloperRoles("codemonkey" /* required but not in project */, null)
-                .execute();
-    }
-
-    @Test(expected = EnforcerRuleException.class)
-    public void shouldFailBecauseContributorRoleBusinessEngineerIsInvalid() throws Exception {
-        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        newRequireContributorRoles(null /* no required roles needed */, "hacker" /* only valid role */)
-                .execute();
-    }
-
-    @Test(expected = EnforcerRuleException.class)
-    public void shouldFailBecauseNoContributorRolesAtAllAreValid() throws Exception {
-        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
-        newRequireContributorRoles(null /* no required roles needed */, "" /*but no role is valid at all */)
-                .execute();
+        assertThrows(EnforcerRuleException.class, () -> newRequireContributorRoles(
+                        "business engineer, quality manager", null)
+                .execute());
     }
 
     @Test
-    public void shouldSucceedAsNoRolesAreRequiredAndAllAreAccepted() throws Exception {
+    void shouldFailBecauseDeveloperWithRoleCodeMonkeyIsMissing() throws Exception {
+        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
+        assertThrows(
+                EnforcerRuleException.class,
+                () -> newRequireDeveloperRoles("codemonkey" /* required but not in project */, null)
+                        .execute());
+    }
+
+    @Test
+    void shouldFailBecauseContributorRoleBusinessEngineerIsInvalid() throws Exception {
+        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
+        assertThrows(
+                EnforcerRuleException.class,
+                () -> newRequireContributorRoles(null /* no required roles needed */, "hacker" /* only valid role */)
+                        .execute());
+    }
+
+    @Test
+    void shouldFailBecauseNoContributorRolesAtAllAreValid() throws Exception {
+        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
+        assertThrows(EnforcerRuleException.class, () -> newRequireContributorRoles(
+                        null /* no required roles needed */, "" /*but no role is valid at all */)
+                .execute());
+    }
+
+    @Test
+    void shouldSucceedAsNoRolesAreRequiredAndAllAreAccepted() throws Exception {
         addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
         newRequireContributorRoles(null /* no required roles */, "*" /* any role is valid */)
                 .execute();
@@ -90,7 +98,7 @@ public class RequireRolesTest {
      * Test of getRolesFromString method, of class AbstractRequireRoles.
      */
     @Test
-    public void testGetRolesFromString() {
+    void getRolesFromString() {
         HashSet<String> expResult = new HashSet<>(Arrays.asList("architect", "codemonkey", "business engineer"));
         final RequireContributorRoles sut = new RequireContributorRoles(mavenProject);
         Set<String> result = sut.getRolesFromString(" architect,  business engineer   , codemonkey ");
@@ -101,7 +109,7 @@ public class RequireRolesTest {
      * Test of getRolesFromMaven method, of class AbstractRequireRoles.
      */
     @Test
-    public void testGetRolesFromMaven() {
+    void getRolesFromMaven() {
         HashSet<String> expResult =
                 new HashSet<>(Arrays.asList("quality manager", "product owner", "business engineer"));
         final Contributor singleHero = new Contributor();

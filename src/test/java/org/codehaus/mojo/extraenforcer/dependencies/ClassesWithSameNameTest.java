@@ -19,18 +19,19 @@ package org.codehaus.mojo.extraenforcer.dependencies;
  * under the License.
  */
 
+import java.io.File;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.enforcer.rule.api.EnforcerLogger;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class ClassesWithSameNameTest {
@@ -48,13 +49,13 @@ public class ClassesWithSameNameTest {
 
     private static final EnforcerLogger LOG = mock(EnforcerLogger.class);
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    private File temporaryFolder;
 
     private ClassFileHelper classFileHelper;
 
-    @Before
-    public void beforeEachTest() {
+    @BeforeEach
+    void beforeEachTest() {
         classFileHelper = new ClassFileHelper(temporaryFolder);
     }
 
@@ -64,7 +65,7 @@ public class ClassesWithSameNameTest {
      * files are exactly the same.
      */
     @Test
-    public void hasDuplicatesShouldReturnTrueWhenClassNameIsDuplicate() throws Exception {
+    void hasDuplicatesShouldReturnTrueWhenClassNameIsDuplicate() throws Exception {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
         ClassFile classFile2 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile1, classFile2);
@@ -75,7 +76,7 @@ public class ClassesWithSameNameTest {
     }
 
     @Test
-    public void hasDuplicatesShouldReturnFalseWhenClassNameIsDuplicateButBytecodeIsIdentical() throws Exception {
+    void hasDuplicatesShouldReturnFalseWhenClassNameIsDuplicateButBytecodeIsIdentical() throws Exception {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "content matches in both");
         ClassFile classFile2 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "content matches in both");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile1, classFile2);
@@ -86,7 +87,7 @@ public class ClassesWithSameNameTest {
     }
 
     @Test
-    public void hasDuplicatesShouldReturnFalseWhenClassHasNoDuplicates() throws Exception {
+    void hasDuplicatesShouldReturnFalseWhenClassHasNoDuplicates() throws Exception {
         ClassFile classFile = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile);
 
@@ -104,7 +105,7 @@ public class ClassesWithSameNameTest {
      * bytecode).
      */
     @Test
-    public void hasDuplicatesShouldReturnTrueWhenClassNameIsDuplicateButBytecodeDiffers() throws Exception {
+    void hasDuplicatesShouldReturnTrueWhenClassNameIsDuplicateButBytecodeDiffers() throws Exception {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "1");
         ClassFile classFile2 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "2");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile1, classFile2);
@@ -122,7 +123,7 @@ public class ClassesWithSameNameTest {
      * We set the test up so it finds duplicates only if the bytecode differs.
      */
     @Test
-    public void hasDuplicatesShouldReturnFalseWhenClassNameIsDuplicateAndBytecodeDiffers() throws Exception {
+    void hasDuplicatesShouldReturnFalseWhenClassNameIsDuplicateAndBytecodeDiffers() throws Exception {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "1");
         ClassFile classFile2 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "2");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile1, classFile2);
@@ -136,7 +137,7 @@ public class ClassesWithSameNameTest {
      * This tests the normal condition where we just output the class file path.
      */
     @Test
-    public void toOutputStringOutputsPlainArtifactWhenJustNamesAreDuplicate() throws Exception {
+    void toOutputStringOutputsPlainArtifactWhenJustNamesAreDuplicate() throws Exception {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
         ClassFile classFile2 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile1, classFile2);
@@ -152,7 +153,7 @@ public class ClassesWithSameNameTest {
      * determine which artifacts they can ignore when fix the BanDuplicateClasses error.
      */
     @Test
-    public void toOutputStringOutputsTwoArtifactsWhereBytecodeIsExactMatch() throws Exception {
+    void toOutputStringOutputsTwoArtifactsWhereBytecodeIsExactMatch() throws Exception {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "content matches in both");
         ClassFile classFile2 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "content matches in both");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile1, classFile2);
@@ -171,8 +172,7 @@ public class ClassesWithSameNameTest {
      * 1 and 2 don't match 3 and 4.
      */
     @Test
-    public void toOutputStringOutputsFourArtifactsWhereBytecodeIsExactMatchInTwoAndExactMatchInOtherTwo()
-            throws Exception {
+    void toOutputStringOutputsFourArtifactsWhereBytecodeIsExactMatchInTwoAndExactMatchInOtherTwo() throws Exception {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "file content of 1 and 2");
         ClassFile classFile2 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "file content of 1 and 2");
         ClassFile classFile3 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "file content of 3 and 4");
@@ -194,16 +194,15 @@ public class ClassesWithSameNameTest {
      * The method should return the 2nd-to-last element in the last, but if there's only 1 element
      * there's no 2nd-to-last element to return.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public void previousShouldThrowIfOnlyOneArtifact() throws Exception {
+    @Test
+    void previousShouldThrowIfOnlyOneArtifact() throws Exception {
         ClassFile classFile = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "file content of 1 and 2");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile);
-
-        classesWithSameName.previous();
+        assertThrows(IllegalArgumentException.class, () -> classesWithSameName.previous());
     }
 
     @Test
-    public void previousShouldReturn2ndToLastElement() throws Exception {
+    void previousShouldReturn2ndToLastElement() throws Exception {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "file content of 1 and 2");
         ClassFile classFile2 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "file content of 1 and 2");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile1, classFile2);
@@ -214,7 +213,7 @@ public class ClassesWithSameNameTest {
     }
 
     @Test
-    public void addShouldAddArtifact() throws Exception {
+    void addShouldAddArtifact() throws Exception {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
         ClassFile classFile2 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile1);
@@ -224,25 +223,25 @@ public class ClassesWithSameNameTest {
         assertEquals(2, classesWithSameName.getAllArtifactsThisClassWasFoundIn().size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void addShouldThrowWhenClassNameDoesNotMatch() throws Exception {
+    @Test
+    void addShouldThrowWhenClassNameDoesNotMatch() throws Exception {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
         ClassFile classFile2 = classFileHelper.createWithContent("some/other/path.class", "");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile1);
-
-        classesWithSameName.add(classFile2);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void constructorShouldThrowWhenClassNameDoesNotMatch() throws Exception {
-        ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
-        ClassFile classFile2 = classFileHelper.createWithContent("some/other/path.class", "");
-
-        new ClassesWithSameName(LOG, classFile1, classFile2);
+        assertThrows(IllegalArgumentException.class, () -> classesWithSameName.add(classFile2));
     }
 
     @Test
-    public void getAllArtifactsThisClassWasFoundInShouldReturnAllArtifacts() throws Exception {
+    void constructorShouldThrowWhenClassNameDoesNotMatch() throws Exception {
+        ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
+        ClassFile classFile2 = classFileHelper.createWithContent("some/other/path.class", "");
+        assertThrows(IllegalArgumentException.class, () -> {
+            new ClassesWithSameName(LOG, classFile1, classFile2);
+        });
+    }
+
+    @Test
+    void getAllArtifactsThisClassWasFoundInShouldReturnAllArtifacts() throws Exception {
         ClassFile classFile1 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
         ClassFile classFile2 = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile1, classFile2);

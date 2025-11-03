@@ -6,28 +6,28 @@ import java.util.Properties;
 import org.apache.maven.enforcer.rule.api.EnforcerLogger;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.project.MavenProject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RequireEncodingTest {
+class RequireEncodingTest {
 
     private RequireEncoding rule;
 
     private MavenProject project;
 
-    @Before
-    public void initFields() {
+    @BeforeEach
+    void initFields() {
         project = mock(MavenProject.class);
         rule = new RequireEncoding(project);
         rule.setLog(mock(EnforcerLogger.class));
     }
 
     @Test
-    public void failUTF8() throws Exception {
+    void failUTF8() throws Exception {
 
         when(project.getBasedir()).thenReturn(new File("src/test/resources").getAbsoluteFile());
 

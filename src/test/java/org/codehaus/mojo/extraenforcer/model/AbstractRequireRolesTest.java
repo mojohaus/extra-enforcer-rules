@@ -20,21 +20,21 @@ package org.codehaus.mojo.extraenforcer.model;
  */
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class AbstractRequireRolesTest {
+class AbstractRequireRolesTest {
     private static final String CSV_TO_SPLIT = "a,b,c";
     private static final String CSV_WITH_SPACES_TO_SPLIT = " a, b ,c ";
 
     @Test
-    public void testCsvSplitSize() {
+    void csvSplitSize() {
         Set<String> values = AbstractRequireRoles.splitCsvToSet(CSV_TO_SPLIT);
 
         assert values.size() == 3;
     }
 
     @Test
-    public void testCsvSplitExpectedElements() {
+    void csvSplitExpectedElements() {
         Set<String> values = AbstractRequireRoles.splitCsvToSet(CSV_TO_SPLIT);
 
         assert values.contains("a");
@@ -43,7 +43,7 @@ public class AbstractRequireRolesTest {
     }
 
     @Test
-    public void testCsvSplitTrimsValues() {
+    void csvSplitTrimsValues() {
         Set<String> values = AbstractRequireRoles.splitCsvToSet(CSV_WITH_SPACES_TO_SPLIT);
 
         assert values.contains("a");

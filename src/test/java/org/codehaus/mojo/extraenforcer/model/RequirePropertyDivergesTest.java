@@ -32,20 +32,24 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @author mirko
  */
-@RunWith(MockitoJUnitRunner.class)
-public class RequirePropertyDivergesTest {
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
+class RequirePropertyDivergesTest {
 
     @Mock
     private ExpressionEvaluator evaluator;
@@ -54,7 +58,7 @@ public class RequirePropertyDivergesTest {
      * Test of execute method, of class RequirePropertyDiverges.
      */
     @Test
-    public void testExecuteInChild() throws EnforcerRuleException {
+    void executeInChild() throws Exception {
         final MavenProject project = createMavenProject("company", "child");
         final MavenProject parent = createParentProject();
         project.setParent(parent);
@@ -68,7 +72,7 @@ public class RequirePropertyDivergesTest {
      * Test of execute method, of class RequirePropertyDiverges.
      */
     @Test
-    public void testExecuteInParent() throws EnforcerRuleException {
+    void executeInParent() throws Exception {
         final MavenProject project = createParentProject();
         RequirePropertyDiverges mockInstance = createMockRule(project);
         setUpHelper(project, "parentValue");
@@ -91,7 +95,7 @@ public class RequirePropertyDivergesTest {
      * Test of execute method, of class RequirePropertyDiverges.
      */
     @Test
-    public void testExecuteInParentWithConfigurationInPluginManagement() throws EnforcerRuleException {
+    void executeInParentWithConfigurationInPluginManagement() throws Exception {
         final MavenProject project = createMavenProject("company", "company-parent-pom");
         RequirePropertyDiverges mockInstance = createMockRule(project);
         final Build build = new Build();
@@ -116,7 +120,7 @@ public class RequirePropertyDivergesTest {
      * Test of execute method, of class RequirePropertyDiverges.
      */
     @Test
-    public void testExecuteInParentWithConfigurationInExecution() throws EnforcerRuleException {
+    void executeInParentWithConfigurationInExecution() throws Exception {
         final MavenProject project = createMavenProject("company", "company-parent-pom");
         RequirePropertyDiverges mockInstance = createMockRule(project);
         final Build build = new Build();
@@ -133,7 +137,7 @@ public class RequirePropertyDivergesTest {
     }
 
     @Test
-    public void testProjectWithoutEnforcer() {
+    void projectWithoutEnforcer() {
         final Build build = new Build();
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
 
@@ -144,21 +148,21 @@ public class RequirePropertyDivergesTest {
     /**
      * Test of execute method, of class RequirePropertyDiverges.
      */
-    @Test(expected = EnforcerRuleException.class)
-    public void testExecuteInChildShouldFail() throws EnforcerRuleException {
+    @Test
+    void executeInChildShouldFail() {
         final MavenProject project = createMavenProject("company", "child");
         RequirePropertyDiverges mockInstance = createMockRule(project);
         final MavenProject parent = createParentProject();
         project.setParent(parent);
         setUpHelper(project, "parentValue");
-        mockInstance.execute();
+        assertThrows(EnforcerRuleException.class, () -> mockInstance.execute());
     }
 
     /**
      * Test of checkPropValueNotBlank method, of class RequirePropertyDiverges.
      */
     @Test
-    public void testCheckPropValueNotBlank() throws Exception {
+    void checkPropValueNotBlank() throws Exception {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
         instance.setProperty("checkedProperty");
         instance.checkPropValueNotBlank("propertyValue");
@@ -167,15 +171,15 @@ public class RequirePropertyDivergesTest {
     /**
      * Test of checkPropValueNotBlank method, of class RequirePropertyDiverges.
      */
-    @Test(expected = EnforcerRuleException.class)
-    public void testCheckPropValueNotBlankNull() throws EnforcerRuleException {
+    @Test
+    void checkPropValueNotBlankNull() {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
         instance.setProperty("checkedProperty");
-        instance.checkPropValueNotBlank(null);
+        assertThrows(EnforcerRuleException.class, () -> instance.checkPropValueNotBlank(null));
     }
 
     @Test
-    public void testCreateResultingErrorMessageReturningCustomMessage() {
+    void createResultingErrorMessageReturningCustomMessage() {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
         instance.setProperty("checkedProperty");
         instance.setMessage("This is needed for foo.");
@@ -185,7 +189,7 @@ public class RequirePropertyDivergesTest {
     }
 
     @Test
-    public void testCreateResultingErrorMessageReturningDefaultMessage() {
+    void createResultingErrorMessageReturningDefaultMessage() {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
 
         instance.setProperty("checkedProperty");
@@ -201,63 +205,64 @@ public class RequirePropertyDivergesTest {
     }
 
     @Test
-    public void testRuleName() {
+    void ruleName() {
         assertEquals("requirePropertyDiverges", RequirePropertyDiverges.ruleName());
     }
 
-    @Test(expected = EnforcerRuleException.class)
-    public void testGetPropertyValueFail() throws ExpressionEvaluationException, EnforcerRuleException {
+    @Test
+    void getPropertyValueFail() throws Exception {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
-
         when(evaluator.evaluate("${checkedProperty}")).thenThrow(ExpressionEvaluationException.class);
         instance.setProperty("checkedProperty");
-        instance.getPropertyValue();
-    }
-
-    @Test(expected = EnforcerRuleException.class)
-    public void testCheckAgainstParentValueFailing() throws EnforcerRuleException, ExpressionEvaluationException {
-        testCheckAgainstParentValue("company.parent-pom", "company.parent-pom");
+        assertThrows(EnforcerRuleException.class, () -> instance.getPropertyValue());
     }
 
     @Test
-    public void testCheckAgainstParentValue() throws EnforcerRuleException, ExpressionEvaluationException {
+    void checkAgainstParentValueFailing() throws Exception {
+        assertThrows(
+                EnforcerRuleException.class,
+                () -> testCheckAgainstParentValue("company.parent-pom", "company.parent-pom"));
+    }
+
+    @Test
+    void checkAgainstParentValue() throws Exception {
         testCheckAgainstParentValue("company.parent-pom", "company.project1");
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testGetParentReferenceNull() throws EnforcerRuleException {
+    @Test
+    void getParentReferenceNull() throws Exception {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
-        instance.getParentReference(null);
-    }
-
-    @Test(expected = EnforcerRuleException.class)
-    public void testGetParentReferenceEmpty() throws EnforcerRuleException {
-        RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
-        instance.getParentReference("");
+        assertThrows(NullPointerException.class, () -> instance.getParentReference(null));
     }
 
     @Test
-    public void testGetParentReferenceKnownValues() throws EnforcerRuleException {
+    void getParentReferenceEmpty() {
+        RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
+        assertThrows(EnforcerRuleException.class, () -> instance.getParentReference(""));
+    }
+
+    @Test
+    void getParentReferenceKnownValues() throws Exception {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
         assertEquals(RequirePropertyDiverges.ParentReference.BASE, instance.getParentReference("BaSE"));
         assertEquals(RequirePropertyDiverges.ParentReference.DEFINING, instance.getParentReference("Defining"));
         assertEquals(RequirePropertyDiverges.ParentReference.PARENT, instance.getParentReference("PaRenT"));
     }
 
-    @Test(expected = EnforcerRuleException.class)
-    public void testGetParentReferenceUnknownValue() throws EnforcerRuleException {
+    @Test
+    void getParentReferenceUnknownValue() {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
-        instance.getParentReference("BOGUS");
+        assertThrows(EnforcerRuleException.class, () -> instance.getParentReference("BOGUS"));
     }
 
     @Test
-    public void testGetParentReferenceDefault() throws EnforcerRuleException {
+    void getParentReferenceDefault() throws Exception {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
         assertEquals(RequirePropertyDiverges.ParentReference.DEFINING, instance.getParentReference());
     }
 
     @Test
-    public void testFindParentDefining() throws EnforcerRuleException {
+    void findParentDefining() throws Exception {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
         MavenProject root = createParentProject();
         MavenProject base = createMavenProject("company", "main-pom");
@@ -271,7 +276,7 @@ public class RequirePropertyDivergesTest {
     }
 
     @Test
-    public void testFindParentParent() throws EnforcerRuleException {
+    void findParentParent() throws Exception {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
         MavenProject root = createParentProject();
         MavenProject base = createMavenProject("company", "main-pom");
@@ -287,7 +292,7 @@ public class RequirePropertyDivergesTest {
     }
 
     @Test
-    public void testFindParentBase() throws EnforcerRuleException {
+    void findParentBase() throws Exception {
         RequirePropertyDiverges instance = createMockRule(mock(MavenProject.class));
         MavenProject root = createParentProject();
         MavenProject base = createMavenProject("company", "main-pom");
