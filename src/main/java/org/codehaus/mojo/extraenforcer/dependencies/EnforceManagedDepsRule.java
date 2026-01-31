@@ -91,10 +91,14 @@ public class EnforceManagedDepsRule extends AbstractEnforcerRule {
         }
 
         final StringBuilder sb = new StringBuilder();
-        sb.append("The following ").append(failed.size()).append(" dependencies are NOT using a managed version:\n");
+        final String ls = System.lineSeparator();
+        sb.append("The following ")
+                .append(failed.size())
+                .append(" dependencies are NOT using a managed version:")
+                .append(ls);
 
         for (final Dependency d : failed) {
-            sb.append("\n  - ").append(d.getManagementKey());
+            sb.append(ls).append("  - ").append(d.getManagementKey());
         }
 
         return sb.toString();
