@@ -2,6 +2,7 @@ package org.codehaus.mojo.extraenforcer.dependencies;
 
 import java.io.File;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -14,7 +15,12 @@ public class ClassFileTest {
     @TempDir
     private File tempFolder;
 
-    private final ClassFileHelper classFileHelper = new ClassFileHelper(tempFolder);
+    private ClassFileHelper classFileHelper;
+
+    @BeforeEach
+    void setup() {
+        classFileHelper = new ClassFileHelper(tempFolder);
+    }
 
     @Test
     void getHashComputesHashOfFile() throws Exception {
