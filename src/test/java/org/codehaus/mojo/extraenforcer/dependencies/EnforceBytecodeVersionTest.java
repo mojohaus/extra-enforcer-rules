@@ -16,25 +16,60 @@
 
 package org.codehaus.mojo.extraenforcer.dependencies;
 
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class EnforceBytecodeVersionTest {
 
-    @Test
-    void renderVersion() {
-        assertEquals("JDK 1.5", EnforceBytecodeVersion.renderVersion(49, 0));
-        assertEquals("JDK 1.7", EnforceBytecodeVersion.renderVersion(51, 0));
-        assertEquals("JDK 11", EnforceBytecodeVersion.renderVersion(55, 0));
-        assertEquals("JDK 12", EnforceBytecodeVersion.renderVersion(56, 0));
-        assertEquals("51.3", EnforceBytecodeVersion.renderVersion(51, 3));
-        assertEquals("44.0", EnforceBytecodeVersion.renderVersion(44, 0));
-        assertEquals("JDK 21", EnforceBytecodeVersion.renderVersion(65, 0));
-        assertEquals("JDK 22", EnforceBytecodeVersion.renderVersion(66, 0));
-        assertEquals("JDK 23", EnforceBytecodeVersion.renderVersion(67, 0));
-        assertEquals("JDK 24", EnforceBytecodeVersion.renderVersion(68, 0));
-        assertEquals("JDK 25", EnforceBytecodeVersion.renderVersion(69, 0));
-        assertEquals("JDK 26", EnforceBytecodeVersion.renderVersion(70, 0));
+    static Stream<Arguments> renderVersion() {
+        return Stream.of(
+                arguments("44.0", 44, 0),
+                arguments("JDK 1.5", 49, 0),
+                arguments("JDK 1.7", 51, 0),
+                arguments("51.3", 51, 3),
+                arguments("JDK 8", 52, 0),
+                arguments("JDK 11", 55, 0),
+                arguments("JDK 12", 56, 0),
+                arguments("JDK 21", 65, 0),
+                arguments("JDK 26", 70, 0),
+                arguments("JDK 57", 101, 0));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void renderVersion(String expected, int major, int minor) {
+        assertEquals(expected, EnforceBytecodeVersion.renderVersion(major, minor));
+    }
+
+    public static Stream<Arguments> decodeMajorVersion() {
+        return Stream.of(
+                arguments("1.1", 45),
+                arguments("1.2", 46),
+                arguments("1.3", 47),
+                arguments("1.4", 48),
+                arguments("1.5", 49),
+                arguments("1.6", 50),
+                arguments("1.7", 51),
+                arguments("1.8", 52),
+                arguments("8", 52),
+                arguments("1.9", 53),
+                arguments("9", 53),
+                arguments("11", 55),
+                arguments("12", 56),
+                arguments("21", 65),
+                arguments("26", 70),
+                arguments("57", 101));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void decodeMajorVersion(String version, int expectedMajor) {
+        assertEquals(expectedMajor, EnforceBytecodeVersion.decodeMajorVersion(version));
     }
 }
