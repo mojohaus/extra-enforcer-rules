@@ -114,33 +114,6 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
         // Java 17
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("17", 61);
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("1.17", 61);
-
-        // Java 18
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("18", 62);
-
-        // Java 19
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("19", 63);
-
-        // Java 20
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("20", 64);
-
-        // Java 21
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("21", 65);
-
-        // Java 22
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("22", 66);
-
-        // Java 23
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("23", 67);
-
-        // Java 24
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("24", 68);
-
-        // Java 25
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("25", 69);
-
-        // Java 26
-        JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("26", 70);
     }
 
     @Inject
@@ -150,6 +123,9 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
 
     static String renderVersion(int major, int minor) {
         if (minor == 0) {
+            if (major > 52) {
+                return "JDK " + (major - 44);
+            }
             for (Map.Entry<String, Integer> entry : JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.entrySet()) {
                 if (major == entry.getValue()) {
                     return "JDK " + entry.getKey();
@@ -157,6 +133,19 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
             }
         }
         return major + "." + minor;
+    }
+
+    static Integer decodeMajorVersion(String version) {
+        Integer major = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get(version);
+        if (major == null) {
+            try {
+                major = Integer.parseInt(version);
+                major = major < 8 ? null : major + 44;
+            } catch (NumberFormatException e) {
+                // ignore, will return null
+            }
+        }
+        return major;
     }
 
     private String message;
@@ -235,7 +224,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
                     "Exactly one of maxJdkVersion or maxJavaMajorVersionNumber options should be set.");
         }
         if (maxJdkVersion != null) {
-            Integer needle = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get(maxJdkVersion);
+            Integer needle = decodeMajorVersion(maxJdkVersion);
             if (needle == null) {
                 throw new IllegalArgumentException(
                         "Unknown JDK version given. Should be something like \"8\", \"11\", \"17\", \"21\" ..");
@@ -321,7 +310,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
                         Matcher matcher = MULTIRELEASE.matcher(entry.getName());
 
                         if (!strict && matcher.matches()) {
-                            Integer maxExpectedMajor = JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get(matcher.group(1));
+                            Integer maxExpectedMajor = decodeMajorVersion(matcher.group(1));
 
                             if (maxExpectedMajor == null) {
                                 getLog().warn("Unknown bytecodeVersion for " + a + " : " + entry.getName() + ": got "
