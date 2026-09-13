@@ -19,13 +19,14 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
+import org.eclipse.aether.util.filter.DependencyFilterUtils;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 
 /**
@@ -44,6 +45,14 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
      * Only verify dependencies with one of these scopes
      */
     private List<String> scopes = Collections.emptyList();
+
+    /**
+     * Optional classpath to resolve: {@code compile}, {@code runtime}, or {@code test}.
+     * Selects direct dependencies before collection and filters the mediated artifacts for that classpath.
+     * The {@link #scopes} and {@link #ignoredScopes} filters only apply to the mediated artifacts to scan.
+     * When absent, all direct dependencies participate in collection and no classpath filter is applied.
+     */
+    private String resolutionScope;
 
     /**
      * Ignore all dependencies which have {@code &lt;optional&gt;true&lt;/optional&gt;}.
@@ -80,14 +89,25 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
 
             final MavenProject currentProject = session.getCurrentProject();
 
-            final List<DependencyFilter> filters = new ArrayList<>(3);
-            Optional.ofNullable(createOptionalFilter()).ifPresent(filters::add);
-            Optional.ofNullable(createScopeDependencyFilter()).ifPresent(filters::add);
+            DependencyFilter optionalFilter = createOptionalFilter();
+            DependencyFilter scopeFilter = createScopeDependencyFilter();
+            DependencyFilter resolutionFilter = createResolutionScopeFilter();
+
+            final List<DependencyFilter> filters = new ArrayList<>(4);
+            Optional.ofNullable(optionalFilter).ifPresent(filters::add);
+            Optional.ofNullable(scopeFilter).ifPresent(filters::add);
+            Optional.ofNullable(resolutionFilter).ifPresent(filters::add);
             filters.add((node, parents) -> searchTransitive || parents.size() <= 1);
             DependencyFilter dependencyFilter = new AndDependencyFilter(filters);
 
+            // MNG-8041: a direct dependency outside the classpath can eclipse a required transitive one
+            // during mediation and then be filtered out, leaving neither artifact in the result.
+            // Filter only the direct dependencies from the effective model; Resolver must manage
+            // and mediate transitive scopes before the artifact filters are applied.
             List<Dependency> dependencies = currentProject.getDependencies().stream()
                     .map(d -> RepositoryUtils.toDependency(d, artifactTypeRegistry))
+                    .filter(d -> resolutionFilter == null
+                            || resolutionFilter.accept(new DefaultDependencyNode(d), Collections.emptyList()))
                     .collect(Collectors.toList());
 
             List<Dependency> managedDependencies = Optional.ofNullable(currentProject.getDependencyManagement())
@@ -102,6 +122,7 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
             collectRequest.setRepositories(currentProject.getRemoteProjectRepositories());
             collectRequest.setDependencies(dependencies);
             collectRequest.setRootArtifact(RepositoryUtils.toArtifact(currentProject.getArtifact()));
+            collectRequest.setRequestContext("project");
 
             DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, dependencyFilter);
 
@@ -109,11 +130,32 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
                     this.repositorySystem.resolveDependencies(session.getRepositorySession(), dependencyRequest);
 
             return dependencyResult.getArtifactResults().stream()
-                    .map(ArtifactResult::getArtifact)
-                    .map(RepositoryUtils::toArtifact)
+                    .map(result -> {
+                        Dependency dependency =
+                                result.getRequest().getDependencyNode().getDependency();
+                        Artifact artifact = RepositoryUtils.toArtifact(result.getArtifact());
+                        artifact.setScope(dependency.getScope());
+                        artifact.setOptional(dependency.isOptional());
+                        return artifact;
+                    })
                     .collect(Collectors.toSet());
         } catch (DependencyResolutionException e) {
             throw new EnforcerRuleError(e.getMessage(), e);
+        }
+    }
+
+    private DependencyFilter createResolutionScopeFilter() throws EnforcerRuleException {
+        if (resolutionScope == null) {
+            return null;
+        }
+        switch (resolutionScope) {
+            case "compile":
+            case "runtime":
+            case "test":
+                return DependencyFilterUtils.classpathFilter(resolutionScope);
+            default:
+                throw new EnforcerRuleException(
+                        "Invalid resolutionScope '" + resolutionScope + "': expected compile, runtime, or test.");
         }
     }
 
