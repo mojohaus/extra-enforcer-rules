@@ -9,6 +9,9 @@ updates:
     ignore:
       # ignore Maven Core updates
       - dependency-name: "org.apache.maven:*"
+      # Mockito 5 requires Java 11; the build still runs on JDK 8
+      - dependency-name: "org.mockito:*"
+        versions: [">= 5.0.0"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
