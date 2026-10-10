@@ -5,7 +5,10 @@ updates:
     exclude-paths:
       - "src/it/**"
     schedule:
-      interval: "daily"
+      interval: "monthly"
+    groups:
+      maven:
+        update-types: ["minor", "patch"]
     ignore:
       # ignore Maven Core updates
       - dependency-name: "org.apache.maven:*"
@@ -15,4 +18,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
+    groups:
+      github-actions:
+        patterns: ["*"]
