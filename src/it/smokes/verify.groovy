@@ -1,24 +1,2 @@
-import java.io.*;
-import org.codehaus.plexus.util.FileUtils;
-import java.util.regex.*;
-
-try
-{
-    File file = new File( basedir, "build.log" );
-    String buf = FileUtils.fileRead( file );
-
-    Pattern p = Pattern.compile( "\\Qorg.codehaus.mojo.extraenforcer.dependencies.BanDuplicateClasses failed with message\\E" );
-    Matcher m = p.matcher( buf.toString() );
-    if ( !m.find() )
-    {
-        System.out.println( "Did not fail because of duplicate classes" );
-        return false;
-    }
-}
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
-
-return true;
+String buf = new File( basedir, "build.log" ).text
+assert buf =~ /\Qorg.codehaus.mojo.extraenforcer.dependencies.BanDuplicateClasses failed with message\E/ : "Did not fail because of duplicate classes"
