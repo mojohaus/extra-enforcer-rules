@@ -58,7 +58,7 @@
 
   <properties>
     <!-- run the ITs in parallel -->
-    <invoker.parallelThreads>0.75C</invoker.parallelThreads>
+    <invoker.parallelThreads>1C</invoker.parallelThreads>
     <!-- override from parent pom, here we need more control -->
     <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
     <!-- we need dot less properties for .vm -->
