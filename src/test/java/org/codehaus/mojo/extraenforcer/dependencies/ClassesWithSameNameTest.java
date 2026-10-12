@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-public class ClassesWithSameNameTest {
+class ClassesWithSameNameTest {
     /** logging thresholds are: DEBUG=0, INFO=1, WARNING=2, ERROR=3, FATAL ERROR=4, DISABLED=5 */
     private static final int LOGGING_THRESHOLD = 5;
 

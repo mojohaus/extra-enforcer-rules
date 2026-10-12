@@ -8,7 +8,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ClassFileTest {
+class ClassFileTest {
     private static final String PATH_TO_CLASS_FILE =
             ClassFileTest.class.getName().replace('.', '/') + ".class";
 
