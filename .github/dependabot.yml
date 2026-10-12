@@ -4,6 +4,8 @@ updates:
     directory: "/"
     exclude-paths:
       - "src/it/**"
+      - "src/it-repo/**"
+      - "src/test/resources/**"
     schedule:
       interval: "monthly"
     groups:
