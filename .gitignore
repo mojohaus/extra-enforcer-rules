@@ -145,3 +145,8 @@ crashlytics.properties
 crashlytics-build.properties
 
 
+
+# mrm mock artifacts: directories named *.jar are the mock jars; mrm writes _*.jar while serving them
+!/src/it-repo/*.jar
+!/src/it-repo/**/*.class
+/src/it-repo/_*.jar

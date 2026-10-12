@@ -40,7 +40,7 @@
       
       <dependencies>
         <dependency>
-          <groupId>commons-lang</groupId>
+          <groupId>localhost</groupId>
           <artifactId>commons-lang</artifactId>
           <version>2.5</version>
         </dependency>
