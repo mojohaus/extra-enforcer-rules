@@ -18,6 +18,8 @@ updates:
       # Mockito 5 requires Java 11; the build still runs on JDK 8
       - dependency-name: "org.mockito:*"
         versions: [">= 5.0.0"]
+      # localhost:* are IT fixtures served by the ITs' mock repository at fixed versions
+      - dependency-name: "localhost:*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
