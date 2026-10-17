@@ -40,6 +40,12 @@ Ban Duplicate Classes
 
     * <<dependencies>> - a list of dependencies for which you want to ignore specific classes.
 
+    * <<resolutionScope>> - optional classpath to resolve: <<<compile>>>,
+      <<<runtime>>>, or <<<test>>>.
+      Selects direct dependencies before collection and filters the mediated artifacts for that classpath.
+      The <<<scopes>>> and <<<ignoredScopes>>> filters only apply to the mediated artifacts to scan.
+      When <<<resolutionScope>>> is omitted, all direct dependencies participate in collection and no classpath filter is applied.
+
     * <<scopes>> - a list of scopes (e.g. test, provided) to include when scanning artifacts
 
     * <<ignoredScopes>> - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
@@ -102,6 +108,33 @@ Ban Duplicate Classes
   [...]
 </project>
 +---+
+
+* Selecting a Classpath
+
+  The <<<resolutionScope>>> selects the direct dependencies used to collect the requested classpath.
+  Maven Resolver applies dependency management and resolves transitive version and scope conflicts within that graph.
+  The <<<scopes>>> and <<<ignoredScopes>>> parameters further select exact dependency scope labels to scan.
+  For example:
+
++---+
+<banDuplicateClasses>
+  <resolutionScope>compile</resolutionScope>
+  <scopes>
+    <scope>compile</scope>
+  </scopes>
+</banDuplicateClasses>
++---+
+
+  Here a direct <<<provided>>> dependency participates in mediation, overriding a transitive declaration of the same artifact.
+  The <<<scopes>>> filter then excludes the provided winner from scanning. The superseded transitive declaration is not scanned.
+
+  For a runtime check, set <<<resolutionScope>>> to <<<runtime>>>. A direct <<<provided>>> or <<<test>>> dependency
+  is excluded before collection, allowing a transitive declaration required by the runtime classpath to be resolved and scanned.
+  A direct <<<test>>> dependency is likewise excluded before collecting a compile classpath.
+  With no scan-scope filters, all artifacts in the chosen classpath are checked.
+  <<<searchTransitive>>> and <<<ignoreOptionals>>> remain available to restrict the check.
+
+* Ignoring Classes per Dependency
 
   You can even ignore classes per dependency if you'd like. For every dependency you can specify either the <<<groupId>>>, <<<artifactId>>>, <<<type>>> or <<<classifier>>>.\
   You can't specify the version, because once Maven has resolved the version of a specific dependency there's only one version available.\

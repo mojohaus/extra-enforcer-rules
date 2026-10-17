@@ -39,6 +39,12 @@ Enforce Bytecode Version
 
   * <<ignoreClasses>> - a list of classes to ignore bytecode version problems. Wildcards can be specified using the * character.
 
+  * <<resolutionScope>> - optional classpath to resolve: <<<compile>>>,
+    <<<runtime>>>, or <<<test>>>.
+    Selects direct dependencies before collection and filters the mediated artifacts for that classpath.
+    The <<<scopes>>> and <<<ignoredScopes>>> filters only apply to the mediated artifacts to scan.
+    When <<<resolutionScope>>> is omitted, all direct dependencies participate in collection and no classpath filter is applied.
+
   * <<scopes>> - a list of scopes (e.g. test, provided) to include when scanning artifacts
 
   * <<ignoredScopes>> - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
