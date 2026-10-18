@@ -23,10 +23,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * LogParser for BanDuplicateClasses Enforcer Rule used for integration test verification by parsing the messages from the BanDuplicateClasses rule.
@@ -49,7 +49,7 @@ public class BanDuplicateClassesLogParser {
      * @throws IOException if the reader for the log file throws one
      */
     public Map<Set<String>, Set<String>> parse() throws IOException {
-        Map<Set<String>, Set<String>> duplicates = new HashMap<>();
+        Map<Set<String>, Set<String>> duplicates = new LinkedHashMap<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(logFile))) {
             String line;
@@ -73,7 +73,7 @@ public class BanDuplicateClassesLogParser {
     }
 
     private static Set<String> readFoundInJars(BufferedReader reader) throws IOException {
-        Set<String> jars = new HashSet<>();
+        Set<String> jars = new TreeSet<>();
         for (String line = reader.readLine();
                 line != null && !"  Duplicate classes:".equals(line);
                 line = reader.readLine()) {
@@ -83,7 +83,7 @@ public class BanDuplicateClassesLogParser {
     }
 
     private static Set<String> readDuplicateClasses(BufferedReader reader) throws IOException {
-        Set<String> classes = new HashSet<>();
+        Set<String> classes = new TreeSet<>();
         for (String line = reader.readLine(); line != null && line.length() > 0; line = reader.readLine()) {
             classes.add(line.trim());
         }
