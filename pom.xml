@@ -59,7 +59,8 @@
   <properties>
     <!-- run the ITs in parallel -->
     <invoker.parallelThreads>1C</invoker.parallelThreads>
-    <!-- override from parent pom, here we need more control -->
+    <!-- enforcer-api version the rules compile against, also used by the ITs and the site;
+         set here so that a mojo-parent update does not move it -->
     <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
     <!-- we need dot less properties for .vm -->
     <enforcerPluginVersion>${maven-enforcer-plugin.version}</enforcerPluginVersion>
