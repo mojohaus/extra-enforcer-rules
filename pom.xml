@@ -61,7 +61,7 @@
     <invoker.parallelThreads>1C</invoker.parallelThreads>
     <!-- enforcer-api version the rules compile against, also used by the ITs and the site;
          set here so that a mojo-parent update does not move it -->
-    <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
+    <maven-enforcer-plugin.version>3.7.0</maven-enforcer-plugin.version>
     <!-- we need dot less properties for .vm -->
     <enforcerPluginVersion>${maven-enforcer-plugin.version}</enforcerPluginVersion>
     <project.build.outputTimestamp>2026-09-11T21:03:36Z</project.build.outputTimestamp>
@@ -113,7 +113,7 @@
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
