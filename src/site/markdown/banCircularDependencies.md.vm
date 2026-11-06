@@ -1,83 +1,22 @@
-~~ Licensed to the Apache Software Foundation (ASF) under one
-~~ or more contributor license agreements.  See the NOTICE file
-~~ distributed with this work for additional information
-~~ regarding copyright ownership.  The ASF licenses this file
-~~ to you under the Apache License, Version 2.0 (the
-~~ "License"); you may not use this file except in compliance
-~~ with the License.  You may obtain a copy of the License at
-~~
-~~ http://www.apache.org/licenses/LICENSE-2.0
-~~
-~~ Unless required by applicable law or agreed to in writing,
-~~ software distributed under the License is distributed on an
-~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-~~ KIND, either express or implied.  See the License for the
-~~ specific language governing permissions and limitations
-~~ under the License.
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-  ------
-  Ban Circular Dependencies
-  ------
-  2012-07-01
-  ------
+http://www.apache.org/licenses/LICENSE-2.0
 
-Ban Circular Dependencies
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
 
-  This rule checks the dependencies and fails if the groupId:artifactId combination exists in the list of direct or transitive dependencies.
+# Ban Circular Dependencies
 
-  The following parameters are supported by this rule:
-
-  * <<scopes>> - a list of scopes (e.g. test, provided) to include when scanning artifacts
-
-  * <<ignoredScopes>> - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
-
-  * <<ignoreOptionals>> - a boolean, if <<<true>>> all dependencies which have <<<<optional>true</optional>>>> are ignored.
-
-  * <<searchTransitive>> - a boolean, specify if transitive dependencies should be searched (default) or only look at direct dependencies.
-
-  []
-
-
-  Sample Plugin Configuration:
-
-+---+
-<project>
-  [...]
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>${enforcerPluginVersion}</version> <!-- find the latest version at http://maven.apache.org/plugins/maven-enforcer-plugin/ -->
-        <executions>
-          <execution>
-            <id>enforce-ban-circular-dependencies</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <banCircularDependencies/>
-              </rules>
-              <fail>true</fail>
-            </configuration>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>${project.artifactId}</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-    </plugins>
-  </build>
-  [...]
-</project>
-+---+
-
-
-* Trademarks
-
-  Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.
+2012-07-01

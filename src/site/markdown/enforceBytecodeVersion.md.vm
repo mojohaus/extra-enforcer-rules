@@ -1,27 +1,23 @@
-~~ Licensed to the Apache Software Foundation (ASF) under one
-~~ or more contributor license agreements.  See the NOTICE file
-~~ distributed with this work for additional information
-~~ regarding copyright ownership.  The ASF licenses this file
-~~ to you under the Apache License, Version 2.0 (the
-~~ "License"); you may not use this file except in compliance
-~~ with the License.  You may obtain a copy of the License at
-~~
-~~ http://www.apache.org/licenses/LICENSE-2.0
-~~
-~~ Unless required by applicable law or agreed to in writing,
-~~ software distributed under the License is distributed on an
-~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-~~ KIND, either express or implied.  See the License for the
-~~ specific language governing permissions and limitations
-~~ under the License.
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-  ------
-  Enforce Bytecode Version
-  ------
-  Baptiste Mathus
-  ------
-  Mars 2013
-  ------
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+# Enforce Bytecode Version
 
 Enforce Bytecode Version
 
@@ -29,25 +25,25 @@ Enforce Bytecode Version
 
   The following parameters are supported by this rule:
 
-  * <<maxJdkVersion>> - the maximum target jdk version (e.g. 8, 11, 17, 21...)
+  * **maxJdkVersion** - the maximum target jdk version (e.g. 8, 11, 17, 21...)
 
-  * <<maxJavaMajorVersionNumber>> - an integer indicating the maximum bytecode major version number (cannot be specified if maxJdkVersion is present)
+  * **maxJavaMajorVersionNumber** - an integer indicating the maximum bytecode major version number (cannot be specified if maxJdkVersion is present)
 
-  * <<maxJavaMinorVersionNumber>> - an integer indicating the maximum bytecode minor version number (cannot be specified if maxJdkVersion is present)
+  * **maxJavaMinorVersionNumber** - an integer indicating the maximum bytecode minor version number (cannot be specified if maxJdkVersion is present)
 
-  * <<includes>>, <<excludes>> - optional lists of artifact patterns to include or exclude ([groupId]:[artifactId]:[type]:[version] with wildcards and optional segments)
+  * **includes**, **excludes** - optional lists of artifact patterns to include or exclude ([groupId]:[artifactId]:[type]:[version] with wildcards and optional segments)
 
-  * <<ignoreClasses>> - a list of classes to ignore bytecode version problems. Wildcards can be specified using the * character.
+  * **ignoreClasses** - a list of classes to ignore bytecode version problems. Wildcards can be specified using the * character.
 
-  * <<scopes>> - a list of scopes (e.g. test, provided) to include when scanning artifacts
+  * **scopes** - a list of scopes (e.g. test, provided) to include when scanning artifacts
 
-  * <<ignoredScopes>> - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
+  * **ignoredScopes** - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
 
-  * <<ignoreOptionals>> - a boolean, if <<<true>>> all dependencies which have <<<<optional>true</optional>>>> are ignored.
+  * **ignoreOptionals** - a boolean, if `true` all dependencies which have <<<<optional>true</optional>>>> are ignored.
 
-  * <<searchTransitive>> - a boolean, specify if transitive dependencies should be searched (default) or only look at direct dependencies.
+  * **searchTransitive** - a boolean, specify if transitive dependencies should be searched (default) or only look at direct dependencies.
 
-  * <<strict>> - a boolean, if <<<true>>> process module-info and Multi-Release JAR classes
+  * **strict** - a boolean, if `true` process module-info and Multi-Release JAR classes
 
   []
 
@@ -96,6 +92,8 @@ Note
 </project>
 +---+
 
-* Trademarks
+
+Trademarks
+----------
 
   Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.

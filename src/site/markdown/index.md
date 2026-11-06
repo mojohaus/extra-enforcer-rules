@@ -1,75 +1,70 @@
-~~ Licensed to the Apache Software Foundation (ASF) under one
-~~ or more contributor license agreements.  See the NOTICE file
-~~ distributed with this work for additional information
-~~ regarding copyright ownership.  The ASF licenses this file
-~~ to you under the Apache License, Version 2.0 (the
-~~ "License"); you may not use this file except in compliance
-~~ with the License.  You may obtain a copy of the License at
-~~
-~~ http://www.apache.org/licenses/LICENSE-2.0
-~~
-~~ Unless required by applicable law or agreed to in writing,
-~~ software distributed under the License is distributed on an
-~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-~~ KIND, either express or implied.  See the License for the
-~~ specific language governing permissions and limitations
-~~ under the License.
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-  ------
-  Extra Enforcer Rules
-  ------
-  Stephen Connolly
-  ------
-  2011-04-01
-  ------
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+# Extra Enforcer Rules
 
 Extra Enforcer Rules
 
-  {{{https://maven.apache.org/plugins/maven-enforcer-plugin/}Apache's Maven Enforcer Plugin}} is used to apply and
-  enforce rules on your Maven projects.
+[Apache's Maven Enforcer Plugin](https://maven.apache.org/plugins/maven-enforcer-plugin/) is used to apply and
+enforce rules on your Maven projects.
 
-  The Enforcer plugin ships with a set of {{{https://maven.apache.org/enforcer/enforcer-rules/index.html}standard rules}}
+The Enforcer plugin ships with a set of [standard rules](https://maven.apache.org/enforcer/enforcer-rules/index.html)
 
-  The Mojo project hosts this project to provide extra rules which are not part of the standard rule set.
+The Mojo project hosts this project to provide extra rules which are not part of the standard rule set.
 
-  These extra rules are available for use with Apache's Maven Enforcer Plugin:
+These extra rules are available for use with Apache's Maven Enforcer Plugin:
 
-  * {{{./banDuplicateClasses.html}banDuplicateClasses}} - verifies that there are no duplicate classes in the dependencies.
+* [banDuplicateClasses](./banDuplicateClasses.html) - verifies that there are no duplicate classes in the dependencies.
 
-  * {{{./requirePropertyDiverges.html}requirePropertyDiverges}} - verifies that a property in a child project diverges from one given in another project.
+* [requirePropertyDiverges](./requirePropertyDiverges.html) - verifies that a property in a child project diverges from one given in another project.
 
-  * {{{./requireDeveloperRoles.html}requireDeveloperRoles}} - verifies that certain roles are represented by at least one developer.
+* [requireDeveloperRoles](./requireDeveloperRoles.html) - verifies that certain roles are represented by at least one developer.
 
-  * {{{./requireContributorRoles.html}requireContributorRoles}} - verifies that certain roles are repesented by at least one contributor.
-  
-  * {{{./enforceBytecodeVersion.html}enforceBytecodeVersion}} - verifies that there are no classes in dependencies having bytecode versions higher than specified.
-  
-  * {{{./banCircularDependencies.html}banCircularDependencies}} - verifies that there are no circular dependencies in the project.
-  
-  * {{{./requireEncoding.html}requireEncoding}} - verifies that source files have a required encoding.
+* [requireContributorRoles](./requireContributorRoles.html) - verifies that certain roles are repesented by at least one contributor.
 
-  * {{{./requireManagedDeps.html}requireManagedDeps}} - verifies that dependencies are managed.
+* [enforceBytecodeVersion](./enforceBytecodeVersion.html) - verifies that there are no classes in dependencies having bytecode versions higher than specified.
 
-  []
-  
-* Usage
+* [banCircularDependencies](./banCircularDependencies.html) - verifies that there are no circular dependencies in the project.
 
-  Instructions on how to use the Extra Enforcer Rules can be found on the {{{./usage.html}usage page}}.
+* [requireEncoding](./requireEncoding.html) - verifies that source files have a required encoding.
 
-  In case you still have questions regarding the plugin's usage, please feel free to contact the
-  {{{./mailing-lists.html}user mailing list}}. The posts to the mailing list are archived and could
-  already contain the answer to your question as part of an older thread. Hence, it is also worth browsing/searching
-  the {{{./mailing-lists.html}mail archive}}.
+* [requireManagedDeps](./requireManagedDeps.html) - verifies that dependencies are managed.
 
-  If you feel like the plugin is missing a feature or has a defect, you can fill a feature request or bug report in our
-  {{{./issue-management.html}issue tracker}}. When creating a new issue, please provide a comprehensive description of your
-  concern. Especially for fixing bugs it is crucial that the developers can reproduce your problem. For this reason,
-  entire debug logs, POMs or most preferably little demo projects attached to the issue are very much appreciated.
-  Of course, patches are welcome, too. Contributors can check out the project from our
-  {{{./scm.html}source repository}} and will find supplementary information in the
-  {{{https://www.mojohaus.org/contribution/submitting-a-patch.html}guide to submitting a patch}}.
+[]
 
+## Usage
 
-* Trademarks
+Instructions on how to use the Extra Enforcer Rules can be found on the [usage page](./usage.html).
 
-  Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.
+In case you still have questions regarding the plugin's usage, please feel free to contact the
+[user mailing list](./mailing-lists.html). The posts to the mailing list are archived and could
+already contain the answer to your question as part of an older thread. Hence, it is also worth browsing/searching
+the [mail archive](./mailing-lists.html).
+
+If you feel like the plugin is missing a feature or has a defect, you can fill a feature request or bug report in our
+[issue tracker](./issue-management.html). When creating a new issue, please provide a comprehensive description of your
+concern. Especially for fixing bugs it is crucial that the developers can reproduce your problem. For this reason,
+entire debug logs, POMs or most preferably little demo projects attached to the issue are very much appreciated.
+Of course, patches are welcome, too. Contributors can check out the project from our
+[source repository](./scm.html) and will find supplementary information in the
+[guide to submitting a patch](https://www.mojohaus.org/contribution/submitting-a-patch.html).
+
+## Trademarks
+
+Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.
