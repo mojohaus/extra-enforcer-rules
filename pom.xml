@@ -262,6 +262,8 @@
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
               <mavenOpts>-Djava.io.tmpdir=${project.build.directory}</mavenOpts>
               <properties>
+                <!-- reuse the prefix file the main build cached instead of fetching it again in every fork -->
+                <aether.remoteRepositoryFilter.prefixes.basedir>${settings.localRepository}/.meta</aether.remoteRepositoryFilter.prefixes.basedir>
                 <maven.compiler.source>${maven.compiler.source}</maven.compiler.source>
                 <maven.compiler.target>${maven.compiler.target}</maven.compiler.target>
               </properties>
