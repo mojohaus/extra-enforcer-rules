@@ -20,3 +20,20 @@ under the License.
 # Require Encoding
 
 2015-07-01
+
+## Parameters
+
+  * **encoding** - the encoding the files must have. Defaults to the `project.build.sourceEncoding` property.
+
+  * **includes** - a comma or pipe separated list of patterns for the files to check, relative to the project directory.
+
+  * **excludes** - a comma or pipe separated list of patterns for the files to skip.
+
+A pattern is an Ant style glob such as `src/**/*.java`. To match with a regular expression instead, write it as `%regex[...]`; commas and pipes inside the brackets belong to the expression and do not separate patterns. A regular expression has to match the whole path relative to the project directory.
+
+```xml
+<requireEncoding>
+  <encoding>UTF-8</encoding>
+  <includes>src/**/*.java,%regex[src/main/resources/.*\.(properties|txt)]</includes>
+</requireEncoding>
+```

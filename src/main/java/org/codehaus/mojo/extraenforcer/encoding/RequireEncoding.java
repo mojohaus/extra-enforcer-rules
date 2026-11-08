@@ -7,8 +7,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.enforcer.rule.api.AbstractEnforcerRule;
@@ -36,12 +38,14 @@ public class RequireEncoding extends AbstractEnforcerRule {
     private String encoding = "";
 
     /**
-     * Comma (or pipe) separated list of globs do include.
+     * Comma (or pipe) separated list of globs do include. A pattern can also be a regular expression, written as
+     * {@code %regex[...]}, in which commas and pipes are part of the expression.
      */
     private String includes = "";
 
     /**
-     * Comma (or pipe) separated list of globs do exclude.
+     * Comma (or pipe) separated list of globs do exclude. A pattern can also be a regular expression, written as
+     * {@code %regex[...]}, in which commas and pipes are part of the expression.
      */
     private String excludes = "";
 
@@ -98,10 +102,10 @@ public class RequireEncoding extends AbstractEnforcerRule {
             DirectoryScanner ds = new DirectoryScanner();
             ds.setBasedir(basedir);
             if (StringUtils.isNotBlank(includes)) {
-                ds.setIncludes(includes.split("[,|]"));
+                ds.setIncludes(splitPatterns(includes));
             }
             if (StringUtils.isNotBlank(excludes)) {
-                ds.setExcludes(excludes.split("[,|]"));
+                ds.setExcludes(splitPatterns(excludes));
             }
             if (useDefaultExcludes) {
                 ds.addDefaultExcludes();
@@ -148,6 +152,41 @@ public class RequireEncoding extends AbstractEnforcerRule {
 
     public void setEncoding(String encoding) {
         this.encoding = encoding;
+    }
+
+    /**
+     * Splits a list of patterns at commas and pipes, except those inside square brackets, so that the alternation and
+     * quantifiers of a {@code %regex[...]} pattern reach the {@link DirectoryScanner} intact. A backslash escapes the
+     * next character. Like {@link String#split(String)}, trailing empty patterns are dropped.
+     */
+    static String[] splitPatterns(String patterns) {
+        List<String> result = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        int depth = 0;
+        for (int i = 0; i < patterns.length(); i++) {
+            char c = patterns.charAt(i);
+            if (c == '\\' && i + 1 < patterns.length()) {
+                current.append(c).append(patterns.charAt(++i));
+                continue;
+            }
+            if (c == '[') {
+                depth++;
+            } else if (c == ']' && depth > 0) {
+                depth--;
+            }
+            if ((c == ',' || c == '|') && depth == 0) {
+                result.add(current.toString());
+                current.setLength(0);
+            } else {
+                current.append(c);
+            }
+        }
+        result.add(current.toString());
+        int size = result.size();
+        while (size > 0 && result.get(size - 1).isEmpty()) {
+            size--;
+        }
+        return result.subList(0, size).toArray(new String[0]);
     }
 
     public String getIncludes() {
