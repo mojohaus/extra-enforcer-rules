@@ -23,6 +23,8 @@ Enforce Bytecode Version
 
   This rule checks the dependencies transitively and fails if any class of any dependency is having its bytecode version higher than the one specified.
 
+  Dependencies packaged as a `.jar` file are checked class by class. A dependency that resolves to a directory, such as `target/classes` of another module in the same reactor build, is checked the same way for the `.class` files below it. Such a directory only holds classes once the module has been compiled, so in a reactor the rule must run after the `compile` phase. When the classes are not there yet, nothing is checked for that dependency.
+
   The following parameters are supported by this rule:
 
   * **maxJdkVersion** - the maximum target jdk version (e.g. 8, 11, 17, 21...)

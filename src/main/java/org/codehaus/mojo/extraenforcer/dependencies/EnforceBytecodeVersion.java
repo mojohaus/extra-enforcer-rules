@@ -26,6 +26,8 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -38,6 +40,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
@@ -49,7 +53,9 @@ import org.apache.maven.shared.artifact.filter.StrictPatternIncludesArtifactFilt
 import org.eclipse.aether.RepositorySystem;
 
 /**
- * Enforcer rule that will check the bytecode version of each class of each dependency.
+ * Enforcer rule that will check the bytecode version of each class of each dependency. A dependency is either a
+ * {@code .jar} file or, for a module of the current reactor, the directory holding its classes, for example
+ * {@code target/classes}. In a reactor the rule must run after the {@code compile} phase to see such classes.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
  * @since 1.0-alpha-4
@@ -269,6 +275,9 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
             // which packaging type is pom.
             return null;
         }
+        if (f.isDirectory()) {
+            return isBadDirectory(a, f);
+        }
         if (!f.getName().endsWith(".jar")) {
             return null;
         }
@@ -276,55 +285,19 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
         try {
             jarFile = new JarFile(f);
             getLog().debug(f.getName() + " => " + f.getPath());
-            byte[] magicAndClassFileVersion = new byte[8];
-            JAR:
             for (Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); ) {
                 JarEntry entry = e.nextElement();
                 if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
-                    for (IgnorableDependency i : ignorableDependencies) {
-                        if (i.matches(entry.getName())) {
-                            continue JAR;
-                        }
+                    if (isIgnored(entry.getName())) {
+                        continue;
                     }
-
+                    byte[] header;
                     try (InputStream is = jarFile.getInputStream(entry)) {
-                        int total = magicAndClassFileVersion.length;
-                        while (total > 0) {
-                            int read =
-                                    is.read(magicAndClassFileVersion, magicAndClassFileVersion.length - total, total);
-                            if (read == -1) {
-                                throw new EOFException(f.toString());
-                            }
-                            total -= read;
-                        }
+                        header = readClassFileHeader(is, f);
                     }
-
-                    int minor = (magicAndClassFileVersion[4] << 8) + magicAndClassFileVersion[5];
-                    int major = (magicAndClassFileVersion[6] << 8) + magicAndClassFileVersion[7];
-
-                    // Assuming regex match is more expensive, verify bytecode versions first
-
-                    if ((major > maxJavaMajorVersionNumber)
-                            || (major == maxJavaMajorVersionNumber && minor > maxJavaMinorVersionNumber)) {
-
-                        Matcher matcher = MULTIRELEASE.matcher(entry.getName());
-
-                        if (!strict && matcher.matches()) {
-                            Integer maxExpectedMajor = decodeMajorVersion(matcher.group(1));
-
-                            if (maxExpectedMajor == null) {
-                                getLog().warn("Unknown bytecodeVersion for " + a + " : " + entry.getName() + ": got "
-                                        + maxExpectedMajor + " class-file-version");
-                            } else if (major > maxExpectedMajor) {
-                                getLog().warn("Invalid bytecodeVersion for " + a + " : " + entry.getName()
-                                        + ": expected lower or equal to " + maxExpectedMajor + ", but was " + major);
-                            }
-                        } else {
-                            return "Restricted to "
-                                    + renderVersion(maxJavaMajorVersionNumber, maxJavaMinorVersionNumber)
-                                    + " yet " + a + " contains " + entry.getName() + " targeted to "
-                                    + renderVersion(major, minor);
-                        }
+                    String problem = checkClassFileVersion(a, entry.getName(), header);
+                    if (problem != null) {
+                        return problem;
                     }
                 }
             }
@@ -334,6 +307,95 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
             throw new EnforcerRuleException("Error while reading " + f, e);
         } finally {
             closeQuietly(jarFile);
+        }
+        return null;
+    }
+
+    /**
+     * Scans the {@code .class} files below a directory artifact, for example {@code target/classes} of a module
+     * of the current reactor.
+     */
+    private String isBadDirectory(Artifact a, File directory) throws EnforcerRuleException {
+        getLog().debug(directory.getName() + " => " + directory.getPath());
+        Path root = directory.toPath();
+        List<Path> classFiles;
+        try (Stream<Path> paths = Files.walk(root)) {
+            classFiles = paths.filter(p -> p.getFileName().toString().endsWith(".class") && Files.isRegularFile(p))
+                    .sorted()
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new EnforcerRuleException("IOException while reading " + directory, e);
+        }
+        for (Path classFile : classFiles) {
+            StringBuilder name = new StringBuilder();
+            for (Path segment : root.relativize(classFile)) {
+                if (name.length() > 0) {
+                    name.append('/');
+                }
+                name.append(segment);
+            }
+            if (isIgnored(name.toString())) {
+                continue;
+            }
+            try (InputStream is = Files.newInputStream(classFile)) {
+                String problem = checkClassFileVersion(a, name.toString(), readClassFileHeader(is, classFile.toFile()));
+                if (problem != null) {
+                    return problem;
+                }
+            } catch (IOException e) {
+                throw new EnforcerRuleException("IOException while reading " + classFile, e);
+            }
+        }
+        return null;
+    }
+
+    private boolean isIgnored(String className) {
+        for (IgnorableDependency i : ignorableDependencies) {
+            if (i.matches(className)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static byte[] readClassFileHeader(InputStream is, File source) throws IOException {
+        byte[] magicAndClassFileVersion = new byte[8];
+        int total = magicAndClassFileVersion.length;
+        while (total > 0) {
+            int read = is.read(magicAndClassFileVersion, magicAndClassFileVersion.length - total, total);
+            if (read == -1) {
+                throw new EOFException(source.toString());
+            }
+            total -= read;
+        }
+        return magicAndClassFileVersion;
+    }
+
+    private String checkClassFileVersion(Artifact a, String entryName, byte[] magicAndClassFileVersion) {
+        int minor = (magicAndClassFileVersion[4] << 8) + magicAndClassFileVersion[5];
+        int major = (magicAndClassFileVersion[6] << 8) + magicAndClassFileVersion[7];
+
+        // Assuming regex match is more expensive, verify bytecode versions first
+
+        if ((major > maxJavaMajorVersionNumber)
+                || (major == maxJavaMajorVersionNumber && minor > maxJavaMinorVersionNumber)) {
+
+            Matcher matcher = MULTIRELEASE.matcher(entryName);
+
+            if (!strict && matcher.matches()) {
+                Integer maxExpectedMajor = decodeMajorVersion(matcher.group(1));
+
+                if (maxExpectedMajor == null) {
+                    getLog().warn("Unknown bytecodeVersion for " + a + " : " + entryName + ": got " + maxExpectedMajor
+                            + " class-file-version");
+                } else if (major > maxExpectedMajor) {
+                    getLog().warn("Invalid bytecodeVersion for " + a + " : " + entryName
+                            + ": expected lower or equal to " + maxExpectedMajor + ", but was " + major);
+                }
+            } else {
+                return "Restricted to " + renderVersion(maxJavaMajorVersionNumber, maxJavaMinorVersionNumber) + " yet "
+                        + a + " contains " + entryName + " targeted to " + renderVersion(major, minor);
+            }
         }
         return null;
     }
@@ -354,6 +416,10 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
 
     public void setMaxJavaMinorVersionNumber(int maxJavaMinorVersionNumber) {
         this.maxJavaMinorVersionNumber = maxJavaMinorVersionNumber;
+    }
+
+    public void setIgnoreClasses(String[] ignoreClasses) {
+        this.ignoreClasses = ignoreClasses;
     }
 
     /**
