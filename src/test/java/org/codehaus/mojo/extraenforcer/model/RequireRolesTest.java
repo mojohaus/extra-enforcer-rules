@@ -97,6 +97,42 @@ class RequireRolesTest {
                 .execute();
     }
 
+    @Test
+    void shouldSucceedWhenEveryRequiredContributorRoleIsPresent() throws Exception {
+        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
+        mavenProject.getContributors().get(0).addRole("quality manager");
+        newRequireContributorRoles("business engineer, quality manager", null).execute();
+    }
+
+    @Test
+    void shouldNameTheMissingContributorRole() throws Exception {
+        addProjectHavingAnArchitectAsDeveloperAndABusinessEngineerAsContributorToHelper();
+        EnforcerRuleException e = assertThrows(
+                EnforcerRuleException.class,
+                () -> newRequireContributorRoles("business engineer, quality manager", null)
+                        .execute());
+        assertEquals("Found no contributor representing role(s) '[quality manager]'", e.getMessage());
+    }
+
+    @Test
+    void shouldSucceedWithoutConfigurationOnAProjectWithoutPeople() throws Exception {
+        mavenProject = new MavenProject();
+        newRequireDeveloperRoles(null, null).execute();
+        newRequireContributorRoles(null, null).execute();
+    }
+
+    @Test
+    void shouldAcceptARequiredRoleThatIsNotListedAsValid() throws Exception {
+        mavenProject = new MavenProject();
+        final Developer lead = new Developer();
+        lead.addRole("lead engineer");
+        mavenProject.addDeveloper(lead);
+        final Developer someone = new Developer();
+        someone.addRole("java developer");
+        mavenProject.addDeveloper(someone);
+        newRequireDeveloperRoles("lead engineer", "java developer").execute();
+    }
+
     /**
      * Test of getRolesFromString method, of class AbstractRequireRoles.
      */
