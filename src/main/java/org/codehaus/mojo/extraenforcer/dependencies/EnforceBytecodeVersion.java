@@ -70,6 +70,12 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
 
     private static final Pattern MULTIRELEASE = Pattern.compile("META-INF/versions/(\\d+)/.*");
 
+    /**
+     * A {@code META-INF/versions/N/} segment below some other directory. A Multi-Release JAR only looks for it at the
+     * root, so such an entry names a package that can never be loaded.
+     */
+    private static final Pattern NESTED_MULTIRELEASE = Pattern.compile(".+/META-INF/versions/\\d+/.*");
+
     static {
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("1.1", 45);
         JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put("1.2", 46);
@@ -392,6 +398,9 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
                     getLog().warn("Invalid bytecodeVersion for " + a + " : " + entryName
                             + ": expected lower or equal to " + maxExpectedMajor + ", but was " + major);
                 }
+            } else if (!strict && NESTED_MULTIRELEASE.matcher(entryName).matches()) {
+                getLog().debug("Skipping " + entryName + " of " + a + ": a nested META-INF/versions entry is never"
+                        + " loaded");
             } else {
                 return "Restricted to " + renderVersion(maxJavaMajorVersionNumber, maxJavaMinorVersionNumber) + " yet "
                         + a + " contains " + entryName + " targeted to " + renderVersion(major, minor);

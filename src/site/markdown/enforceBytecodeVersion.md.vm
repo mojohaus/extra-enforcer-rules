@@ -51,7 +51,7 @@ Enforce Bytecode Version
 
   * **searchTransitive** - a boolean, specify if transitive dependencies should be searched (default) or only look at direct dependencies.
 
-  * **strict** - a boolean, if `true` process module-info and Multi-Release JAR classes
+  * **strict** - a boolean, if `true` process module-info and Multi-Release JAR classes. Otherwise classes below a `META-INF/versions/N/` directory that is not at the root of the JAR, such as `org/example/META-INF/versions/9/`, are skipped, because a JVM can never load them.
 
   []
 

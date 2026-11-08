@@ -101,6 +101,32 @@ class EnforceBytecodeVersionDirectoryTest {
         assertDoesNotThrow(() -> check(new File(tempDir.toFile(), "classes-not-compiled-yet")));
     }
 
+    @Test
+    void nestedMultiReleaseEntryIsSkippedUnlessStrict() throws Exception {
+        File classes = compile("11", "com/example/Newer.java", "package com.example; public class Newer {}");
+        Path nested = classes.toPath().resolve("org/gradle/internal/impldep/META-INF/versions/9/com/example");
+        Files.createDirectories(nested);
+        Files.move(classes.toPath().resolve("com/example/Newer.class"), nested.resolve("Newer.class"));
+        rule.setMaxJavaMajorVersionNumber(52);
+
+        assertDoesNotThrow(() -> check(classes));
+
+        rule.setStrict(true);
+        assertThrows(EnforcerRuleException.class, () -> check(classes));
+    }
+
+    @Test
+    void rootMultiReleaseEntryStillWarnsWhenNewerThanItsVersion() throws Exception {
+        File classes = compile("11", "com/example/Newer.java", "package com.example; public class Newer {}");
+        Path root = classes.toPath().resolve("META-INF/versions/9/com/example");
+        Files.createDirectories(root);
+        Files.move(classes.toPath().resolve("com/example/Newer.class"), root.resolve("Newer.class"));
+        rule.setMaxJavaMajorVersionNumber(52);
+
+        assertDoesNotThrow(() -> check(classes));
+        verify(log).warn(argThat((String m) -> m.contains("Invalid bytecodeVersion")));
+    }
+
     private void check(File fileOrDirectory) throws EnforcerRuleException {
         Artifact artifact = ArtifactBuilder.newBuilder()
                 .withType("jar")
