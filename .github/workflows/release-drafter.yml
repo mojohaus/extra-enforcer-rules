@@ -5,4 +5,5 @@ on:
       - master
 jobs:
   update_release_draft:
+    if: github.repository_owner == 'mojohaus'
     uses: apache/maven-gh-actions-shared/.github/workflows/release-drafter.yml@v5
