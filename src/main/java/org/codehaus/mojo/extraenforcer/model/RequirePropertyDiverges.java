@@ -86,6 +86,7 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
      *
      * @throws EnforcerRuleException the enforcer rule exception
      */
+    @Override
     public void execute() throws EnforcerRuleException {
 
         Object propValue = getPropertyValue();
