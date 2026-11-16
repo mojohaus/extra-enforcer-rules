@@ -59,12 +59,12 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
     /**
      * Specify the required property. Must be given.
      */
-    private String property = null;
+    private String property;
 
     /**
      * Match the property value to a given regular expression. Defaults to value of defining project.
      */
-    private String regex = null;
+    private String regex;
 
     private String reference = "DEFINING";
 

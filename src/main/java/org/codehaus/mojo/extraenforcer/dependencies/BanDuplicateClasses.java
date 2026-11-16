@@ -222,7 +222,7 @@ public class BanDuplicateClasses extends AbstractResolveDependencies {
         }
 
         ClassesWithSameName classesWithSameName = classesSeen.get(pathToClassFile);
-        boolean isFirstTimeSeeingThisClass = (classesWithSameName == null);
+        boolean isFirstTimeSeeingThisClass = classesWithSameName == null;
 
         ClassFile classFile = new ClassFile(pathToClassFile, artifact, inputStreamSupplier);
 

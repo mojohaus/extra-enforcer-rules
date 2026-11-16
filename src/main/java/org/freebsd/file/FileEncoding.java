@@ -318,9 +318,9 @@ public class FileEncoding {
 
         for (i = 2; i + 1 < nbytes; i += 2) {
             if (bigend == 1) {
-                ubuf[(ulen)++] = (char) (unsignedByte(buf[i + 1]) + 256 * buf[i]);
+                ubuf[ulen++] = (char) (unsignedByte(buf[i + 1]) + 256 * buf[i]);
             } else {
-                ubuf[(ulen)++] = (char) (unsignedByte(buf[i]) + 256 * buf[i + 1]);
+                ubuf[ulen++] = (char) (unsignedByte(buf[i]) + 256 * buf[i + 1]);
             }
 
             if (ubuf[ulen - 1] == 0xfffe) {

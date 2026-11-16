@@ -59,7 +59,7 @@ abstract class AbstractResolveDependencies extends AbstractEnforcerRule {
      *
      * @since 1.2
      */
-    private boolean ignoreOptionals = false;
+    private boolean ignoreOptionals;
 
     /**
      * Specify if transitive dependencies should be searched (default) or only look at direct dependencies.
