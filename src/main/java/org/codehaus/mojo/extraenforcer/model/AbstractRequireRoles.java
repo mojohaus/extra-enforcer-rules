@@ -75,7 +75,7 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractEnfor
             throws EnforcerRuleException {
         final Set<String> copyOfRequiredRolesSet = new LinkedHashSet<>(requiredRolesSet);
         copyOfRequiredRolesSet.removeAll(rolesFromProject);
-        if (copyOfRequiredRolesSet.size() > 0) {
+        if (!copyOfRequiredRolesSet.isEmpty()) {
             final String message =
                     String.format("Found no %s representing role(s) '%s'", getRoleName(), copyOfRequiredRolesSet);
             throw new EnforcerRuleException(message);
@@ -91,7 +91,7 @@ abstract class AbstractRequireRoles<T extends Contributor> extends AbstractEnfor
 
             // results in invalid roles
             copyOfRolesFromProject.removeAll(allowedRoles);
-            if (copyOfRolesFromProject.size() > 0) {
+            if (!copyOfRolesFromProject.isEmpty()) {
                 final String message =
                         String.format("Found invalid %s role(s) '%s'", getRoleName(), copyOfRolesFromProject);
                 throw new EnforcerRuleException(message);

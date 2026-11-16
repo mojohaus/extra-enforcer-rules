@@ -198,7 +198,7 @@ class ClassesWithSameNameTest {
     void previousShouldThrowIfOnlyOneArtifact() throws Exception {
         ClassFile classFile = classFileHelper.createWithContent(PATH_TO_CLASS_FILE, "file content of 1 and 2");
         ClassesWithSameName classesWithSameName = new ClassesWithSameName(LOG, classFile);
-        assertThrows(IllegalArgumentException.class, () -> classesWithSameName.previous());
+        assertThrows(IllegalArgumentException.class, classesWithSameName::previous);
     }
 
     @Test

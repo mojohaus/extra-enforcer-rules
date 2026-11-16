@@ -62,12 +62,12 @@ public class RequireEncoding extends AbstractEnforcerRule {
     /**
      * Should the rule accept US-ASCII as an subset of UTF-8 and ISO-8859-1/-15.
      */
-    private boolean acceptAsciiSubset = false;
+    private boolean acceptAsciiSubset;
 
     /**
      * Should the rule accept ISO-8859-1 as a subset of ISO-8859-15.
      */
-    private boolean acceptIso8859Subset = false;
+    private boolean acceptIso8859Subset;
 
     private final MavenProject project;
 
@@ -90,11 +90,11 @@ public class RequireEncoding extends AbstractEnforcerRule {
 
             if (acceptAsciiSubset
                     && (encoding.equals(StandardCharsets.ISO_8859_1.name())
-                            || encoding.equals(ISO_8859_15)
+                            || ISO_8859_15.equals(encoding)
                             || encoding.equals(StandardCharsets.UTF_8.name()))) {
                 acceptedEncodings.add(StandardCharsets.US_ASCII.name());
             }
-            if (acceptIso8859Subset && encoding.equals(ISO_8859_15)) {
+            if (acceptIso8859Subset && ISO_8859_15.equals(encoding)) {
                 acceptedEncodings.add("ISO-8859-1");
             }
 

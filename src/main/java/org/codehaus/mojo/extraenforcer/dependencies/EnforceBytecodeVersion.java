@@ -181,12 +181,14 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
      * @see #maxJavaMajorVersionNumber
      * @see <a href="https://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
      */
-    int maxJavaMinorVersionNumber = 0;
+    int maxJavaMinorVersionNumber;
 
     /**
      * @see AbstractStrictPatternArtifactFilter
      */
-    private List<String> includes, excludes;
+    private List<String> includes;
+
+    private List<String> excludes;
 
     /**
      * List of classes to ignore. Wildcard at the end accepted
@@ -196,7 +198,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
     /**
      * Process module-info and Multi-Release JAR classes if true
      */
-    private boolean strict = false;
+    private boolean strict;
 
     private List<IgnorableDependency> ignorableDependencies = new ArrayList<>();
 

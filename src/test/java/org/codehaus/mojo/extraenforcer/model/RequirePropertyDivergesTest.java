@@ -155,7 +155,7 @@ class RequirePropertyDivergesTest {
         final MavenProject parent = createParentProject();
         project.setParent(parent);
         setUpHelper(project, "parentValue");
-        assertThrows(EnforcerRuleException.class, () -> mockInstance.execute());
+        assertThrows(EnforcerRuleException.class, mockInstance::execute);
     }
 
     /**

@@ -30,7 +30,7 @@ import org.apache.maven.artifact.Artifact;
  * Test utility to make writing tests with {@link ClassFile}s easier.
  */
 public class ClassFileHelper {
-    private static int uniqueId = 0;
+    private static int uniqueId;
 
     private final File temporaryFolder;
 

@@ -62,7 +62,7 @@ public class BanDuplicateClassesLogParser {
                 if (line.startsWith("[INFO] ---")) {
                     break;
                 }
-                if (line.equals("  Found in:")) {
+                if ("  Found in:".equals(line)) {
                     Set<String> jars = readFoundInJars(reader);
                     Set<String> classes = readDuplicateClasses(reader);
                     duplicates.put(jars, classes);
