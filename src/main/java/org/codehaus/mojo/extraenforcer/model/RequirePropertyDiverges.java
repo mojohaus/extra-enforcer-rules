@@ -421,7 +421,7 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
      * @return
      */
     String createResultingErrorMessage(String errorMessage) {
-        if (StringUtils.isNotEmpty(message)) {
+        if (message != null && !message.isEmpty()) {
             return "Property '" + property + "' must be overridden:\n" + message;
         } else {
             return errorMessage;
