@@ -406,7 +406,8 @@ public class RequirePropertyDiverges extends AbstractEnforcerRule {
      */
     ParentReference getParentReference(String parentReferenceName) throws EnforcerRuleException {
         try {
-            return ParentReference.valueOf(StringUtils.upperCase(StringUtils.strip(parentReferenceName)));
+            return ParentReference.valueOf(
+                    StringUtils.upperCase(parentReferenceName == null ? null : parentReferenceName.trim()));
         } catch (IllegalArgumentException iae) {
             throw new EnforcerRuleError("Unknown parent reference value: " + parentReferenceName, iae);
         }
