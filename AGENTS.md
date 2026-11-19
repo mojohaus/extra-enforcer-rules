@@ -26,8 +26,8 @@ what the code and the POMs do not make obvious.
 - The rules compile against Maven 3.9.16 (`mavenVersion`); building the project needs Maven 3.9
   (`minimalMavenBuildVersion`). There is no `<prerequisites>` element, because the artifact is not a
   plugin.
-- `.github/workflows/maven.yml` calls the shared `apache/maven-gh-actions-shared`
-  `maven-verify.yml@v5` workflow. Branches in this repository build under the push event.
+- `.github/workflows/maven.yml` calls the MojoHaus `maven-verify.yml` workflow in `mojohaus/.github`.
+  Branches in this repository build under the push event.
 
 ## Unit tests
 
