@@ -46,7 +46,7 @@ These extra rules are available for use with Apache's Maven Enforcer Plugin:
 
 * [requireManagedDeps](./requireManagedDeps.html) - verifies that dependencies are managed.
 
-[]
+* [earModuleClasspath](./earModuleClasspath.html) - verifies that Class-Path manifest entries in EJBs inside a EAR are valid.
 
 ## Usage
 
