@@ -7,7 +7,7 @@ what the code and the POMs do not make obvious.
 
 - One jar module with Maven Enforcer rules in `org.codehaus.mojo.extraenforcer`: `dependencies`
   (`BanDuplicateClasses`, `BanCircularDependencies`, `EnforceBytecodeVersion`,
-  `EnforceManagedDepsRule`), `encoding` (`RequireEncoding`) and `model` (the `Require*` rules for
+  `EnforceManagedDepsRule`, `EarModuleClasspath`), `encoding` (`RequireEncoding`) and `model` (the `Require*` rules for
   roles, project URL and diverging properties). `sisu-maven-plugin` generates the component index,
   so a new rule needs the Sisu `@Named` annotation like the existing ones.
 - It is not a Maven plugin, so there is no plugin descriptor. The plugin report is disabled in the

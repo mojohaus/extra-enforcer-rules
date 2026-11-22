@@ -45,7 +45,8 @@ These extra rules are available for use with Apache's Maven Enforcer Plugin:
 * [requireProjectUrl](./requireProjectUrl.html) - verifies that the project defines a URL, optionally matching a regular expression.
 
 * [requireManagedDeps](./requireManagedDeps.html) - verifies that dependencies are managed.
-* [earModuleClasspath](./earModuleClasspath.html) - verifies that Class-Path manifest entries in EJBs inside a EAR are valid.
+
+* [earModuleClasspath](./earModuleClasspath.html) - verifies that the Class-Path manifest entries of the modules in an EAR resolve to files in the EAR.
 
 ## Usage
 
