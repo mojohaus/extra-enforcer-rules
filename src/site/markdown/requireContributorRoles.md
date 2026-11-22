@@ -21,25 +21,23 @@ under the License.
 
 Require Contributor Roles
 
-  This rule checks that certain roles in a project are represented by contributors.
+This rule checks that certain roles in a project are represented by contributors.
 
-  Say you want to enforce a policy that in every project there is at least one
-  contributor representing a specific role, e.g. at least one contributor has
-  the role "business engineer".
+Say you want to enforce a policy that in every project there is at least one
+contributor representing a specific role, e.g. at least one contributor has
+the role "business engineer".
 
-  The following parameters are supported by this rule:
+The following parameters are supported by this rule:
 
-   * **requiredRoles** - Comma separated list of roles which must be represented
-   by at least one contributor.
+* **requiredRoles** - Comma separated list of roles which must be represented
+  by at least one contributor.
 
-   * **validRoles** - Comma separated list of roles which are additionally allowed. `requiredRoles` are always valid, so the union of `requiredRoles` and `validRoles` forms the set of all accepted roles.
-   By default it has the value `*`, which means every role is accepted. This rule does **not** support Ant-patterns.
-   
-   []
+* **validRoles** - Comma separated list of roles which are additionally allowed. `requiredRoles` are always valid, so the union of `requiredRoles` and `validRoles` forms the set of all accepted roles.
+  By default it has the value `*`, which means every role is accepted. This rule does **not** support Ant-patterns.
 
-  Sample Plugin Configuration:
+Sample Plugin Configuration:
 
-+---+
+```xml
 <project>
   <groupId>company</groupId>
   <artifactId>company-parent-pom</artifactId>
@@ -50,7 +48,7 @@ Require Contributor Roles
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>${enforcerPluginVersion}</version> <!-- find the latest version at http://maven.apache.org/plugins/maven-enforcer-plugin/ -->
+        <version><!-- latest release --></version> <!-- find the latest version at https://maven.apache.org/plugins/maven-enforcer-plugin/ -->
         <executions>
           <execution>
             <id>enforce-require-roles</id>
@@ -70,9 +68,8 @@ Require Contributor Roles
         </executions>
         <dependencies>
           <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>${project.artifactId}</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>extra-enforcer-rules</artifactId>
           </dependency>
         </dependencies>
       </plugin>
@@ -80,12 +77,9 @@ Require Contributor Roles
   </build>
   [...]
 </project>
-+---+
-
-
-
+```
 
 Trademarks
 ----------
 
-  Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.
+Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.

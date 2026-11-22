@@ -19,15 +19,23 @@ under the License.
 
 # Require Encoding
 
-2015-07-01
+This rule checks that the files below the project directory are encoded in the required encoding. The encoding of a file is detected from its content; a file whose encoding cannot be detected is not reported.
 
 ## Parameters
 
-  * **encoding** - the encoding the files must have. Defaults to the `project.build.sourceEncoding` property.
+* **encoding** - the encoding the files must have. Defaults to the `project.build.sourceEncoding` property.
 
-  * **includes** - a comma or pipe separated list of patterns for the files to check, relative to the project directory.
+* **includes** - a comma or pipe separated list of patterns for the files to check, relative to the project directory.
 
-  * **excludes** - a comma or pipe separated list of patterns for the files to skip.
+* **excludes** - a comma or pipe separated list of patterns for the files to skip.
+
+* **useDefaultExcludes** - a boolean, if `true` (default) the default excludes for SCM files, such as `.git/**`, are applied.
+
+* **failFast** - a boolean, if `true` (default) the rule fails at the first file with a wrong encoding, otherwise it reports all of them.
+
+* **acceptAsciiSubset** - a boolean, if `true` a file that only contains US-ASCII characters is also accepted when the required encoding is UTF-8, ISO-8859-1 or ISO-8859-15. Default `false`.
+
+* **acceptIso8859Subset** - a boolean, if `true` an ISO-8859-1 file is also accepted when the required encoding is ISO-8859-15. Default `false`.
 
 A pattern is an Ant style glob such as `src/**/*.java`. To match with a regular expression instead, write it as `%regex[...]`; commas and pipes inside the brackets belong to the expression and do not separate patterns. A regular expression has to match the whole path relative to the project directory.
 
@@ -37,3 +45,4 @@ A pattern is an Ant style glob such as `src/**/*.java`. To match with a regular 
   <includes>src/**/*.java,%regex[src/main/resources/.*\.(properties|txt)]</includes>
 </requireEncoding>
 ```
+

@@ -19,14 +19,12 @@ under the License.
 
 # Extra Enforcer Rules
 
-Extra Enforcer Rules
-
 [Apache's Maven Enforcer Plugin](https://maven.apache.org/plugins/maven-enforcer-plugin/) is used to apply and
 enforce rules on your Maven projects.
 
 The Enforcer plugin ships with a set of [standard rules](https://maven.apache.org/enforcer/enforcer-rules/index.html)
 
-The Mojo project hosts this project to provide extra rules which are not part of the standard rule set.
+The MojoHaus project hosts this project to provide extra rules which are not part of the standard rule set.
 
 These extra rules are available for use with Apache's Maven Enforcer Plugin:
 
@@ -36,7 +34,7 @@ These extra rules are available for use with Apache's Maven Enforcer Plugin:
 
 * [requireDeveloperRoles](./requireDeveloperRoles.html) - verifies that certain roles are represented by at least one developer.
 
-* [requireContributorRoles](./requireContributorRoles.html) - verifies that certain roles are repesented by at least one contributor.
+* [requireContributorRoles](./requireContributorRoles.html) - verifies that certain roles are represented by at least one contributor.
 
 * [enforceBytecodeVersion](./enforceBytecodeVersion.html) - verifies that there are no classes in dependencies having bytecode versions higher than specified.
 
@@ -44,9 +42,9 @@ These extra rules are available for use with Apache's Maven Enforcer Plugin:
 
 * [requireEncoding](./requireEncoding.html) - verifies that source files have a required encoding.
 
-* [requireManagedDeps](./requireManagedDeps.html) - verifies that dependencies are managed.
+* [requireProjectUrl](./requireProjectUrl.html) - verifies that the project defines a URL, optionally matching a regular expression.
 
-[]
+* [requireManagedDeps](./requireManagedDeps.html) - verifies that dependencies are managed.
 
 ## Usage
 

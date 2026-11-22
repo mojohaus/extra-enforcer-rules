@@ -23,17 +23,17 @@ what the code and the POMs do not make obvious.
   build and checks it when the `CI` environment variable is set. It formats Java with
   palantir-java-format and also reformats Markdown, so run `mvn spotless:apply` after editing the
   README or this file.
-- The rules compile against Maven 3.9.16 (`mavenVersion`); building the project needs Maven 3.9
-  (`minimalMavenBuildVersion`). There is no `<prerequisites>` element, because the artifact is not a
-  plugin.
+- The rules compile against the Maven 3.9.x release in `mavenVersion`; building the project needs
+  the Maven version in `minimalMavenBuildVersion`. There is no `<prerequisites>` element, because
+  the artifact is not a plugin.
 - `.github/workflows/maven.yml` calls the MojoHaus `maven-verify.yml` workflow in `mojohaus/.github`.
   Branches in this repository build under the push event.
 
 ## Unit tests
 
-- JUnit 5 and Mockito. The rules are tested directly, with `ArtifactBuilder` and `ClassFileHelper`
-  in `dependencies` for building artifacts and class files, and the files in `src/test/resources`
-  for the encoding rule.
+- Unit tests use JUnit 5 and Mockito. The rules are tested directly, with `ArtifactBuilder` and
+  `ClassFileHelper` in `dependencies` for building artifacts and class files, and the files in
+  `src/test/resources` for the encoding rule.
 - Prefer a unit test. Add an integration test only for what needs a real Maven build: the rule
   configuration read from a POM, resolved dependencies, or multi-module reactors.
 
@@ -66,6 +66,24 @@ what the code and the POMs do not make obvious.
   Maven and Enforcer versions change by hand through `mavenVersion` and
   `maven-enforcer-plugin.version`; Mockito stays below 5 because it needs Java 11 and the build
   still runs on JDK 8.
+
+## Documentation updates
+
+A change that users or contributors can notice ships with the documentation it affects, in the
+same pull request. A refactor with no visible effect needs none.
+
+- A new rule or parameter, or a changed default: its page in `src/site/markdown` (one
+  `<ruleName>.md` per rule), and the rule list in `src/site/markdown/index.md`. The Javadoc of a
+  rule is not published, so the page is the user guide.
+- A page added, removed or renamed: the menu in `src/site/site.xml`. Never rename a published page;
+  its URL is linked from elsewhere.
+- The site pages are plain Markdown, not Velocity templates. The first plugin declaration
+  on `usage.md` writes the versions as `<version><!-- latest release --></version>`, and the
+  other examples leave the version out, so they never go stale.
+- The Maven or Java requirement, or how to build and release: `README.md`.
+- A new convention, build gate or test fixture: this file.
+
+Check the result with `mvn site` and open `target/site/index.html`.
 
 ## Pull requests
 

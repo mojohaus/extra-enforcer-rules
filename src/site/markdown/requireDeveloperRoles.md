@@ -21,25 +21,23 @@ under the License.
 
 Require Developer Roles
 
-  This rule checks that certain roles in a project are represented by developers.
+This rule checks that certain roles in a project are represented by developers.
 
-  Say you want to enforce a policy that in every project there is at least one
-  developer representing a specific role, e.g. at least one developer has the role
-  "lead engineer".
+Say you want to enforce a policy that in every project there is at least one
+developer representing a specific role, e.g. at least one developer has the role
+"lead engineer".
 
-  The following parameters are supported by this rule:
+The following parameters are supported by this rule:
 
-   * **requiredRoles** - Comma separated list of roles which must be represented
-   by at least one developer.
+* **requiredRoles** - Comma separated list of roles which must be represented
+  by at least one developer.
 
-   * **validRoles** - Comma separated list of roles which are additionally allowed. `requiredRoles` are always valid, so the union of `requiredRoles` and `validRoles` forms the set of all accepted roles.
-   By default it has the value `*`, which means every role is accepted. This rule does **not** support Ant-patterns.
-   
-   []
+* **validRoles** - Comma separated list of roles which are additionally allowed. `requiredRoles` are always valid, so the union of `requiredRoles` and `validRoles` forms the set of all accepted roles.
+  By default it has the value `*`, which means every role is accepted. This rule does **not** support Ant-patterns.
 
-  Sample Plugin Configuration:
+Sample Plugin Configuration:
 
-+---+
+```xml
 <project>
   <groupId>company</groupId>
   <artifactId>company-parent-pom</artifactId>
@@ -50,7 +48,7 @@ Require Developer Roles
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>${enforcerPluginVersion}</version> <!-- find the latest version at http://maven.apache.org/plugins/maven-enforcer-plugin/ -->
+        <version><!-- latest release --></version> <!-- find the latest version at https://maven.apache.org/plugins/maven-enforcer-plugin/ -->
         <executions>
           <execution>
             <id>enforce-require-roles</id>
@@ -70,9 +68,8 @@ Require Developer Roles
         </executions>
         <dependencies>
           <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>${project.artifactId}</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>extra-enforcer-rules</artifactId>
           </dependency>
         </dependencies>
       </plugin>
@@ -80,12 +77,9 @@ Require Developer Roles
   </build>
   [...]
 </project>
-+---+
-
-
-
+```
 
 Trademarks
 ----------
 
-  Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.
+Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.
