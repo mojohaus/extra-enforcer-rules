@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"org.codehaus.mojo.extraenforcer.dependencies"},{"l":"org.codehaus.mojo.extraenforcer.encoding"},{"l":"org.codehaus.mojo.extraenforcer.model"},{"l":"org.freebsd.file"}]
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.codehaus.mojo.extraenforcer.dependencies"},{"l":"org.codehaus.mojo.extraenforcer.encoding"},{"l":"org.codehaus.mojo.extraenforcer.model"},{"l":"org.freebsd.file"}];updateSearchResults();
