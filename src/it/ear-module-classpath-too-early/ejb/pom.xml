@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.codehaus.mojo.extraenforcer.it.ear-module-classpath-no-prefix</groupId>
+        <groupId>org.codehaus.mojo.extraenforcer.it.ear-module-classpath-too-early</groupId>
         <artifactId>parent</artifactId>
         <version>1.0</version>
     </parent>
@@ -24,9 +24,9 @@
                 <configuration>
                     <ejbVersion>3.2</ejbVersion>
                     <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
+                        <manifestEntries>
+                            <Class-Path>lib/log4j-api-2.17.2.jar lib/missing-1.0.jar</Class-Path>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>

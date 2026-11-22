@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.codehaus.mojo.extraenforcer.it.ear-module-classpath-no-prefix</groupId>
+        <groupId>org.codehaus.mojo.extraenforcer.it.ear-module-classpath-dtd-descriptor</groupId>
         <artifactId>parent</artifactId>
         <version>1.0</version>
     </parent>
@@ -11,7 +11,7 @@
     <packaging>ear</packaging>
     <dependencies>
         <dependency>
-            <groupId>org.codehaus.mojo.extraenforcer.it.ear-module-classpath-no-prefix</groupId>
+            <groupId>org.codehaus.mojo.extraenforcer.it.ear-module-classpath-dtd-descriptor</groupId>
             <artifactId>ejb</artifactId>
             <version>1.0</version>
             <type>ejb</type>
@@ -23,7 +23,7 @@
                 <artifactId>maven-ear-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <version>7</version>
+                    <version>1.3</version>
                     <defaultLibBundleDir>lib</defaultLibBundleDir>
                     <outputFileNameMapping>@{artifactId}@-@{version}@@{dashClassifier?}@.@{extension}@</outputFileNameMapping>
                 </configuration>
