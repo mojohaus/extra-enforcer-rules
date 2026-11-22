@@ -1,0 +1,130 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+# Require Property Diverges
+
+Require Property Diverges
+
+This rule checks that a property in a project diverges from one given in an ancestor project.
+
+Say you want to enforce a policy in your company's `company-parent-pom` that all your
+projects' `project.url`s should point to a link in your company's wiki.
+Maven automatically appends the `artifactId` to the inherited `project.url`
+from your `company-parent-pom`, which will probably just be an invalid url. So you
+specify that derived projects have to override the `project.url` property
+and should not match `http://company/wiki/company-parent-pom/.*`
+Or you want to make sure projects do not "reuse" the `project.groupId` of
+the `company-parent-pom`.
+
+The following parameters are supported by this rule:
+
+* **property** - name of the property which should diverge. Must be given.
+
+* **reference** - parent level to use as evaluation context for the reference value:
+
+  * DEFINING - the rule-defining POM. Default historical behaviour.
+
+  * PARENT - the direct parent of the current POM. The rule is skipped if the POM has no parent.
+
+  * BASE - the top-most local POM of the project. The rule is skipped if the current POM is the top-most POM.
+
+* **regex** - match the property value to a given regular expression.
+  When not given, this rule checks that the property in the child does not equal
+  the one from the defining ancestor.
+
+Note that certain properties (e.g. `project.url` or `project.scm.connection`
+are automatically extended with the child's `project.artifactId` (see [Inheritance assembly](https://maven.apache.org/ref/current/maven-model-builder/#inheritance-assembly)), so using
+a regex will help in this case, see sample below.
+
+Another caveat: properties defined in the `properties` section will be
+overwritten with those from inheriting projects so you have to:
+
+* define a `regex` for these as well, see the rule definition for the property
+  `just.a.property.with.dots` in the
+  [**mojo-1853**](https://github.com/mojohaus/extra-enforcer-rules/tree/master/src/it/mojo-1853)
+  integration test when the property name contains a dot.
+
+* use an [alternative syntax](http://codehaus-plexus.github.io//plexus-utils/apidocs/org/codehaus/plexus/util/introspection/ReflectionValueExtractor.html#evaluate)
+  ala `project.properties(justAProperty)` when the property name does not
+  contain a dot.
+
+Sample Plugin Configuration:
+
+```xml
+<project>
+  <groupId>company</groupId>
+  <artifactId>company-parent-pom</artifactId>
+  <version>1.0</version>
+  <url>http://company/wiki/company-parent-pom</url>
+  [...]
+  <properties>
+    <just.a.property.with.dots>just a value</just.a.property.with.dots>
+    <justAPropertyWithoutDots>just another value</justAPropertyWithoutDots>
+  </properties>
+  [...]
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version><!-- latest release --></version> <!-- find the latest version at https://maven.apache.org/plugins/maven-enforcer-plugin/ -->
+        <executions>
+          <execution>
+            <id>enforce-require-property-diverges</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requirePropertyDiverges>
+                  <property>project.url</property>
+                  <regex>http://company/wiki/company-parent-pom/.*</regex>
+                </requirePropertyDiverges>
+                <requirePropertyDiverges>
+                  <property>project.groupId</property><!-- children must have a diverging groupId -->
+                </requirePropertyDiverges>
+                <requirePropertyDiverges>
+                  <property>just.a.property.with.dots</property>
+                  <regex>just a value</regex><!-- need to use a regex here as children's value will override the definition -->
+                </requirePropertyDiverges>
+                <requirePropertyDiverges>
+                  <property>project.properties(justAPropertyWithoutDots)</property>
+                </requirePropertyDiverges>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>extra-enforcer-rules</artifactId>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+  [...]
+</project>
+```
+
+Trademarks
+----------
+
+Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.

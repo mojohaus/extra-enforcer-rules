@@ -21,39 +21,37 @@ under the License.
 
 Ban Duplicate Classes
 
-  This rule checks the dependencies and fails if any class is present in more than one dependency.
+This rule checks the dependencies and fails if any class is present in more than one dependency.
 
-  The following parameters are supported by this rule:
+The following parameters are supported by this rule:
 
-    * **ignoreClasses** - a list of classes to ignore duplicates of. Wildcards can be specified using the * character.
+* **ignoreClasses** - a list of classes to ignore duplicates of. Wildcards can be specified using the * character.
 
-    * **findAllDuplicates** - a boolean to indicate whether the rule should find all duplicates or fail fast at the first duplicate. Defaults to `false`.
+* **findAllDuplicates** - a boolean to indicate whether the rule should find all duplicates or fail fast at the first duplicate. Defaults to `false`.
 
-    * **ignoreWhenIdentical** - when `true` indicates duplicate classes don't fail the build when their bytecode exactly matches each other. Defaults to `false`.
+* **ignoreWhenIdentical** - when `true` indicates duplicate classes don't fail the build when their bytecode exactly matches each other. Defaults to `false`.
 
-    * **message** - an optional message to provide when duplicates are found.
+* **message** - an optional message to provide when duplicates are found.
 
-    * **dependencies** - a list of dependencies for which you want to ignore specific classes.
+* **dependencies** - a list of dependencies for which you want to ignore specific classes.
 
-    * **resolutionScope** - optional classpath to resolve: `compile`,
-      `runtime`, or `test`.
-      Selects direct dependencies before collection and filters the mediated artifacts for that classpath.
-      The `scopes` and `ignoredScopes` filters only apply to the mediated artifacts to scan.
-      When `resolutionScope` is omitted, all direct dependencies participate in collection and no classpath filter is applied.
+* **resolutionScope** - optional classpath to resolve: `compile`,
+  `runtime`, or `test`.
+  Selects direct dependencies before collection and filters the mediated artifacts for that classpath.
+  The `scopes` and `ignoredScopes` filters only apply to the mediated artifacts to scan.
+  When `resolutionScope` is omitted, all direct dependencies participate in collection and no classpath filter is applied.
 
-    * **scopes** - a list of scopes (e.g. test, provided) to include when scanning artifacts
+* **scopes** - a list of scopes (e.g. test, provided) to include when scanning artifacts
 
-    * **ignoredScopes** - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
+* **ignoredScopes** - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
 
-    * **ignoreOptionals** - a boolean, if `true` all dependencies which have <<<<optional>true</optional>>>> are ignored.
+* **ignoreOptionals** - a boolean, if `true` all dependencies which have `<optional>true</optional>` are ignored.
 
-    * **searchTransitive** - a boolean, specify if transitive dependencies should be searched (default) or only look at direct dependencies.
+* **searchTransitive** - a boolean, specify if transitive dependencies should be searched (default) or only look at direct dependencies.
 
-    []
+Sample Plugin Configuration:
 
-  Sample Plugin Configuration:
-
-+---+
+```xml
 <project>
   [...]
   <build>
@@ -61,7 +59,7 @@ Ban Duplicate Classes
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>${enforcerPluginVersion}</version> <!-- find the latest version at http://maven.apache.org/plugins/maven-enforcer-plugin/ -->
+        <version><!-- latest release --></version> <!-- find the latest version at https://maven.apache.org/plugins/maven-enforcer-plugin/ -->
         <executions>
           <execution>
             <id>enforce-ban-duplicate-classes</id>
@@ -92,9 +90,8 @@ Ban Duplicate Classes
         </executions>
         <dependencies>
           <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>${project.artifactId}</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>extra-enforcer-rules</artifactId>
           </dependency>
         </dependencies>
       </plugin>
@@ -102,14 +99,14 @@ Ban Duplicate Classes
   </build>
   [...]
 </project>
-+---+
+```
 
 ## Selecting a Classpath
 
-  The `resolutionScope` selects the direct dependencies used to collect the requested classpath.
-  Maven Resolver applies dependency management and resolves transitive version and scope conflicts within that graph.
-  The `scopes` and `ignoredScopes` parameters further select exact dependency scope labels to scan.
-  For example:
+The `resolutionScope` selects the direct dependencies used to collect the requested classpath.
+Maven Resolver applies dependency management and resolves transitive version and scope conflicts within that graph.
+The `scopes` and `ignoredScopes` parameters further select exact dependency scope labels to scan.
+For example:
 
 ```xml
 <banDuplicateClasses>
@@ -120,24 +117,24 @@ Ban Duplicate Classes
 </banDuplicateClasses>
 ```
 
-  Here a direct `provided` dependency participates in mediation, overriding a transitive declaration of the same artifact.
-  The `scopes` filter then excludes the provided winner from scanning. The superseded transitive declaration is not scanned.
+Here a direct `provided` dependency participates in mediation, overriding a transitive declaration of the same artifact.
+The `scopes` filter then excludes the provided winner from scanning. The superseded transitive declaration is not scanned.
 
-  For a runtime check, set `resolutionScope` to `runtime`. A direct `provided` or `test` dependency
-  is excluded before collection, allowing a transitive declaration required by the runtime classpath to be resolved and scanned.
-  A direct `test` dependency is likewise excluded before collecting a compile classpath.
-  With no scan-scope filters, all artifacts in the chosen classpath are checked.
-  `searchTransitive` and `ignoreOptionals` remain available to restrict the check.
+For a runtime check, set `resolutionScope` to `runtime`. A direct `provided` or `test` dependency
+is excluded before collection, allowing a transitive declaration required by the runtime classpath to be resolved and scanned.
+A direct `test` dependency is likewise excluded before collecting a compile classpath.
+With no scan-scope filters, all artifacts in the chosen classpath are checked.
+`searchTransitive` and `ignoreOptionals` remain available to restrict the check.
 
 ## Ignoring Classes per Dependency
 
-  You can even ignore classes per dependency if you'd like. For every dependency you can specify either the `groupId`, `artifactId`, `type` or `classifier`.\
-  You can't specify the version, because once Maven has resolved the version of a specific dependency there's only one version available.\
-  Note that you can use wildcard-expressions for these values, i.e. a '?' for one character and a '*' for any number of characters. 
+You can even ignore classes per dependency if you'd like. For every dependency you can specify either the `groupId`, `artifactId`, `type` or `classifier`.\
+You can't specify the version, because once Maven has resolved the version of a specific dependency there's only one version available.\
+Note that you can use wildcard-expressions for these values, i.e. a '?' for one character and a '*' for any number of characters.
 
-  The configuration would look like this
+The configuration would look like this
 
-+---+
+```xml
 <configuration>
   <rules>
     <banDuplicateClasses>
@@ -161,20 +158,18 @@ Ban Duplicate Classes
     </banDuplicateClasses>
   </rules>
 </configuration>
-+---+
-
-
+```
 
 Inheriting Configuration from Parent POMs
 -----------------------------------------
 
-  When you want to extend `banDuplicateClasses` configuration from a parent POM in a child POM, you must use Maven's `combine.children="append"` attribute on the collection elements (`ignoreClasses` and `dependencies`) to append to the parent's configuration rather than replacing it.
+When you want to extend `banDuplicateClasses` configuration from a parent POM in a child POM, you must use Maven's `combine.children="append"` attribute on the collection elements (`ignoreClasses` and `dependencies`) to append to the parent's configuration rather than replacing it.
 
-  Without this attribute, Maven will replace the parent's configuration entirely.
+Without this attribute, Maven will replace the parent's configuration entirely.
 
-#[[### Parent POM Example]]#
+### Parent POM Example
 
-+---+
+```xml
 <plugin>
   <artifactId>maven-enforcer-plugin</artifactId>
   <configuration>
@@ -196,11 +191,11 @@ Inheriting Configuration from Parent POMs
     </rules>
   </configuration>
 </plugin>
-+---+
+```
 
-#[[### Child POM Example]]#
+### Child POM Example
 
-+---+
+```xml
 <plugin>
   <artifactId>maven-enforcer-plugin</artifactId>
   <configuration>
@@ -222,15 +217,13 @@ Inheriting Configuration from Parent POMs
     </rules>
   </configuration>
 </plugin>
-+---+
+```
 
-  Note: The `combine.children="append"` attribute must be placed on the collection element in the child POM (not the parent POM).
+Note: The `combine.children="append"` attribute must be placed on the collection element in the child POM (not the parent POM).
 
-  See [Maven POM Reference](https://maven.apache.org/pom.html#Plugins) for more details on configuration combination.
-
-
+See [Maven POM Reference](https://maven.apache.org/pom.html#Plugins) for more details on configuration combination.
 
 Trademarks
 ----------
 
-  Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.
+Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.

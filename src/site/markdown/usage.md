@@ -21,10 +21,10 @@ under the License.
 
 Usage
 
-  To use any of the extra rules you just need to add the extra rules as a dependency of the Apache Maven Enforcer
-  Plugin. This is best achieved by adding the dependency within a `pluginManagement` section
+To use any of the extra rules you just need to add the extra rules as a dependency of the Apache Maven Enforcer
+Plugin. This is best achieved by adding the dependency within a `pluginManagement` section
 
-+---+
+```xml
 <project>
   [...]
   <build>
@@ -33,12 +33,12 @@ Usage
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>${enforcerPluginVersion}</version> <!-- find the latest version at http://maven.apache.org/plugins/maven-enforcer-plugin/ -->
+          <version><!-- latest release --></version> <!-- find the latest version at https://maven.apache.org/plugins/maven-enforcer-plugin/ -->
           <dependencies>
             <dependency>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>${project.artifactId}</artifactId>
-              <version>${project.version}</version>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>extra-enforcer-rules</artifactId>
+              <version><!-- latest release --></version>
             </dependency>
           </dependencies>
         </plugin>
@@ -47,18 +47,12 @@ Usage
   </build>
   [...]
 </project>
-+---+
+```
 
-  Note: If you are using Maven 2.x then, as a result of the classloader design in Maven 2.x, you may need to use
-  the `pluginManagement` technique in the ultimate parent of your reactor build in order to ensure that
-  the rule is available.
-
-  Note: If you want to extend rules in child poms read the article about
-  {{{http://www.sonatype.com/people/2011/01/maven-how-to-merging-plugin-configuration-in-complex-projects/} extending or replacing plugin
-  configurations on this page at Sonatype}}
-
+Note: If you want to extend rules in child poms read the article about
+[extending or replacing plugin configurations on this page at Sonatype](https://www.sonatype.com/people/2011/01/maven-how-to-merging-plugin-configuration-in-complex-projects/).
 
 Trademarks
 ----------
 
-  Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.
+Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.

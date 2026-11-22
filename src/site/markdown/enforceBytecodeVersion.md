@@ -1,0 +1,105 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+# Enforce Bytecode Version
+
+Enforce Bytecode Version
+
+This rule checks the dependencies transitively and fails if any class of any dependency is having its bytecode version higher than the one specified.
+
+Dependencies packaged as a `.jar` file are checked class by class. A dependency that resolves to a directory, such as `target/classes` of another module in the same reactor build, is checked the same way for the `.class` files below it. Such a directory only holds classes once the module has been compiled, so in a reactor the rule must run after the `compile` phase. When the classes are not there yet, nothing is checked for that dependency.
+
+The following parameters are supported by this rule:
+
+* **maxJdkVersion** - the maximum target jdk version (e.g. 8, 11, 17, 21...)
+
+* **maxJavaMajorVersionNumber** - an integer indicating the maximum bytecode major version number (cannot be specified if maxJdkVersion is present)
+
+* **maxJavaMinorVersionNumber** - an integer indicating the maximum bytecode minor version number (cannot be specified if maxJdkVersion is present)
+
+* **includes**, **excludes** - optional lists of artifact patterns to include or exclude ([groupId]:[artifactId]:[type]:[version] with wildcards and optional segments)
+
+* **message** - an optional message to use instead of the default one when a class with a too high bytecode version is found.
+
+* **ignoreClasses** - a list of classes to ignore bytecode version problems. Wildcards can be specified using the * character.
+
+* **resolutionScope** - optional classpath to resolve: `compile`,
+  `runtime`, or `test`.
+  Selects direct dependencies before collection and filters the mediated artifacts for that classpath.
+  The `scopes` and `ignoredScopes` filters only apply to the mediated artifacts to scan.
+  When `resolutionScope` is omitted, all direct dependencies participate in collection and no classpath filter is applied.
+
+* **scopes** - a list of scopes (e.g. test, provided) to include when scanning artifacts
+
+* **ignoredScopes** - a list of scopes (e.g. test, provided) to ignore when scanning artifacts
+
+* **ignoreOptionals** - a boolean, if `true` all dependencies which have `<optional>true</optional>` are ignored.
+
+* **searchTransitive** - a boolean, specify if transitive dependencies should be searched (default) or only look at direct dependencies.
+
+* **strict** - a boolean, if `true` process module-info and Multi-Release JAR classes. Otherwise classes below a `META-INF/versions/N/` directory that is not at the root of the JAR, such as `org/example/META-INF/versions/9/`, are skipped, because a JVM can never load them.
+
+Note
+Sample Plugin Configuration:
+
+```xml
+<project>
+  [...]
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version><!-- latest release --></version> <!-- find the latest version at https://maven.apache.org/plugins/maven-enforcer-plugin/ -->
+        <executions>
+          <execution>
+            <id>enforce-bytecode-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <enforceBytecodeVersion>
+                  <maxJdkVersion>1.7</maxJdkVersion>
+                  <excludes>
+                    <exclude>org.mindrot:jbcrypt</exclude>
+                  </excludes>
+                </enforceBytecodeVersion>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>extra-enforcer-rules</artifactId>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+  [...]
+</project>
+```
+
+Trademarks
+----------
+
+Apache, Apache Maven, Maven and the Apache feather logo are trademarks of The Apache Software Foundation.
