@@ -11,7 +11,7 @@ what the code and the POMs do not make obvious.
   roles, project URL and diverging properties). `sisu-maven-plugin` generates the component index,
   so a new rule needs the Sisu `@Named` annotation like the existing ones.
 - It is not a Maven plugin, so there is no plugin descriptor. The plugin report is disabled in the
-  POM, and the rules are documented in the `apt` pages in `src/site`.
+  POM, and the rules are documented in the Markdown pages in `src/site/markdown`.
 - The enforcer version the rules build and test against is the `maven-enforcer-plugin.version`
   property. The build bans `org.apache.maven.enforcer:enforcer-rules` (MOJO-1949): depend on
   `enforcer-api` only.
