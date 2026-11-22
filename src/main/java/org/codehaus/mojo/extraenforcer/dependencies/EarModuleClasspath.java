@@ -29,15 +29,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.jar.JarFile;
@@ -55,8 +57,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * This rule verifies that the {@code Class-Path} entries in the manifests of the modules of an EAR refer to
- * libraries in the EAR.
+ * This rule verifies that the {@code Class-Path} entries in the manifests of the modules of an EAR, that is its
+ * EJB, application client and web modules, point to files or directories in the EAR. Each entry is resolved
+ * relative to the location of the module in the EAR, as the JAR specification describes.
  *
  * <p>The rule reads the built EAR, so bind it to the {@code package} phase or later.
  *
@@ -64,8 +67,6 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 @Named("earModuleClasspath")
 public class EarModuleClasspath extends AbstractEnforcerRule {
-
-    private static final String DEFAULT_LIB_DIR = "lib";
 
     private final MavenProject project;
 
@@ -97,37 +98,96 @@ public class EarModuleClasspath extends AbstractEnforcerRule {
     }
 
     /**
-     * Returns one message per Class-Path entry that does not point to a library in the EAR.
+     * Returns one message per Class-Path entry that does not point to a file or directory in the EAR.
      */
     List<String> verify(File earFile) throws IOException, EnforcerRuleException {
         List<String> problems = new ArrayList<>();
         try (ZipFile ear = new ZipFile(earFile)) {
-            ApplicationXmlHandler appXml = readApplicationXml(ear);
-            Set<String> sharedLibs = new HashSet<>();
-            Map<String, Set<String>> moduleClasspaths = new LinkedHashMap<>();
-
-            String libFolderName = appXml.getLibDir() + '/';
+            Set<String> names = new HashSet<>();
+            List<String> topLevelArchives = new ArrayList<>();
             Enumeration<? extends ZipEntry> entries = ear.entries();
             while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                String entryName = entry.getName();
-                if (appXml.getEjbModules().contains(entryName)) {
-                    moduleClasspaths.put(entryName, readClassPath(ear, entry));
-                } else if (entryName.startsWith(libFolderName) && entryName.endsWith(".jar")) {
-                    sharedLibs.add(entryName);
+                String name = entries.nextElement().getName();
+                names.add(name);
+                // a directory may exist only implicitly, as the parent of an entry
+                for (int slash = name.indexOf('/'); slash >= 0; slash = name.indexOf('/', slash + 1)) {
+                    names.add(name.substring(0, slash + 1));
+                }
+                if (name.indexOf('/') < 0 && (name.endsWith(".jar") || name.endsWith(".war"))) {
+                    topLevelArchives.add(name);
                 }
             }
 
-            for (Map.Entry<String, Set<String>> module : moduleClasspaths.entrySet()) {
-                for (String clEntry : module.getValue()) {
-                    if (!sharedLibs.contains(clEntry) && !sharedLibs.contains(libFolderName + clEntry)) {
-                        problems.add(module.getKey() + " refers to " + clEntry + " in its Class-Path, but " + clEntry
-                                + " is not in the EAR");
+            Collection<String> modules = readModules(ear, topLevelArchives);
+            for (String module : modules) {
+                ZipEntry moduleEntry = ear.getEntry(module);
+                if (moduleEntry == null || moduleEntry.isDirectory()) {
+                    getLog().debug("Module " + module + " is declared but not in the EAR, skipping it");
+                    continue;
+                }
+                for (String clEntry : readClassPath(ear, moduleEntry)) {
+                    String problem = check(module, clEntry, names);
+                    if (problem != null) {
+                        problems.add(problem);
                     }
                 }
             }
         }
         return problems;
+    }
+
+    /**
+     * Resolves one Class-Path entry against the location of the module in the EAR, as the JAR specification
+     * describes, and returns a message if the target is not in the EAR.
+     */
+    private String check(String module, String clEntry, Set<String> names) {
+        URI uri;
+        try {
+            uri = new URI(clEntry);
+        } catch (URISyntaxException e) {
+            return module + ": the Class-Path entry " + clEntry + " is not a valid relative URL";
+        }
+        if (uri.isAbsolute()
+                || uri.getAuthority() != null
+                || uri.getPath() == null
+                || uri.getPath().startsWith("/")) {
+            getLog().debug("Ignoring " + clEntry + " in the Class-Path of " + module + ": it is not a relative URL");
+            return null;
+        }
+        String target = resolve(module, uri.getPath());
+        if (target == null) {
+            return module + ": the Class-Path entry " + clEntry + " points outside the EAR";
+        }
+        if (!target.isEmpty() && !names.contains(target)) {
+            return module + ": the Class-Path entry " + clEntry + " resolves to " + target
+                    + ", which is not in the EAR";
+        }
+        return null;
+    }
+
+    /**
+     * Returns the path inside the EAR that {@code path} names when read relative to the directory of
+     * {@code module}, or {@code null} if it leaves the EAR. The result of a directory ends with a slash, and the
+     * root of the EAR is the empty string.
+     */
+    static String resolve(String module, String path) {
+        String base = module.substring(0, module.lastIndexOf('/') + 1);
+        Deque<String> segments = new ArrayDeque<>();
+        for (String segment : (base + path).split("/")) {
+            if (segment.isEmpty() || ".".equals(segment)) {
+                continue;
+            }
+            if ("..".equals(segment)) {
+                if (segments.isEmpty()) {
+                    return null;
+                }
+                segments.removeLast();
+            } else {
+                segments.addLast(segment);
+            }
+        }
+        String resolved = String.join("/", segments);
+        return path.endsWith("/") && !resolved.isEmpty() ? resolved + '/' : resolved;
     }
 
     private Set<String> readClassPath(ZipFile ear, ZipEntry module) throws IOException {
@@ -138,7 +198,7 @@ public class EarModuleClasspath extends AbstractEnforcerRule {
                 if (JarFile.MANIFEST_NAME.equalsIgnoreCase(entry.getName())) {
                     String value = new Manifest(zip).getMainAttributes().getValue("Class-Path");
                     if (value != null && !value.trim().isEmpty()) {
-                        classPath.addAll(java.util.Arrays.asList(value.trim().split("\\s+")));
+                        classPath.addAll(Arrays.asList(value.trim().split("\\s+")));
                     }
                     break;
                 }
@@ -147,12 +207,18 @@ public class EarModuleClasspath extends AbstractEnforcerRule {
         return classPath;
     }
 
-    private ApplicationXmlHandler readApplicationXml(ZipFile ear) throws IOException, EnforcerRuleException {
+    /**
+     * Returns the EJB, application client and web modules of the EAR. Without an {@code application.xml} the
+     * archives at the top level of the EAR are the modules.
+     */
+    private Collection<String> readModules(ZipFile ear, List<String> topLevelArchives)
+            throws IOException, EnforcerRuleException {
         ZipEntry applicationXml = ear.getEntry("META-INF/application.xml");
-        ApplicationXmlHandler handler = new ApplicationXmlHandler();
         if (applicationXml == null) {
-            return handler;
+            getLog().debug("The EAR has no META-INF/application.xml, checking its top-level archives");
+            return topLevelArchives;
         }
+        ApplicationXmlHandler handler = new ApplicationXmlHandler();
         try (InputStream in = ear.getInputStream(applicationXml)) {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setNamespaceAware(true);
@@ -163,7 +229,7 @@ public class EarModuleClasspath extends AbstractEnforcerRule {
             SAXParser parser = factory.newSAXParser();
             parser.getXMLReader().setEntityResolver((publicId, systemId) -> new InputSource(new StringReader("")));
             parser.parse(in, handler);
-            return handler;
+            return handler.getModules();
         } catch (ParserConfigurationException | SAXException e) {
             throw new EnforcerRuleException("Cannot parse META-INF/application.xml: " + e.getMessage(), e);
         }
@@ -175,10 +241,9 @@ public class EarModuleClasspath extends AbstractEnforcerRule {
     }
 
     private static final class ApplicationXmlHandler extends DefaultHandler {
-        private final Set<String> ejbModules = new LinkedHashSet<>();
+        private final Set<String> modules = new LinkedHashSet<>();
         private final Deque<String> elements = new ArrayDeque<>();
         private final StringBuilder text = new StringBuilder();
-        private String libDir = DEFAULT_LIB_DIR;
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) {
@@ -196,20 +261,15 @@ public class EarModuleClasspath extends AbstractEnforcerRule {
             elements.pop();
             String parent = elements.peek();
             String value = text.toString().trim();
-            if ("ejb".equals(localName) && "module".equals(parent)) {
-                ejbModules.add(value);
-            } else if ("library-directory".equals(localName)) {
-                libDir = value;
+            boolean module = ("ejb".equals(localName) || "java".equals(localName)) && "module".equals(parent);
+            if ((module || "web-uri".equals(localName) && "web".equals(parent)) && !value.isEmpty()) {
+                modules.add(value.startsWith("/") ? value.substring(1) : value);
             }
             text.setLength(0);
         }
 
-        Set<String> getEjbModules() {
-            return ejbModules;
-        }
-
-        String getLibDir() {
-            return libDir;
+        Set<String> getModules() {
+            return modules;
         }
     }
 }
