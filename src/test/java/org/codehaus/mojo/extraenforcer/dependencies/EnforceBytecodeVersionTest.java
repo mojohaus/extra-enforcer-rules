@@ -16,13 +16,17 @@
 
 package org.codehaus.mojo.extraenforcer.dependencies;
 
+import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class EnforceBytecodeVersionTest {
@@ -71,5 +75,30 @@ class EnforceBytecodeVersionTest {
     @MethodSource
     void decodeMajorVersion(String version, int expectedMajor) {
         assertEquals(expectedMajor, EnforceBytecodeVersion.decodeMajorVersion(version));
+    }
+
+    @Test
+    void failsWithoutAnyVersionOption() {
+        EnforceBytecodeVersion rule = new EnforceBytecodeVersion(null, null);
+
+        IllegalArgumentException e =
+                assertThrows(IllegalArgumentException.class, () -> rule.handleArtifacts(Collections.emptySet()));
+        assertEquals(
+                "Exactly one of maxJdkVersion or maxJavaMajorVersionNumber options should be set.", e.getMessage());
+    }
+
+    @Test
+    void failsWhenBothVersionOptionsAreSet() throws Exception {
+        EnforceBytecodeVersion rule = new EnforceBytecodeVersion(null, null);
+        Field maxJdkVersion = EnforceBytecodeVersion.class.getDeclaredField("maxJdkVersion");
+        maxJdkVersion.setAccessible(true);
+        maxJdkVersion.set(rule, "1.2");
+        rule.setMaxJavaMajorVersionNumber(46);
+
+        IllegalArgumentException e =
+                assertThrows(IllegalArgumentException.class, () -> rule.handleArtifacts(Collections.emptySet()));
+        assertEquals(
+                "Only maxJdkVersion or maxJavaMajorVersionNumber configuration parameters should be set. Not both.",
+                e.getMessage());
     }
 }
