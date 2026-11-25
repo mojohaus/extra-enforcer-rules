@@ -16,6 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- File log = new File(basedir, 'build.log')
- assert log.exists()
- assert log.getText().contains('DEBUG] Skipping org.slf4j:jcl-over-slf4j:jar:1.7.2 (test) due to scope')
+File log = new File(basedir, 'build.log')
+assert log.exists()
+assert log.getText().contains('DEBUG] Skipping org.slf4j:jcl-over-slf4j:jar:1.7.2 (test) due to scope')

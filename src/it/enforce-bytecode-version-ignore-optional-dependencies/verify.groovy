@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- File log = new File(basedir, 'build.log')
- assert log.exists()
+File log = new File(basedir, 'build.log')
+assert log.exists()
 
 assert log.getText().contains('[DEBUG] Skipping junit:junit:jar:4.13.2 (test) due to scope')
 assert log.getText().contains('[DEBUG] Skipping javax.transaction:jta:jar:1.1 (compile?) due to skip optional')
