@@ -4,7 +4,9 @@ assert builds.size() == 4 : 'Expected three managed-scope invocations'
 String text = builds[0]
 
 // Invoker checks each invocation's exit status; also check the reasons for failure.
-int duplicateFailures = text.readLines().count { it == '[ERROR] Duplicate classes found:' }
+int duplicateFailures = text.readLines().count {
+    it == '[ERROR] Duplicate classes found:'
+}
 assert duplicateFailures == 5 : 'Expected duplicates after classpath selection and transitive mediation'
 assert text.contains('[ERROR]     test.resolution-scope:api:jar:1.0-SNAPSHOT:compile') : 'Missing runtime API after direct-scope filtering'
 assert text.contains('test.resolution-scope:api:jar:1.0-SNAPSHOT:provided') : 'Unexpected scope-resolution log output'
