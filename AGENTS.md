@@ -49,6 +49,9 @@ what the code and the POMs do not make obvious.
   ```shell
   mvn -B -P run-its verify -Dinvoker.test=require-encoding-utf8,require-project-url-present
   ```
+- The ITs with the `enforceBytecodeVersion` rule run maven-enforcer-plugin
+  `enforcerPluginVersionForBytecodeVersion` (3.6.2), not `maven-enforcer-plugin.version`: since 3.6.3 the plugin
+  has its own rule with the same name, and which one Maven picks depends on the component order.
 - They run in parallel, one per CPU core (`invoker.parallelThreads` 1C), so a test must not depend
   on another test's output.
 - The forked builds get `JAVA_TOOL_OPTIONS=-XX:TieredStopAtLevel=1 -XX:+UseSerialGC`, so every JVM

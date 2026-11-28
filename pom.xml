@@ -65,6 +65,10 @@
     <maven-enforcer-plugin.version>3.7.0</maven-enforcer-plugin.version>
     <!-- we need dot less properties for .vm -->
     <enforcerPluginVersion>${maven-enforcer-plugin.version}</enforcerPluginVersion>
+    <!-- maven-enforcer-plugin for the enforceBytecodeVersion ITs: since 3.6.3 the plugin has its own
+         enforceBytecodeVersion rule with the same name, and which of the two rules Maven picks depends on
+         the component order (apache/maven#14162), so keep the last release without it -->
+    <enforcerPluginVersionForBytecodeVersion>3.6.2</enforcerPluginVersionForBytecodeVersion>
     <project.build.outputTimestamp>2026-11-22T23:42:37Z</project.build.outputTimestamp>
     <mavenVersion>3.9.16</mavenVersion>
     <resolverVersion>1.9.27</resolverVersion>
@@ -269,6 +273,7 @@
               </properties>
               <filterProperties>
                 <enforcerPluginVersion>${maven-enforcer-plugin.version}</enforcerPluginVersion>
+                <enforcerPluginVersionForBytecodeVersion>${enforcerPluginVersionForBytecodeVersion}</enforcerPluginVersionForBytecodeVersion>
               </filterProperties>
               <goals>
                 <goal>enforcer:enforce</goal>

@@ -59,7 +59,11 @@ import org.eclipse.aether.RepositorySystem;
  *
  * @see <a href="http://en.wikipedia.org/wiki/Java_class_file#General_layout">Java class file general layout</a>
  * @since 1.0-alpha-4
+ * @deprecated the rule is part of the Maven Enforcer Plugin since 3.6.3, with fixes in 3.7.0; use
+ *     <a href="https://maven.apache.org/enforcer/enforcer-rules/enforceBytecodeVersion.html">enforceBytecodeVersion</a>
+ *     from the Maven Enforcer Plugin instead
  */
+@Deprecated
 @Named("enforceBytecodeVersion")
 public class EnforceBytecodeVersion extends AbstractResolveDependencies {
     private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new LinkedHashMap<>();
@@ -67,6 +71,11 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
      * Default ignores when validating against jdk < 9 because <code>module-info.class</code> will always have level 1.9.
      */
     private static final String[] DEFAULT_CLASSES_IGNORE_BEFORE_JDK_9 = {"module-info"};
+
+    static final String DEPRECATION_WARNING = "The enforceBytecodeVersion rule of extra-enforcer-rules is deprecated"
+            + " and will be removed in a future release. Use the enforceBytecodeVersion rule of"
+            + " maven-enforcer-plugin 3.7.0 or later instead:"
+            + " https://maven.apache.org/enforcer/enforcer-rules/enforceBytecodeVersion.html";
 
     private static final Pattern MULTIRELEASE = Pattern.compile("META-INF/versions/(\\d+)/.*");
 
@@ -204,6 +213,7 @@ public class EnforceBytecodeVersion extends AbstractResolveDependencies {
 
     @Override
     protected void handleArtifacts(Set<Artifact> artifacts) throws EnforcerRuleException {
+        getLog().warn(DEPRECATION_WARNING);
         computeParameters();
 
         // look for banned dependencies

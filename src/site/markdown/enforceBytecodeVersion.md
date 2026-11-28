@@ -19,7 +19,12 @@ under the License.
 
 # Enforce Bytecode Version
 
-Enforce Bytecode Version
+**Deprecated:** the Maven Enforcer Plugin ships its own
+[enforceBytecodeVersion](https://maven.apache.org/enforcer/enforcer-rules/enforceBytecodeVersion.html) rule since
+version 3.6.3, with fixes in 3.7.0. Use that rule instead: with maven-enforcer-plugin 3.7.0 or later, remove the
+`extra-enforcer-rules` dependency if it is only declared for this rule. The built-in rule has no `resolutionScope`
+parameter; use `scopes` or `ignoredScopes` to select the dependencies to check instead. This rule logs a warning on
+every run and will be removed in a future release.
 
 This rule checks the dependencies transitively and fails if any class of any dependency is having its bytecode version higher than the one specified.
 
