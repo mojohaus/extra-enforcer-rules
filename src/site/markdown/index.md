@@ -37,6 +37,7 @@ These extra rules are available for use with Apache's Maven Enforcer Plugin:
 * [requireContributorRoles](./requireContributorRoles.html) - verifies that certain roles are represented by at least one contributor.
 
 * [enforceBytecodeVersion](./enforceBytecodeVersion.html) - verifies that there are no classes in dependencies having bytecode versions higher than specified.
+  **Deprecated**, use the [rule of the Maven Enforcer Plugin](https://maven.apache.org/enforcer/enforcer-rules/enforceBytecodeVersion.html) instead.
 
 * [banCircularDependencies](./banCircularDependencies.html) - verifies that there are no circular dependencies in the project.
 

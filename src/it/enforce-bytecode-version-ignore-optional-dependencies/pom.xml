@@ -10,7 +10,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>@enforcerPluginVersion@</version>
+                <version>@enforcerPluginVersionForBytecodeVersion@</version>
                 <dependencies>
                     <dependency>
                         <groupId>@project.groupId@</groupId>

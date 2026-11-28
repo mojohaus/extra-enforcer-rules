@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.stream.Stream;
 
+import org.apache.maven.enforcer.rule.api.EnforcerLogger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -28,6 +29,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class EnforceBytecodeVersionTest {
 
@@ -80,6 +83,7 @@ class EnforceBytecodeVersionTest {
     @Test
     void failsWithoutAnyVersionOption() {
         EnforceBytecodeVersion rule = new EnforceBytecodeVersion(null, null);
+        rule.setLog(mock(EnforcerLogger.class));
 
         IllegalArgumentException e =
                 assertThrows(IllegalArgumentException.class, () -> rule.handleArtifacts(Collections.emptySet()));
@@ -90,6 +94,7 @@ class EnforceBytecodeVersionTest {
     @Test
     void failsWhenBothVersionOptionsAreSet() throws Exception {
         EnforceBytecodeVersion rule = new EnforceBytecodeVersion(null, null);
+        rule.setLog(mock(EnforcerLogger.class));
         Field maxJdkVersion = EnforceBytecodeVersion.class.getDeclaredField("maxJdkVersion");
         maxJdkVersion.setAccessible(true);
         maxJdkVersion.set(rule, "1.2");
@@ -100,5 +105,17 @@ class EnforceBytecodeVersionTest {
         assertEquals(
                 "Only maxJdkVersion or maxJavaMajorVersionNumber configuration parameters should be set. Not both.",
                 e.getMessage());
+    }
+
+    @Test
+    void warnsThatTheRuleIsDeprecated() throws Exception {
+        EnforceBytecodeVersion rule = new EnforceBytecodeVersion(null, null);
+        EnforcerLogger log = mock(EnforcerLogger.class);
+        rule.setLog(log);
+        rule.setMaxJavaMajorVersionNumber(52);
+
+        rule.handleArtifacts(Collections.emptySet());
+
+        verify(log).warn(EnforceBytecodeVersion.DEPRECATION_WARNING);
     }
 }
